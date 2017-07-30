@@ -1,0 +1,7 @@
+-f karate.pairs
+-u 3
+-s 1
+-b 0
+-e 1
+-p 0
+-v 1
