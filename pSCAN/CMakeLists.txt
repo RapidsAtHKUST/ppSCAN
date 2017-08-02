@@ -11,3 +11,4 @@ add_executable(pSCAN ${SOURCE_FILES})
 
 add_executable(play play/graph_io.cpp Utility.cpp)
 target_compile_definitions(play PRIVATE _DEBUG_=1 FOO=1)
+target_compile_options(play PRIVATE -O3)
