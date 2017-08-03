@@ -1,0 +1,30 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/*   Description: Implementation of scalable parallel DBSCAN algorithm       */
+/*				using the disjoint set data structure        */
+/*                                                                           */
+/*   Author:  Md. Mostofa Ali Patwary                                        */
+/*            EECS Department, Northwestern University                       */
+/*            email: mpatwary@eecs.northwestern.edu                          */
+/*                                                                           */
+/*   Copyright, 2012, Northwestern University                                */
+/*   See COPYRIGHT notice in top-level directory.                            */
+/*                                                                           */
+/*   Please cite the following publication if you use this package 	     */
+/* 									     */
+/*   Md. Mostofa Ali Patwary, Diana Palsetia, Ankit Agrawal, Wei-keng Liao,  */
+/*   Fredrik Manne, and Alok Choudhary, "A New Scalable Parallel DBSCAN      */
+/*   Algorithm Using the Disjoint Set Data Structure", Proceedings of the    */
+/*   International Conference on High Performance Computing, Networking,     */
+/*   Storage and Analysis (Supercomputing, SC'12), pp.62:1-62:11, 2012.	     */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+Two versions of source code:
+
+1. parallel_multicore (for shared memory computers): 
+An OpenMP implementation of DBSCAN clustering algorithm using the disjoint set data structure.
+
+2. parallel_mpi (for distributed memory computers):
+An MPI implementation DBSCAN clustering algorithm using the disjoint set data structure.
+
+More details on how to use the code are available in the corresponding folder.
+
