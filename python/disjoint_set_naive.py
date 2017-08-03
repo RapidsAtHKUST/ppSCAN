@@ -11,12 +11,14 @@ class LinkedListNode:
         self.last_.next_ = another_list_head
 
         # update first pointer
-        while cur_node_ref.next_ is not None:
+        while cur_node_ref is not None:
             cur_node_ref.first_ = self
-            cur_node_ref = cur_node_ref.next_
 
-        # update last pointer
-        self.last_ = cur_node_ref
+            # update last pointer
+            if cur_node_ref.next_ is None:
+                self.last_ = cur_node_ref
+
+            cur_node_ref = cur_node_ref.next_
 
 
 class LinkedList:
@@ -36,6 +38,7 @@ class LinkedList:
             else:
                 return another_list, self
 
+        # weighted union heuristic
         large_list, small_list = get_sorted_pair()
         large_list.node_size += small_list.node_size
         large_list.head_node.append(small_list.head_node)
@@ -43,10 +46,19 @@ class LinkedList:
 
     def is_in_set(self, x):
         iter_node = self.head_node
-        while iter_node.next_ is not None:
+        while iter_node is not None:
             if iter_node.value_ == x:
                 return True
+            iter_node = iter_node.next_
         return False
+
+    def __str__(self):
+        val_list = []
+        iter_node = self.head_node
+        while iter_node is not None:
+            val_list.append(iter_node.value_)
+            iter_node = iter_node.next_
+        return str(sorted(val_list))
 
 
 class NaiveDisjointSet:
@@ -76,3 +88,31 @@ class NaiveDisjointSet:
                 return element
         # not found in any
         return None
+
+    def __str__(self):
+        str_list = map(str, self.set_list)
+        return str(str_list)
+
+
+def connected_component(vertex_collection, edge_list):
+    naive_disjoint_set = NaiveDisjointSet()
+    for vertex in vertex_collection:
+        naive_disjoint_set.make_set(vertex)
+    for src, dst in edge_list:
+        if naive_disjoint_set.find_set(src) != naive_disjoint_set.find_set(dst):
+            naive_disjoint_set.union(src, dst)
+    return naive_disjoint_set
+
+
+if __name__ == '__main__':
+    edge_list = [(1, 2), (2, 3), (4, 5), (4, 7), (5, 7)]
+    vertex_set = set()
+    for src, dst in edge_list:
+        vertex_set.add(src)
+        vertex_set.add(dst)
+    vertex_set.add(9)
+
+    # find connected component
+    print 'vertices:', vertex_set
+    print 'edges:', edge_list
+    print connected_component(vertex_set, edge_list)
