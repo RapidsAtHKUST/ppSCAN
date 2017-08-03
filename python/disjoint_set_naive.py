@@ -8,8 +8,8 @@ class LinkedListNode:
 class LinkedList:
     def __init__(self, x):
         self.head_node_ = LinkedListNode(x, self)
-        self.tail_node = self.head_node_
-        self.node_size = 1
+        self.tail_node_ = self.head_node_
+        self.node_size_ = 1
 
     # heuristic: weighted union, i.e, choose biggest as the head
     @staticmethod
@@ -20,7 +20,7 @@ class LinkedList:
         """
 
         def get_sorted_pair():
-            if left_list.node_size > right_list.node_size:
+            if left_list.node_size_ > right_list.node_size_:
                 return left_list, right_list
             else:
                 return right_list, left_list
@@ -28,7 +28,7 @@ class LinkedList:
         def concat_two_lists():
             # update next pointer
             cur_node_ref = small_list.head_node_
-            large_list.tail_node.next_ = small_list.head_node_
+            large_list.tail_node_.next_ = small_list.head_node_
 
             while cur_node_ref is not None:
                 # update first pointer
@@ -37,10 +37,10 @@ class LinkedList:
                 cur_node_ref = cur_node_ref.next_
 
             # update last pointer
-            large_list.tail_node = small_list.tail_node
+            large_list.tail_node_ = small_list.tail_node_
 
         large_list, small_list = get_sorted_pair()
-        large_list.node_size += small_list.node_size
+        large_list.node_size_ += small_list.node_size_
         concat_two_lists()
         return large_list
 
@@ -60,32 +60,32 @@ class LinkedList:
 # self.node_dict: keep the mapping from ele to node
 class NaiveDisjointSet:
     def __init__(self):
-        self.set_list = []
-        self.node_dict = {}
+        self.set_list_ = set()
+        self.node_dict_ = {}
 
     def make_set(self, x):
         new_list = LinkedList(x)
-        self.set_list.append(new_list)
-        self.node_dict[x] = new_list.head_node_
+        self.set_list_.add(new_list)
+        self.node_dict_[x] = new_list.head_node_
 
     def union(self, x, y):
-        x_list = self.node_dict[x].list_head_
-        y_list = self.node_dict[y].list_head_
+        x_list = self.node_dict_[x].list_head_
+        y_list = self.node_dict_[y].list_head_
         union_list = LinkedList.link(x_list, y_list)
         if union_list is not x_list:
-            self.set_list.remove(x_list)
+            self.set_list_.remove(x_list)
 
         else:
-            self.set_list.remove(y_list)
+            self.set_list_.remove(y_list)
 
     def find_set(self, x):
         """
         :rtype: LinkedList
         """
-        return self.node_dict[x].list_head_ if x in self.node_dict else None
+        return self.node_dict_[x].list_head_ if x in self.node_dict_ else None
 
     def __str__(self):
-        str_list = map(lambda ele: ele.to_sorted_list(), self.set_list)
+        str_list = map(lambda ele: ele.to_sorted_list(), self.set_list_)
         return str(str_list)
 
 
