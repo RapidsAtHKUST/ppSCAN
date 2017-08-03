@@ -1,5 +1,9 @@
-#include "Utility.h"
 #include "Graph.h"
+
+#include <chrono>
+
+#include "Utility.h"
+
 
 Graph::Graph(const char *_dir) {
     dir = string(_dir);
@@ -72,22 +76,14 @@ void Graph::read_graph() {
     int tt;
     fread(&tt, sizeof(int), 1, f);
     if (tt != (int) sizeof(int)) {
-        printf("sizeof int is different: edge.bin(%d), machine(%d)\n", tt, (int) sizeof(int));
+        cout << "sizeof int is different: edge.bin(" << tt << "), machine(" << (int) sizeof(int) << "\n";
         return;
     }
     fread(&n, sizeof(int), 1, f);
     fread(&m, sizeof(int), 1, f);
 
-    // printf("\tn = %u; m = %u\n", n, m/2);
-
     degree = new int[n];
     fread(degree, sizeof(int), n, f);
-
-#ifdef _DEBUG_
-    long long sum = 0;
-    for(ui i = 0;i < n;i ++) sum += degree[i];
-    if(sum != m) printf("WA input graph\n");
-#endif
 
     fclose(f);
 
@@ -99,7 +95,7 @@ void Graph::read_graph() {
     if (min_cn == nullptr) min_cn = new int[m];
     memset(min_cn, 0, sizeof(int) * m);
 
-    int *buf = new int[n];
+    auto *buf = new int[n];
 
     pstart[0] = 0;
     for (ui i = 0; i < n; i++) {
@@ -119,22 +115,14 @@ void Graph::read_graph() {
 
     for (ui i = 0; i < n; i++) {
         for (ui j = pstart[i]; j < pstart[i + 1]; j++) {
-            if (edges[j] == i) {
-                printf("Self loop\n");
-                //exit(1);
-            }
-            if (j > pstart[i] && edges[j] <= edges[j - 1]) {
-                printf("Edges not sorted in increasing id order!\nThe program may not run properly!\n");
-                //exit(1);
-            }
+            if (edges[j] == i)cout << "Self loop\n";
+            if (j > pstart[i] && edges[j] <= edges[j - 1])
+                cout << "Edges not sorted in increasing id order!\nThe program may not run properly!\n";
         }
     }
 }
 
 ui Graph::binary_search(const int *array, ui b, ui e, int val) {
-#ifdef _DEBUG_
-    if(e < b) printf("??? WA1 in binary_search\n");
-#endif
     --e;
     if (array[e] < val) return e + 1;
     while (b < e) {
@@ -142,9 +130,6 @@ ui Graph::binary_search(const int *array, ui b, ui e, int val) {
         if (array[mid] >= val) e = mid;
         else b = mid + 1;
     }
-#ifdef _DEBUG_
-    if(array[e] < val) printf("??? WA2 in binary_search\n");
-#endif
     return e;
 }
 
@@ -166,7 +151,7 @@ void Graph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
                 if (similar_degree[edges[j]] < mu) {
                     if (min_cn[j] >= 0) {
                         min_cn[j] = similar_check_OP(i, j, eps_a2, eps_b2);
-                        if (reverse[reverse[j]] != j) printf("WA cluster_noncore\n");
+                        if (reverse[reverse[j]] != j)cout << "WA cluster_noncore\n";
                         min_cn[reverse[j]] = min_cn[j];
                         if (min_cn[j] == -1) {
                             ++similar_degree[i];
@@ -195,8 +180,8 @@ void Graph::output(const char *eps_s, const char *miu) {
 
     sort(noncore_cluster.begin(), noncore_cluster.end());
     noncore_cluster.erase(unique(noncore_cluster.begin(), noncore_cluster.end()), noncore_cluster.end());
-    for (ui i = 0; i < noncore_cluster.size(); i++) {
-        fprintf(fout, "n %d %d\n", noncore_cluster[i].second, noncore_cluster[i].first);
+    for (auto &i : noncore_cluster) {
+        fprintf(fout, "n %d %d\n", i.second, i.first);
     }
 
     fclose(fout);
@@ -219,34 +204,21 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
         rank[i] = 0;
     }
 
-#ifdef _LINUX_
-    struct timeval start;
-    gettimeofday(&start, nullptr);
-#else
-    int start = clock();
-#endif
+    using namespace std::chrono;
+    auto start = high_resolution_clock::now();
 
-    ui *edge_buf = new ui[n];
-    int *cores = new int[n];
+    auto *edge_buf = new ui[n];
+    auto *cores = new int[n];
     int cores_n = 0;
 
     prune_and_cross_link(eps_a2, eps_b2, miu, cores, cores_n);
-    //printf("\t*** Finished prune and cross link!\n");
 
-#ifdef _LINUX_
-    struct timeval end1;
-    gettimeofday(&end1, nullptr);
+    auto end1 = high_resolution_clock::now();
+    cout << "prune and cross link execution time:" << duration_cast<milliseconds>(end1 - start).count() << " ms"
+         << endl;
 
-    long long mtime1, seconds1, useconds1;
-    seconds1 = end1.tv_sec - start.tv_sec;
-    useconds1 = end1.tv_usec - start.tv_usec;
-    mtime1 = seconds1 * 1000000 + useconds1;
-#else
-    int end1 = clock();
-#endif
-
-    int *bin_head = new int[n];
-    int *bin_next = new int[n];
+    auto *bin_head = new int[n];
+    auto *bin_next = new int[n];
     for (ui i = 0; i < n; i++) bin_head[i] = -1;
 
     int max_ed = 0;
@@ -295,9 +267,6 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
         while (similar_degree[u] < miu && effective_degree[u] >= miu && i < edge_buf_n) {
             ui idx = edge_buf[i];
             if (min_cn[idx] != -1) {
-#ifdef _DEBUG_
-                if(min_cn[idx] == 0) printf("WA min_cn!\n");
-#endif
                 int v = edges[idx];
 
                 min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx, eps_a2, eps_b2);
@@ -348,34 +317,15 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
 
             ++i;
         }
-        //printf(")\n");
     }
-    //printf("\t*** Finished clustering core vertices!\n");
 
     delete[] edge_buf;
-    edge_buf = nullptr;
     delete[] cores;
-    cores = nullptr;
     delete[] bin_head;
-    bin_head = nullptr;
     delete[] bin_next;
-    bin_next = nullptr;
 
-#ifdef _LINUX_
-    struct timeval end;
-    gettimeofday(&end, nullptr);
-
-    long long mtime, seconds, useconds;
-    seconds = end.tv_sec - end1.tv_sec;
-    useconds = end.tv_usec - end1.tv_usec;
-    mtime = seconds * 1000000 + useconds;
-
-    //printf("Prune time: %lld\nRefine time: %lld\n", mtime1, mtime);
-#else
-    int end = clock();
-
-    printf("Prune time: %d\nSort time: %d\nRefine time: %d\n", end1-start,end2-2end1,end-end2);
-#endif
+    auto end = high_resolution_clock::now();
+    cout << "other time:" << duration_cast<milliseconds>(end - end1).count() << " ms";
 
     cluster_noncore_vertices(eps_a2, eps_b2, miu);
 }
@@ -408,17 +358,9 @@ int Graph::check_common_neighbor(int u, int v, int c) {
 int Graph::similar_check_OP(int u, ui idx, int eps_a2, int eps_b2) {
     int v = edges[idx];
 
-#ifdef _DEBUG_
-    if(min_cn[idx] == -1||min_cn[idx] == -2) printf("??? WA in similar_check\n");
-#endif
-
     if (min_cn[idx] == 0) {
         int du = degree[u], dv = degree[v];
         int c = compute_common_neighbor_lowerbound(du, dv, eps_a2, eps_b2);
-
-#ifdef _DEBUG_
-        if(du < c||dv < c) return -2;
-#endif
 
         if (c <= 2) return -1;
 
@@ -429,17 +371,9 @@ int Graph::similar_check_OP(int u, ui idx, int eps_a2, int eps_b2) {
 }
 
 int Graph::compute_common_neighbor_lowerbound(int du, int dv, int eps_a2, int eps_b2) {
-    int c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
-
-#ifdef _DEBUG_
-    if(((long long)du)*dv*eps_a2 < 0||((long long)c)*c*eps_b2 < 0) printf("??? Overflow in similar_check\n");
-#endif
+    auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
 
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) ++c;
-
-#ifdef _DEBUG_
-    if(((long long)c)*((long long)c)*eps_b2 < ((long long)du)*((long long)dv)*eps_a2) printf("??? Wrong common neigbor computation in similar_check\n");
-#endif
     return c;
 }
 
@@ -462,10 +396,6 @@ void Graph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *cores, in
                 --effective_degree[v];
             } else {
                 int c = compute_common_neighbor_lowerbound(a, b, eps_a2, eps_b2);
-
-#ifdef _DEBUG_
-                if(a < c||b < c) printf("!!! HHH\n");
-#endif
 
                 if (c <= 2) {
                     min_cn[j] = -1;
@@ -534,7 +464,7 @@ void Graph::get_eps(const char *eps_s) {
     }
 
     if (eps_a > eps_b || eps_b > 100 || eps_a <= 0) {
-        printf("??? Wrong eps format: %d/%d, %s\n", eps_a, eps_b, eps_s);
+        cout << "??? Wrong eps format: " << eps_a << "," << eps_b << "," << eps_s << "\n";
         exit(1);
     }
 
