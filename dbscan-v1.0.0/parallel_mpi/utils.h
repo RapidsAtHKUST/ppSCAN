@@ -30,7 +30,7 @@
 #define proc_of_interest 0
 #define _GET_EXTRA_POINT_STAT 0
 #define _GET_LOCAL_POINT_COUNT 0
-#define NETCDF_FORMAT
+//#define NETCDF_FORMAT
 
 #include <mpi.h>
 #include <algorithm>
