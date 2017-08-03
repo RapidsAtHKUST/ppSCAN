@@ -1,59 +1,52 @@
 class LinkedListNode:
-    def __init__(self, val):
+    def __init__(self, val, list_head_ptr):
         self.value_ = val
-        self.first_ = self
-        self.last_ = self
         self.next_ = None
-
-    def append(self, another_list_head):
-        # update next pointer
-        cur_node_ref = another_list_head
-        self.last_.next_ = another_list_head
-
-        # update first pointer
-        while cur_node_ref is not None:
-            cur_node_ref.first_ = self
-
-            # update last pointer
-            if cur_node_ref.next_ is None:
-                self.last_ = cur_node_ref
-
-            cur_node_ref = cur_node_ref.next_
+        self.list_head_ = list_head_ptr
 
 
 class LinkedList:
     def __init__(self, x):
-        self.head_node = LinkedListNode(x)
+        self.head_node_ = LinkedListNode(x, self)
+        self.tail_node = self.head_node_
         self.node_size = 1
 
     # heuristic: weighted union, i.e, choose biggest as the head
-    def union(self, another_list):
+    @staticmethod
+    def link(left_list, right_list):
         """
-        :type another_list: LinkedList
+        :type left_list: LinkedList
+        :type right_list: LinkedList
         """
 
         def get_sorted_pair():
-            if self.node_size > another_list.node_size:
-                return self, another_list
+            if left_list.node_size > right_list.node_size:
+                return left_list, right_list
             else:
-                return another_list, self
+                return right_list, left_list
+
+        def concat_two_lists():
+            # update next pointer
+            cur_node_ref = small_list.head_node_
+            large_list.tail_node.next_ = small_list.head_node_
+
+            while cur_node_ref is not None:
+                # update first pointer
+                cur_node_ref.list_head_ = large_list
+                # update link
+                cur_node_ref = cur_node_ref.next_
+
+            # update last pointer
+            large_list.tail_node = small_list.tail_node
 
         large_list, small_list = get_sorted_pair()
         large_list.node_size += small_list.node_size
-        large_list.head_node.append(small_list.head_node)
+        concat_two_lists()
         return large_list
-
-    def is_in_set(self, x):
-        iter_node = self.head_node
-        while iter_node is not None:
-            if iter_node.value_ == x:
-                return True
-            iter_node = iter_node.next_
-        return False
 
     def to_sorted_list(self):
         val_list = []
-        iter_node = self.head_node
+        iter_node = self.head_node_
         while iter_node is not None:
             val_list.append(iter_node.value_)
             iter_node = iter_node.next_
@@ -64,19 +57,24 @@ class LinkedList:
 
 
 # attention: users need to keep the disjoint property
+# self.node_dict: keep the mapping from ele to node
 class NaiveDisjointSet:
     def __init__(self):
         self.set_list = []
+        self.node_dict = {}
 
     def make_set(self, x):
-        self.set_list.append(LinkedList(x))
+        new_list = LinkedList(x)
+        self.set_list.append(new_list)
+        self.node_dict[x] = new_list.head_node_
 
     def union(self, x, y):
-        x_list = self.find_set(x)
-        y_list = self.find_set(y)
-        union_list = x_list.union(y_list)
+        x_list = self.node_dict[x].list_head_
+        y_list = self.node_dict[y].list_head_
+        union_list = LinkedList.link(x_list, y_list)
         if union_list is not x_list:
             self.set_list.remove(x_list)
+
         else:
             self.set_list.remove(y_list)
 
@@ -84,12 +82,7 @@ class NaiveDisjointSet:
         """
         :rtype: LinkedList
         """
-        for element in self.set_list:
-            assert isinstance(element, LinkedList)
-            if element.is_in_set(x):
-                return element
-        # not found in any
-        return None
+        return self.node_dict[x].list_head_ if x in self.node_dict else None
 
     def __str__(self):
         str_list = map(lambda ele: ele.to_sorted_list(), self.set_list)
@@ -117,4 +110,4 @@ if __name__ == '__main__':
     # find connected component
     print 'vertices:', vertex_set
     print 'edges:', edge_list
-    print connected_component(vertex_set, edge_list)
+    print 'connected component:', connected_component(vertex_set, edge_list)
