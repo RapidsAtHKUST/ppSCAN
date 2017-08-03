@@ -26,8 +26,8 @@ class LinkedList:
         self.head_node = LinkedListNode(x)
         self.node_size = 1
 
+    # heuristic: weighted union, i.e, choose biggest as the head
     def union(self, another_list):
-        # choose biggest as the head
         """
         :type another_list: LinkedList
         """
@@ -38,7 +38,6 @@ class LinkedList:
             else:
                 return another_list, self
 
-        # weighted union heuristic
         large_list, small_list = get_sorted_pair()
         large_list.node_size += small_list.node_size
         large_list.head_node.append(small_list.head_node)
@@ -52,20 +51,23 @@ class LinkedList:
             iter_node = iter_node.next_
         return False
 
-    def __str__(self):
+    def to_sorted_list(self):
         val_list = []
         iter_node = self.head_node
         while iter_node is not None:
             val_list.append(iter_node.value_)
             iter_node = iter_node.next_
-        return str(sorted(val_list))
+        return sorted(val_list)
+
+    def __str__(self):
+        return str(self.to_sorted_list())
 
 
+# attention: users need to keep the disjoint property
 class NaiveDisjointSet:
     def __init__(self):
         self.set_list = []
 
-    # users need to keep the disjoint property
     def make_set(self, x):
         self.set_list.append(LinkedList(x))
 
@@ -90,7 +92,7 @@ class NaiveDisjointSet:
         return None
 
     def __str__(self):
-        str_list = map(str, self.set_list)
+        str_list = map(lambda ele: ele.to_sorted_list(), self.set_list)
         return str(str_list)
 
 
