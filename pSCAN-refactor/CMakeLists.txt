@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
         Graph.cpp Graph.h
-        main.cpp Utility.cpp Utility.h)
+        main.cpp Utility.cpp Utility.h InputOutput.cpp InputOutput.h)
 
 add_executable(pSCAN ${SOURCE_FILES})
 

@@ -15,7 +15,10 @@
 #include <set>
 
 typedef unsigned int ui;
+using namespace std;
 
-FILE *open_file(const char *file_name, const char *mode) ;
+FILE *open_file(const char *file_name, const char *mode);
+
+pair<int, int> get_eps(const char *eps_s);
 
 #endif

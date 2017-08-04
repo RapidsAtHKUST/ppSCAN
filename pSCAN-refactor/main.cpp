@@ -2,7 +2,7 @@
 #include "Graph.h"
 
 void usage() {
-    printf("Usage: [1]exe [2]graph-dir [3]similarity-threshold [4]density-threshold [5 optional]output\n");
+    cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold [4]density-threshold [5 optional]output\n";
 }
 
 int main(int argc, char *argv[]) {
@@ -28,8 +28,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     Graph *graph = new Graph(argv[1]);
-    graph->read_graph();
-    printf("\t*** Finished loading graph!\n");
+
 
 #ifdef _LINUX_
     gettimeofday(&end1, NULL);
