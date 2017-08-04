@@ -1,18 +1,9 @@
 #ifndef _UTILITY_H_
 #define _UTILITY_H_
 
-#include <ctime>
-#include <cstdlib>
+
 #include <cstdio>
-#include <cmath>
-#include <cstring>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <sstream>
-#include <iostream>
-#include <queue>
-#include <set>
+#include <utility>
 
 typedef unsigned int ui;
 using namespace std;

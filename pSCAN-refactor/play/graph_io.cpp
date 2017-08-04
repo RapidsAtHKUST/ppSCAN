@@ -1,5 +1,9 @@
 
 #include <cstdio>
+#include <string>
+#include <cstring>
+#include <iostream>
+
 #include "../Utility.h"
 
 //

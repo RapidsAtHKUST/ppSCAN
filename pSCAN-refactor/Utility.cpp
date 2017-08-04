@@ -1,9 +1,10 @@
 #include "Utility.h"
+#include <iostream>
 
 FILE *open_file(const char *file_name, const char *mode) {
     FILE *f = fopen(file_name, mode);
-    if (f == NULL) {
-        printf("Can not open file: %s\n", file_name);
+    if (f == nullptr) {
+        cout << "Can not open file: " << file_name << endl;
         exit(1);
     }
 

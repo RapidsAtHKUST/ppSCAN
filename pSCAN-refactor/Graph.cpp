@@ -1,5 +1,10 @@
 #include "Graph.h"
 
+#include <cstring>
+#include <cmath>
+#include <chrono>
+#include <iostream>
+
 Graph::Graph(const char *dir_string) {
     // helper
     io_helper_ptr = make_unique<InputOutput>(dir_string);
@@ -231,9 +236,9 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
     cout << "prune and cross link execution time:" << duration_cast<milliseconds>(end1 - start).count() << " ms"
          << endl;
 
-    auto *bin_head = new int[n];
+    auto bin_head = vector<int>(n);
     auto *bin_next = new int[n];
-    for (ui i = 0; i < n; i++) bin_head[i] = -1;
+    std::fill(bin_head.begin(), bin_head.end(), -1);
 
     int max_ed = 0;
     for (ui i = 0; i < n; i++)
@@ -336,11 +341,10 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
 
     delete[] edge_buf;
     delete[] cores;
-    delete[] bin_head;
     delete[] bin_next;
 
     auto end = high_resolution_clock::now();
-    cout << "other time:" << duration_cast<milliseconds>(end - end1).count() << " ms";
+    cout << "other time:" << duration_cast<milliseconds>(end - end1).count() << " ms\n";
     cluster_noncore_vertices(eps_a2, eps_b2, miu);
 }
 

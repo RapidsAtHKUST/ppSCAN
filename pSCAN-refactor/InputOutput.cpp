@@ -4,6 +4,10 @@
 
 #include "InputOutput.h"
 
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+
 InputOutput::InputOutput(const string &dir) : dir(dir) {}
 
 void InputOutput::read_graph() {

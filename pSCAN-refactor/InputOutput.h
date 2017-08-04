@@ -5,9 +5,10 @@
 #ifndef PSCAN_INPUTOUTPUT_H
 #define PSCAN_INPUTOUTPUT_H
 
-
-#include "Utility.h"
 #include <fstream>
+#include <vector>
+#include "Utility.h"
+
 
 using namespace std;
 

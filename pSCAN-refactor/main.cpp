@@ -1,4 +1,7 @@
-#include "Utility.h"
+#include <iostream>
+#include <cstring>
+#include <chrono>
+
 #include "Graph.h"
 
 void usage() {
@@ -10,52 +13,18 @@ int main(int argc, char *argv[]) {
         usage();
         return 0;
     }
+    // input
+    auto *graph = new Graph(argv[1]);
 
-#ifdef _DEBUG_
-    printf("**** Graph Clustering (Debug): %s, %s, %s *** ", argv[1], argv[2], argv[3]);
-#else
-    printf("**** Graph Clustering (Release): %s, %s, %s *** ", argv[1], argv[2], argv[3]);
-#endif
-
-    printf("\n");
-
-#ifdef _LINUX_
-    struct timeval start, end1, end;
-    gettimeofday(&start, NULL);
-#else
-    int start, end1, end;
-    start = clock();
-#endif
-
-    Graph *graph = new Graph(argv[1]);
-
-
-#ifdef _LINUX_
-    gettimeofday(&end1, NULL);
-
-    long long mtime1, seconds1, useconds1;
-    seconds1 = end1.tv_sec - start.tv_sec;
-    useconds1 = end1.tv_usec - start.tv_usec;
-    mtime1 = seconds1*1000000 + useconds1;
-#else
-    end1 = clock();
-#endif
-
+    // compute
+    using namespace std::chrono;
+    auto start = high_resolution_clock::now();
     graph->pSCAN(argv[2], atoi(argv[3]));
+    auto end = high_resolution_clock::now();
+    cout << "Total time without IO:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
-#ifdef _LINUX_
-    gettimeofday(&end, NULL);
-
-    long long mtime, seconds, useconds;
-    seconds = end.tv_sec - start.tv_sec;
-    useconds = end.tv_usec - start.tv_usec;
-    mtime = seconds*1000000 + useconds;
-
-    printf("Total time without IO: %lld\n", mtime-mtime1);
-#endif
-
+    // output
     if (argc >= 5 && strcmp(argv[4], "output") == 0) graph->output(argv[2], argv[3]);
-
     return 0;
 }
 
