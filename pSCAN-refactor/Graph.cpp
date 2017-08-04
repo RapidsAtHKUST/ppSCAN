@@ -159,7 +159,7 @@ void Graph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
                         }
                     }
 
-                    if (min_cn[j] == -1) noncore_cluster.pb(mp(cid[pa[i]], edges[j]));
+                    if (min_cn[j] == -1) noncore_cluster.emplace_back(cid[pa[i]], edges[j]);
                 }
         }
 }
