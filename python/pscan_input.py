@@ -1,7 +1,7 @@
 from BinaryStream import BinaryStream
 
 import numpy as np
-import networkx as nx
+import os
 
 
 # (1,2) (2,1) count twice in num_edges statistics
@@ -38,4 +38,12 @@ def get_spare_adj_matrix():
 if __name__ == '__main__':
     n, m, deg_arr = get_v_e_deg()
     print 'v_num:', n, 'e_num:', m / 2, 'avg deg:', m / 2.0 / n
-    print get_spare_adj_matrix()
+    spare_adj_matrix = get_spare_adj_matrix()
+    print spare_adj_matrix
+
+    os.system('mkdir -p data')
+
+    with open('data/pscan_demo_edge_list.txt', 'w') as ofs:
+        for i in xrange(n):
+            lines = map(lambda lst_ele: str(i) + ' ' + str(lst_ele), spare_adj_matrix[i])
+            ofs.write('\n'.join(lines) + '\n')
