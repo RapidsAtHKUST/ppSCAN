@@ -63,7 +63,7 @@ void InputOutput::read_graph() {
 
 
 void InputOutput::output(const char *eps_s, const char *miu, vector<pair<int, int>> noncore_cluster,
-                         const int *similar_degree, int *cid, const int *pa) {
+                         const int *similar_degree, vector<int> &cid, const int *pa) {
     cout << "\t*** Start write result into disk!\n";
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(miu) + ".txt";
     ofstream ofs(out_name);

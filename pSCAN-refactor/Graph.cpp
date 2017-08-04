@@ -5,13 +5,18 @@
 #include <chrono>
 #include <iostream>
 
-Graph::Graph(const char *dir_string) {
+Graph::Graph(const char *dir_string, const char *eps_s, int _miu) {
+    auto eps_pair = get_eps(eps_s);
+    eps_a2 = eps_pair.first;
+    eps_b2 = eps_pair.second;
+    miu = _miu;
+
     // helper
     io_helper_ptr = make_unique<InputOutput>(dir_string);
     io_helper_ptr->read_graph();
 
     // 1st: graph
-    n = io_helper_ptr->n;
+    n = static_cast<ui>(io_helper_ptr->n);
     degree = io_helper_ptr->degree;
     pstart = io_helper_ptr->pstart;
     edges = io_helper_ptr->edges;
@@ -35,17 +40,18 @@ Graph::Graph(const char *dir_string) {
 }
 
 Graph::~Graph() {
+    // 1st: graph
     delete[] pstart;
     delete[] edges;
     delete[] reverse;
     delete[] min_cn;
-    if (cid != nullptr) {
-        delete[] cid;
-        cid = nullptr;
-    }
+
+    // 2nd: algorithm related: sd, ed
     delete[] degree;
     delete[] effective_degree;
     delete[] similar_degree;
+
+    // 3rd: disjoint-set
     delete[] pa;
     delete[] rank;
 }
@@ -55,7 +61,6 @@ void Graph::output(const char *eps_s, const char *miu) {
 }
 
 // data structure related: union-find disjoint set
-
 int Graph::find_root(int u) {
     int x = u;
     while (pa[x] != x) x = pa[x];
@@ -95,14 +100,14 @@ ui Graph::binary_search(const int *array, ui b, ui e, int val) {
 }
 
 
-int Graph::compute_common_neighbor_lowerbound(int du, int dv, int eps_a2, int eps_b2) {
+int Graph::compute_common_neighbor_lowerbound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
 
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) ++c;
     return c;
 }
 
-void Graph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *cores, int &cores_e) {
+void Graph::prune_and_cross_link(int *cores, int &cores_e) {
     for (ui i = 0; i < n; i++) { //must be iterating from 0 to n-1
         for (ui j = pstart[i]; j < pstart[i + 1]; j++) {
             if (edges[j] < i) {
@@ -120,7 +125,7 @@ void Graph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *cores, in
                 --effective_degree[i];
                 --effective_degree[v];
             } else {
-                int c = compute_common_neighbor_lowerbound(a, b, eps_a2, eps_b2);
+                int c = compute_common_neighbor_lowerbound(a, b);
 
                 if (c <= 2) {
                     min_cn[j] = -1;
@@ -134,7 +139,6 @@ void Graph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *cores, in
             }
 
             if (min_cn[j] != -2) {
-                //else {
                 ui r_id = binary_search(edges, pstart[v], pstart[v + 1], i);
                 reverse[j] = r_id;
                 reverse[r_id] = j;
@@ -170,13 +174,13 @@ int Graph::check_common_neighbor(int u, int v, int c) {
     return -2;
 }
 
-// 2nd phase core implemenation:  non-core vertices clustering related:
-int Graph::similar_check_OP(int u, ui idx, int eps_a2, int eps_b2) {
+// 2nd phase core implementation:  non-core vertices clustering related:
+int Graph::similar_check_OP(int u, ui idx) {
     int v = edges[idx];
 
     if (min_cn[idx] == 0) {
         int du = degree[u], dv = degree[v];
-        int c = compute_common_neighbor_lowerbound(du, dv, eps_a2, eps_b2);
+        int c = compute_common_neighbor_lowerbound(du, dv);
 
         if (c <= 2) return -1;
 
@@ -186,12 +190,12 @@ int Graph::similar_check_OP(int u, ui idx, int eps_a2, int eps_b2) {
     return check_common_neighbor(u, v, min_cn[idx]);
 }
 
-void Graph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
-    cid = new int[n];
-    for (ui i = 0; i < n; i++) cid[i] = n;
+void Graph::cluster_noncore_vertices() {
+    cid.resize(n);
+    std::fill(cid.begin(), cid.end(), n);
 
     for (ui i = 0; i < n; i++)
-        if (similar_degree[i] >= mu) {
+        if (similar_degree[i] >= miu) {
             int x = find_root(i);
             if (i < cid[x]) cid[x] = i;
         }
@@ -199,11 +203,11 @@ void Graph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
     noncore_cluster.clear();
     noncore_cluster.reserve(n);
     for (ui i = 0; i < n; i++)
-        if (similar_degree[i] >= mu) {
+        if (similar_degree[i] >= miu) {
             for (ui j = pstart[i]; j < pstart[i + 1]; j++)
-                if (similar_degree[edges[j]] < mu) {
+                if (similar_degree[edges[j]] < miu) {
                     if (min_cn[j] >= 0) {
-                        min_cn[j] = similar_check_OP(i, j, eps_a2, eps_b2);
+                        min_cn[j] = similar_check_OP(i, j);
                         if (reverse[reverse[j]] != j)cout << "WA cluster_noncore\n";
                         min_cn[reverse[j]] = min_cn[j];
                         if (min_cn[j] == -1) {
@@ -217,12 +221,7 @@ void Graph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
         }
 }
 
-void Graph::pSCAN(const char *eps_s, int _miu) {
-    auto eps_pair = get_eps(eps_s);
-    eps_a2 = eps_pair.first;
-    eps_b2 = eps_pair.second;
-    miu = _miu;
-
+void Graph::pSCAN() {
     using namespace std::chrono;
     auto start = high_resolution_clock::now();
 
@@ -230,11 +229,10 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
     auto *cores = new int[n];
     int cores_n = 0;
 
-    prune_and_cross_link(eps_a2, eps_b2, miu, cores, cores_n);
+    prune_and_cross_link(cores, cores_n);
 
     auto end1 = high_resolution_clock::now();
-    cout << "prune and cross link execution time:" << duration_cast<milliseconds>(end1 - start).count() << " ms"
-         << endl;
+    cout << "prune and cross link execution time:" << duration_cast<milliseconds>(end1 - start).count() << " ms\n";
 
     auto bin_head = vector<int>(n);
     auto *bin_next = new int[n];
@@ -251,8 +249,9 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
 
     while (true) {
         int u = -1;
-        if (cores_n) u = cores[--cores_n];
-        else {
+        if (cores_n != 0) {
+            u = cores[--cores_n];
+        } else {
             while (max_ed >= miu && u == -1) {
                 for (int x = bin_head[max_ed]; x != -1;) {
                     int tmp = bin_next[x];
@@ -289,7 +288,7 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
             if (min_cn[idx] != -1) {
                 int v = edges[idx];
 
-                min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx, eps_a2, eps_b2);
+                min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx);
 
                 if (min_cn[idx] == -1) ++similar_degree[u];
                 else --effective_degree[u];
@@ -323,7 +322,7 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
                 continue;
             }
 
-            min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx, eps_a2, eps_b2);
+            min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx);
 
             if (effective_degree[v] >= 0) {
                 if (min_cn[idx] == -1) {
@@ -344,10 +343,6 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
     delete[] bin_next;
 
     auto end = high_resolution_clock::now();
-    cout << "other time:" << duration_cast<milliseconds>(end - end1).count() << " ms\n";
-    cluster_noncore_vertices(eps_a2, eps_b2, miu);
+    cout << "before noncore clustering time:" << duration_cast<milliseconds>(end - end1).count() << " ms\n";
+    cluster_noncore_vertices();
 }
-
-
-
-
