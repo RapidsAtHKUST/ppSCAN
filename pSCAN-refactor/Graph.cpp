@@ -1,74 +1,48 @@
 #include "Graph.h"
 
-#include <chrono>
-
-Graph::Graph(const char *_dir) {
-    dir = string(_dir);
-    eps_a2 = eps_b2 = miu = 0;
-
-    cid = nullptr;
-
-    effective_degree = nullptr;
-    similar_degree = nullptr;
-
-    pa = nullptr;
-    rank = nullptr;
-
-    io_helper_ptr = new InputOutput(_dir);
+Graph::Graph(const char *dir_string) {
+    // helper
+    io_helper_ptr = make_unique<InputOutput>(dir_string);
     io_helper_ptr->read_graph();
-    degree = io_helper_ptr->degree;
-    n = io_helper_ptr->n;
 
+    // 1st: graph
+    n = io_helper_ptr->n;
+    degree = io_helper_ptr->degree;
     pstart = io_helper_ptr->pstart;
     edges = io_helper_ptr->edges;
     reverse = io_helper_ptr->reverse_;
     min_cn = io_helper_ptr->min_cn;
-    cout << "\t*** Finished loading graph!\n";
+
+    // 2nd: algorithm related: sd, ed
+    similar_degree = new int[n];
+    memset(similar_degree, 0, sizeof(int) * n);
+
+    effective_degree = new int[n];
+    for (ui i = 0; i < n; i++) effective_degree[i] = degree[i] - 1;
+
+    // 3rd: disjoint-set
+    pa = new int[n];
+    rank = new int[n];
+    for (ui i = 0; i < n; i++) {
+        pa[i] = i;
+        rank[i] = 0;
+    }
 }
 
 Graph::~Graph() {
-    if (pstart != nullptr) {
-        delete[] pstart;
-        pstart = nullptr;
-    }
-    if (edges != nullptr) {
-        delete[] edges;
-        edges = nullptr;
-    }
-    if (reverse != nullptr) {
-        delete[] reverse;
-        reverse = nullptr;
-    }
-    if (min_cn != nullptr) {
-        delete[] min_cn;
-        min_cn = nullptr;
-    }
+    delete[] pstart;
+    delete[] edges;
+    delete[] reverse;
+    delete[] min_cn;
     if (cid != nullptr) {
         delete[] cid;
         cid = nullptr;
     }
-    if (degree != nullptr) {
-        delete[] degree;
-        degree = nullptr;
-    }
-    if (effective_degree != nullptr) {
-        delete[] effective_degree;
-        effective_degree = nullptr;
-    }
-    if (similar_degree != nullptr) {
-        delete[] similar_degree;
-        similar_degree = nullptr;
-    }
-    if (pa != nullptr) {
-        delete[] pa;
-        pa = nullptr;
-    }
-    if (rank != nullptr) {
-        delete[] rank;
-        rank = nullptr;
-    }
-
-    delete io_helper_ptr;
+    delete[] degree;
+    delete[] effective_degree;
+    delete[] similar_degree;
+    delete[] pa;
+    delete[] rank;
 }
 
 void Graph::output(const char *eps_s, const char *miu) {
@@ -87,7 +61,7 @@ ui Graph::binary_search(const int *array, ui b, ui e, int val) {
 }
 
 void Graph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
-    if (cid == nullptr) cid = new int[n];
+    cid = new int[n];
     for (ui i = 0; i < n; i++) cid[i] = n;
 
     for (ui i = 0; i < n; i++)
@@ -123,19 +97,6 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
     eps_a2 = eps_pair.first;
     eps_b2 = eps_pair.second;
     miu = _miu;
-
-    if (similar_degree == nullptr) similar_degree = new int[n];
-    memset(similar_degree, 0, sizeof(int) * n);
-
-    if (effective_degree == nullptr) effective_degree = new int[n];
-    for (ui i = 0; i < n; i++) effective_degree[i] = degree[i] - 1;
-
-    if (pa == nullptr) pa = new int[n];
-    if (rank == nullptr) rank = new int[n];
-    for (ui i = 0; i < n; i++) {
-        pa[i] = i;
-        rank[i] = 0;
-    }
 
     using namespace std::chrono;
     auto start = high_resolution_clock::now();
@@ -259,7 +220,6 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
 
     auto end = high_resolution_clock::now();
     cout << "other time:" << duration_cast<milliseconds>(end - end1).count() << " ms";
-
     cluster_noncore_vertices(eps_a2, eps_b2, miu);
 }
 

@@ -1,22 +1,25 @@
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
-#include "Utility.h"
+#include <utility>
+#include <chrono>
+#include <bits/unique_ptr.h>
 
+#include "Utility.h"
 #include "InputOutput.h"
 
 using namespace std;
 
+// fast consumption object
 class Graph {
 private:
-    string dir;
-    InputOutput *io_helper_ptr;
+    unique_ptr<InputOutput> io_helper_ptr;
 
     int eps_a2, eps_b2, miu; // eps_a2/eps_b2 = eps^2
 
     int n;
     ui *pstart; //offset of neighbors of nodes
-    int *edges; //adjacent ids of edges
+    int *edges;
     ui *reverse; //the position of reverse edge in edges
     int *min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
 
@@ -32,7 +35,7 @@ private:
     vector<pair<int, int> > noncore_cluster;
 
 public:
-    explicit Graph(const char *_dir);
+    explicit Graph(const char *dir_string);
 
     ~Graph();
 
