@@ -48,7 +48,7 @@ void read_graph(string dir) {
     min_cn = new int[m];
     memset(min_cn, 0, sizeof(int) * m);
 
-    int *buf = new int[n];
+    auto *buf = new int[n];
 
     pstart[0] = 0;
     for (ui i = 0; i < n; i++) {

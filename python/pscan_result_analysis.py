@@ -6,8 +6,6 @@ def get_cores_hubs():
         print len(core_lines), len(hub_lines)
         cores = map(lambda line: tuple(map(int, line.split()[1:])), core_lines)
         hubs = map(lambda line: tuple(map(int, line.split()[1:])), hub_lines)
-        print core_lines
-        print hubs
         return cores, hubs
 
 

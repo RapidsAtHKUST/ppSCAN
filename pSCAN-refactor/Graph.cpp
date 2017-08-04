@@ -96,7 +96,6 @@ void Graph::read_graph() {
 
     pstart[0] = 0;
     for (ui i = 0; i < n; i++) {
-        //printf("%d %d\n", i, degree[i]);
         if (degree[i] > 0) fread(buf, sizeof(int), degree[i], f);
 
         for (ui j = 0; j < degree[i]; j++) edges[pstart[i] + j] = buf[j];

@@ -1,4 +1,5 @@
 .idea
+*.pyc
 build
 cmake-build-debug
 # Prerequisites
