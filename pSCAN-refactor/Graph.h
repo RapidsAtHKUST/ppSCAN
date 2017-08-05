@@ -11,12 +11,15 @@ constexpr int NOT_SIMILAR = -2;
 constexpr int SIMILAR = -1;
 constexpr int NOT_SURE = 0;
 
+constexpr int INVALID_VERTEX_IDX = -1;
+constexpr int ALREADY_EXPLORED = -1;
+
 // Graph instance: fast consumption object
 class Graph {
 private:
     unique_ptr<InputOutput> io_helper_ptr;
-    // e.g eps: 0.13, eps_a:13, eps_b:100;
-    // min_u: 5, 5 nearest neighbor as threshold
+    // algorithm parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
+    // algorithm parameter2: min_u: 5, 5 nearest neighbor as threshold
     int eps_a2, eps_b2, min_u;
 
     // compressed spare row graph
@@ -63,7 +66,7 @@ private:
 
     int compute_cn_lower_bound(int u, int v);
 
-    void prune_and_cross_link(vector<int> &cores, int &cores_e);
+    void prune_and_cross_link(vector<int> &cores);
 
     // 2nd phase core implementation:  non-core vertices clustering related:
     int check_common_neighbor(int u, int v, int c);

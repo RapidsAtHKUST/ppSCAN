@@ -2,6 +2,9 @@
 // Created by yche on 8/4/17.
 //
 #include <iostream>
+#include <vector>
+
+#include "pretty_print.h"
 
 using namespace std;
 
@@ -47,6 +50,16 @@ void play_epsa_and_epsb() {
     }
 }
 
+void play_increment() {
+    auto my_vec = vector<int>{1, 2, 3, 4};
+    cout << my_vec << endl;
+    auto i = 1;
+//    my_vec[++i] = 3;
+    my_vec[i++] = 3;
+    cout << my_vec << endl;
+}
+
 int main() {
-    play_epsa_and_epsb();
+//    play_epsa_and_epsb();
+    play_increment();
 }

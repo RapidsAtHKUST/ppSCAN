@@ -12,26 +12,26 @@ FILE *open_file(const char *file_name, const char *mode) {
 }
 
 pair<int, int> get_eps(const char *eps_s) {
-    int i = 0, eps_a = 0, eps_b = 1;
+    int i = 0, eps_numerator = 0, eps_denominator = 1;
     while (eps_s[i] != '\0' && eps_s[i] != '.') {
-        eps_a = eps_a * 10 + (eps_s[i] - '0');
+        eps_numerator = eps_numerator * 10 + (eps_s[i] - '0');
         ++i;
     }
 
     if (eps_s[i] == '.') {
         ++i;
         while (eps_s[i] != '\0') {
-            eps_a = eps_a * 10 + (eps_s[i] - '0');
-            eps_b *= 10;
+            eps_numerator = eps_numerator * 10 + (eps_s[i] - '0');
+            eps_denominator *= 10;
             ++i;
         }
     }
 
-    if (eps_a > eps_b || eps_b > 100 || eps_a <= 0) {
-        cout << "??? Wrong eps format: " << eps_a << "," << eps_b << "," << eps_s << "\n";
+    if (eps_numerator > eps_denominator || eps_denominator > 100 || eps_numerator <= 0) {
+        cout << "??? Wrong eps format: " << eps_numerator << "," << eps_denominator << "," << eps_s << "\n";
         exit(1);
     }
 
-    return make_pair(eps_a * eps_a, eps_b * eps_b);
+    return make_pair(eps_numerator * eps_numerator, eps_denominator * eps_denominator);
 }
 
