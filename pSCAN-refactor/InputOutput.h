@@ -29,7 +29,7 @@ public:
     void read_graph();
 
     void output(const char *eps_s, const char *miu, vector<pair<int, int>> noncore_cluster,
-                const int *similar_degree, vector<int> &cid, const int *pa);
+                vector<int> &similar_degree, vector<int> &cid, vector<int> &pa);
 };
 
 

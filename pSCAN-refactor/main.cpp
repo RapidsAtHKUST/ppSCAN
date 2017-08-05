@@ -24,7 +24,9 @@ int main(int argc, char *argv[]) {
     cout << "Total time without IO:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
     // output
-    if (argc >= 5 && strcmp(argv[4], "output") == 0) graph->output(argv[2], argv[3]);
+    if (argc >= 5 && strcmp(argv[4], "output") == 0) {
+        graph->output(argv[2], argv[3]);
+    }
     return 0;
 }
 

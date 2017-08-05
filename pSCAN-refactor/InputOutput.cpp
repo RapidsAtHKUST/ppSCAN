@@ -29,22 +29,23 @@ void InputOutput::read_graph() {
 
     f = open_file((dir + string("/b_adj.bin")).c_str(), "rb");
 
-    if (pstart == nullptr) pstart = new ui[n + 1];
-    if (edges == nullptr) edges = new int[m];
-    if (reverse_ == nullptr) reverse_ = new ui[m];
-    if (min_cn == nullptr) min_cn = new int[m];
+    pstart = new ui[n + 1];
+    edges = new int[m];
+    reverse_ = new ui[m];
+    min_cn = new int[m];
     memset(min_cn, 0, sizeof(int) * m);
 
     auto *buf = new int[n];
 
     pstart[0] = 0;
     for (ui i = 0; i < n; i++) {
-        if (degree[i] > 0) fread(buf, sizeof(int), degree[i], f);
-
-        for (ui j = 0; j < degree[i]; j++) edges[pstart[i] + j] = buf[j];
-
+        if (degree[i] > 0) {
+            fread(buf, sizeof(int), degree[i], f);
+        }
+        for (ui j = 0; j < degree[i]; j++) {
+            edges[pstart[i] + j] = buf[j];
+        }
         pstart[i + 1] = pstart[i] + degree[i];
-
         ++degree[i];
     }
 
@@ -63,7 +64,7 @@ void InputOutput::read_graph() {
 
 
 void InputOutput::output(const char *eps_s, const char *miu, vector<pair<int, int>> noncore_cluster,
-                         const int *similar_degree, vector<int> &cid, const int *pa) {
+                         vector<int> &similar_degree, vector<int> &cid, vector<int> &pa) {
     cout << "\t*** Start write result into disk!\n";
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(miu) + ".txt";
     ofstream ofs(out_name);
