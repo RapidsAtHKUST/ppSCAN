@@ -27,11 +27,6 @@ pair<int, int> get_eps(const char *eps_s) {
         }
     }
 
-    if (eps_numerator > eps_denominator || eps_denominator > 100 || eps_numerator <= 0) {
-        cout << "??? Wrong eps format: " << eps_numerator << "," << eps_denominator << "," << eps_s << "\n";
-        exit(1);
-    }
-
     return make_pair(eps_numerator * eps_numerator, eps_denominator * eps_denominator);
 }
 

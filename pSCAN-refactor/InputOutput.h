@@ -24,19 +24,23 @@ private:
 public:
     explicit InputOutput(const string &dir);
 
-    int n;
-    int m;
+    ui n;
+    ui m;
 
-    ui *pstart;
-    int *edges;
+// csr
+    vector<ui> offset_out_edges;
+    vector<int> out_edges;
 
-    int *degree;
+// vertex property
 
-    ui *reverse_;
+    vector<int> degree;
+
+// edge property
+    vector<ui> reverse_edge_idx;
 
     void read_graph();
 
-    void output(const char *eps_s, const char *min_u, vector<pair<int, int>> noncore_cluster,
+    void output(const char *eps_s, const char *min_u, vector<pair<int, int>>& noncore_cluster,
                 vector<int> &similar_degree, vector<int> &cid, vector<int> &pa);
 };
 

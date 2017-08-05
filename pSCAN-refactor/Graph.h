@@ -24,15 +24,15 @@ private:
 
     // compressed spare row graph
     ui n;
-    ui *out_edge_start;
-    int *out_edges;
+    vector<ui> out_edge_start;
+    vector<int> out_edges;
 
     // edge properties
-    ui *reverse_edge_idx; //the position of reverse_edge_idx edge in out_edges
+    vector<ui> reverse_edge_idx; //the position of reverse_edge_idx edge in out_edges
     vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
 
     // vertex properties
-    int *degree;
+    vector<int> degree;
     vector<int> similar_degree;
     vector<int> effective_degree;
 
@@ -43,11 +43,11 @@ private:
     // clusters: core and non-core(hubs)
     vector<int> cid;    // observation 2: core vertex clusters are disjoint
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
+    vector<int> cores;
+    vector<ui> edge_buf;
 
 public:
     explicit Graph(const char *dir_string, const char *eps_s, int miu);
-
-    ~Graph();
 
     void pSCAN();
 
@@ -62,11 +62,15 @@ private:
     void union_if_not_same_set(int u, int v);
 
     // 1st phase core implementation: prune_and_cross_link related, for cores clustering:
-    ui binary_search(const int *array, ui offset_beg, ui offset_end, int val);
+    ui binary_search(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
     int compute_cn_lower_bound(int u, int v);
 
-    void prune_and_cross_link(vector<int> &cores);
+    void prune_and_cross_link();
+
+    int check_core(int u);
+
+    void cluster_core_vertex(int u, int index_i);
 
     // 2nd phase core implementation:  non-core vertices clustering related:
     int check_common_neighbor(int u, int v, int c);
