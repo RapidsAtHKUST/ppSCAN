@@ -11,7 +11,6 @@ FILE *open_file(const char *file_name, const char *mode) {
     return f;
 }
 
-
 pair<int, int> get_eps(const char *eps_s) {
     int i = 0, eps_a = 0, eps_b = 1;
     while (eps_s[i] != '\0' && eps_s[i] != '.') {

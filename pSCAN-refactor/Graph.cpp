@@ -6,25 +6,28 @@
 #include <iostream>
 
 Graph::Graph(const char *dir_string, const char *eps_s, int miu) {
+    // 1st: parameter
     std::tie(eps_a2, eps_b2) = get_eps(eps_s);
-    this->miu = miu;
+    this->min_u = miu;
 
-    // helper
+    // 2nd: graph
     io_helper_ptr = make_unique<InputOutput>(dir_string);
     io_helper_ptr->read_graph();
 
-    // 1st: graph
+    // csr representation
     n = static_cast<ui>(io_helper_ptr->n);
-    degree = io_helper_ptr->degree;
-    pstart = io_helper_ptr->pstart;
-    edges = io_helper_ptr->edges;
-    reverse = io_helper_ptr->reverse_;
-    min_cn = io_helper_ptr->min_cn;
+    out_edge_start = io_helper_ptr->pstart;
+    out_edges = io_helper_ptr->edges;
 
-    // 2nd: algorithm related: sd, ed
+    // edge properties
+    reverse_edge_idx = io_helper_ptr->reverse_;
+    min_cn = vector<int>(static_cast<ui>(io_helper_ptr->m));
+    std::fill(min_cn.begin(), min_cn.end(), NOT_SURE);
+
+    // vertex properties
+    degree = io_helper_ptr->degree;
     similar_degree = vector<int>(n);
     std::fill(similar_degree.begin(), similar_degree.end(), 0);
-
     effective_degree = vector<int>(n);
     for (ui i = 0; i < n; i++) {
         effective_degree[i] = degree[i] - 1;
@@ -39,13 +42,11 @@ void Graph::output(const char *eps_s, const char *miu) {
 }
 
 Graph::~Graph() {
-    // 1st: graph
-    delete[] pstart;
-    delete[] edges;
-    delete[] reverse;
-    delete[] min_cn;
+    delete[] out_edge_start;
+    delete[] out_edges;
 
-    // 2nd: algorithm related: sd, ed
+    delete[] reverse_edge_idx;
+
     delete[] degree;
 }
 
@@ -93,23 +94,23 @@ void Graph::union_if_not_same_set(int u, int v) {
 }
 
 // 1st phase core implementation: prune_and_cross_link related, for cores clustering:
-ui Graph::binary_search(const int *array, ui b, ui e, int val) {
-    --e;
-    if (array[e] < val) {
-        return e + 1;
+ui Graph::binary_search(const int *array, ui offset_beg, ui offset_end, int val) {
+    --offset_end;
+    if (array[offset_end] < val) {
+        return offset_end + 1;
     }
-    while (b < e) {
-        ui mid = b + (e - b) / 2;
+    while (offset_beg < offset_end) {
+        ui mid = offset_beg + (offset_end - offset_beg) / 2;
         if (array[mid] >= val) {
-            e = mid;
+            offset_end = mid;
         } else {
-            b = mid + 1;
+            offset_beg = mid + 1;
         }
     }
-    return e;
+    return offset_end;
 }
 
-int Graph::compute_common_neighbor_lowerbound(int du, int dv) {
+int Graph::compute_cn_lower_bound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
 
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) {
@@ -119,16 +120,18 @@ int Graph::compute_common_neighbor_lowerbound(int du, int dv) {
 }
 
 void Graph::prune_and_cross_link(vector<int> &cores, int &cores_e) {
-    for (ui i = 0; i < n; i++) { //must be iterating from 0 to n-1
-        for (ui j = pstart[i]; j < pstart[i + 1]; j++) {
-            if (edges[j] < i) {
+    //must iterate from 0 to n-1
+    for (ui i = 0; i < n; i++) {
+        for (ui j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+            if (out_edges[j] < i) {
                 if (min_cn[j] == NOT_SURE) {
                     min_cn[j] = NOT_SIMILAR;
                 }
-                continue; //this edge has already been checked
+                //this edge has already been checked
+                continue;
             }
 
-            int v = edges[j];
+            int v = out_edges[j];
             int a = degree[i], b = degree[v];
             if (a > b) {
                 swap(a, b);
@@ -140,7 +143,7 @@ void Graph::prune_and_cross_link(vector<int> &cores, int &cores_e) {
                 --effective_degree[i];
                 --effective_degree[v];
             } else {
-                int c = compute_common_neighbor_lowerbound(a, b);
+                int c = compute_cn_lower_bound(a, b);
 
                 if (c <= 2) {
                     min_cn[j] = SIMILAR;
@@ -148,10 +151,10 @@ void Graph::prune_and_cross_link(vector<int> &cores, int &cores_e) {
                     ++similar_degree[i];
                     ++similar_degree[v];
 
-                    if (similar_degree[i] == miu) {
+                    if (similar_degree[i] == min_u) {
                         cores[cores_e++] = i;
                     }
-                    if (similar_degree[v] == miu) {
+                    if (similar_degree[v] == min_u) {
                         cores[cores_e++] = v;
                     }
                 } else {
@@ -159,10 +162,10 @@ void Graph::prune_and_cross_link(vector<int> &cores, int &cores_e) {
                 }
             }
 
-            if (min_cn[j] != -2) {
-                ui r_id = binary_search(edges, pstart[v], pstart[v + 1], i);
-                reverse[j] = r_id;
-                reverse[r_id] = j;
+            if (min_cn[j] != NOT_SIMILAR) {
+                ui r_id = binary_search(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
+                reverse_edge_idx[j] = r_id;
+                reverse_edge_idx[r_id] = j;
 
                 min_cn[r_id] = min_cn[j];
             }
@@ -179,12 +182,12 @@ int Graph::check_common_neighbor(int u, int v, int c) {
     }
 
     int du = degree[u] + 1, dv = degree[v] + 1;
-    ui i = pstart[u], j = pstart[v];
-    while (i < pstart[u + 1] && j < pstart[v + 1] && cn < c && du >= c && dv >= c) {
-        if (edges[i] < edges[j]) {
+    ui i = out_edge_start[u], j = out_edge_start[v];
+    while (i < out_edge_start[u + 1] && j < out_edge_start[v + 1] && cn < c && du >= c && dv >= c) {
+        if (out_edges[i] < out_edges[j]) {
             --du;
             ++i;
-        } else if (edges[i] > edges[j]) {
+        } else if (out_edges[i] > out_edges[j]) {
             --dv;
             ++j;
         } else {
@@ -201,17 +204,17 @@ int Graph::check_common_neighbor(int u, int v, int c) {
 }
 
 int Graph::similar_check_OP(int u, ui idx) {
-    int v = edges[idx];
+    int v = out_edges[idx];
 
     if (min_cn[idx] == NOT_SURE) {
         int du = degree[u], dv = degree[v];
-        int c = compute_common_neighbor_lowerbound(du, dv);
+        int c = compute_cn_lower_bound(du, dv);
 
         if (c <= 2) {
             return SIMILAR;
         }
 
-        min_cn[idx] = min_cn[reverse[idx]] = c;
+        min_cn[idx] = min_cn[reverse_edge_idx[idx]] = c;
     }
 
     return check_common_neighbor(u, v, min_cn[idx]);
@@ -222,7 +225,7 @@ void Graph::cluster_noncore_vertices() {
     std::fill(cid.begin(), cid.end(), n);
 
     for (ui i = 0; i < n; i++)
-        if (similar_degree[i] >= miu) {
+        if (similar_degree[i] >= min_u) {
             int x = find_root(i);
             if (i < cid[x]) {
                 cid[x] = i;
@@ -232,23 +235,23 @@ void Graph::cluster_noncore_vertices() {
     noncore_cluster.clear();
     noncore_cluster.reserve(n);
     for (ui i = 0; i < n; i++)
-        if (similar_degree[i] >= miu) {
-            for (ui j = pstart[i]; j < pstart[i + 1]; j++) {
-                if (similar_degree[edges[j]] < miu) {
+        if (similar_degree[i] >= min_u) {
+            for (ui j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+                if (similar_degree[out_edges[j]] < min_u) {
                     if (min_cn[j] >= 0) {
                         min_cn[j] = similar_check_OP(i, j);
-                        if (reverse[reverse[j]] != j) {
+                        if (reverse_edge_idx[reverse_edge_idx[j]] != j) {
                             cout << "WA cluster_noncore\n";
                         }
-                        min_cn[reverse[j]] = min_cn[j];
+                        min_cn[reverse_edge_idx[j]] = min_cn[j];
                         if (min_cn[j] == SIMILAR) {
                             ++similar_degree[i];
-                            ++similar_degree[edges[j]];
+                            ++similar_degree[out_edges[j]];
                         }
                     }
 
                     if (min_cn[j] == SIMILAR) {
-                        noncore_cluster.emplace_back(cid[parent[i]], edges[j]);
+                        noncore_cluster.emplace_back(cid[parent[i]], out_edges[j]);
                     }
                 }
             }
@@ -274,7 +277,7 @@ void Graph::pSCAN() {
 
     int max_ed = 0;
     for (ui i = 0; i < n; i++) {
-        if (effective_degree[i] >= miu) {
+        if (effective_degree[i] >= min_u) {
             int ed = effective_degree[i];
             if (ed > max_ed) {
                 max_ed = ed;
@@ -289,7 +292,7 @@ void Graph::pSCAN() {
         if (cores_n != 0) {
             u = cores[--cores_n];
         } else {
-            while (max_ed >= miu && u == -1) {
+            while (max_ed >= min_u && u == -1) {
                 for (int x = bin_head[max_ed]; x != -1;) {
                     int tmp = bin_next[x];
                     int ed = effective_degree[x];
@@ -298,7 +301,7 @@ void Graph::pSCAN() {
                         bin_head[max_ed] = bin_next[x];
                         break;
                     }
-                    if (ed >= miu) {
+                    if (ed >= min_u) {
                         bin_next[x] = bin_head[ed];
                         bin_head[ed] = x;
                     }
@@ -315,22 +318,22 @@ void Graph::pSCAN() {
         }
 
         int edge_buf_n = 0;
-        for (ui j = pstart[u]; j < pstart[u + 1]; j++) {
+        for (ui j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
             if (min_cn[j] == NOT_SIMILAR) {
                 continue;
             }
-            if (similar_degree[u] < miu || find_root(u) != find_root(edges[j])) {
+            if (similar_degree[u] < min_u || find_root(u) != find_root(out_edges[j])) {
                 edge_buf[edge_buf_n++] = j;
             }
         }
 
         int i = 0;
-        while (similar_degree[u] < miu && effective_degree[u] >= miu && i < edge_buf_n) {
+        while (similar_degree[u] < min_u && effective_degree[u] >= min_u && i < edge_buf_n) {
             ui idx = edge_buf[i];
             if (min_cn[idx] != SIMILAR) {
-                int v = edges[idx];
+                int v = out_edges[idx];
 
-                min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx);
+                min_cn[idx] = min_cn[reverse_edge_idx[idx]] = similar_check_OP(u, idx);
 
                 if (min_cn[idx] == SIMILAR) {
                     ++similar_degree[u];
@@ -342,7 +345,7 @@ void Graph::pSCAN() {
                     if (min_cn[idx] == SIMILAR) {
                         ++similar_degree[v];
 
-                        if (similar_degree[v] == miu) {
+                        if (similar_degree[v] == min_u) {
                             cores[cores_n++] = v;
                         }
                     } else {
@@ -356,32 +359,32 @@ void Graph::pSCAN() {
 
         effective_degree[u] = -1;
 
-        if (similar_degree[u] < miu) {
+        if (similar_degree[u] < min_u) {
             continue;
         }
 
         for (int j = 0; j < edge_buf_n; j++) {
             ui idx = edge_buf[j];
-            if (min_cn[idx] == SIMILAR && similar_degree[edges[idx]] >= miu) {
-                union_if_not_same_set(u, edges[idx]);
+            if (min_cn[idx] == SIMILAR && similar_degree[out_edges[idx]] >= min_u) {
+                union_if_not_same_set(u, out_edges[idx]);
             }
         }
 
         while (i < edge_buf_n) {
             ui idx = edge_buf[i];
-            int v = edges[idx];
-            if (min_cn[idx] < 0 || similar_degree[v] < miu || find_root(u) == find_root(v)) {
+            int v = out_edges[idx];
+            if (min_cn[idx] < 0 || similar_degree[v] < min_u || find_root(u) == find_root(v)) {
                 ++i;
                 continue;
             }
 
-            min_cn[idx] = min_cn[reverse[idx]] = similar_check_OP(u, idx);
+            min_cn[idx] = min_cn[reverse_edge_idx[idx]] = similar_check_OP(u, idx);
 
             if (effective_degree[v] >= 0) {
                 if (min_cn[idx] == SIMILAR) {
                     ++similar_degree[v];
 
-                    if (similar_degree[v] == miu) {
+                    if (similar_degree[v] == min_u) {
                         cores[cores_n++] = v;
                     }
                 } else {
@@ -397,6 +400,6 @@ void Graph::pSCAN() {
     }
 
     auto end = high_resolution_clock::now();
-    cout << "before non-core clustering time:" << duration_cast<milliseconds>(end - end1).count() << " ms\n";
+    cout << "core clustering time:" << duration_cast<milliseconds>(end - end1).count() << " ms\n";
     cluster_noncore_vertices();
 }

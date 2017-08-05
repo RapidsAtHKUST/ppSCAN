@@ -9,26 +9,34 @@
 #include <vector>
 #include "Utility.h"
 
-
 using namespace std;
 
 class InputOutput {
+private:
+    string dir;
+
+    void read_degree();
+
+    void check_input_graph();
+
+    void read_adjacency_list();
+
 public:
     explicit InputOutput(const string &dir);
 
-    string dir;
-    int *degree;
     int n;
     int m;
 
     ui *pstart;
     int *edges;
+
+    int *degree;
+
     ui *reverse_;
-    int *min_cn;
 
     void read_graph();
 
-    void output(const char *eps_s, const char *miu, vector<pair<int, int>> noncore_cluster,
+    void output(const char *eps_s, const char *min_u, vector<pair<int, int>> noncore_cluster,
                 vector<int> &similar_degree, vector<int> &cid, vector<int> &pa);
 };
 
