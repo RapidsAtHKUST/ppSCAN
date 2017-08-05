@@ -1,87 +1,75 @@
-
-#include <cstdio>
-#include <string>
-#include <cstring>
+#include <fstream>
+#include <vector>
 #include <iostream>
 
-#include "../Utility.h"
+#include "pretty_print.h"
 
 //
 // Created by yche on 8/2/17.
 //
 
-int *degree;
-int n;
-int m;
+using ui=unsigned int;
+ui n, m;
 
-ui *pstart;
-int *edges;
-ui *reverse_;
-int *min_cn;
+using namespace std;
+// csr
+vector<ui> offset_out_edges;
+vector<int> out_edges;
+
+// vertex property
+vector<int> degree;
+
+// edge property
+vector<ui> reverse_;
 
 using namespace std;
 
-void read_graph(string dir) {
-    FILE *f = open_file((dir + string("/b_degree.bin")).c_str(), "rb");
+void read_degree_bin(const string &dir) {
+    ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
+    int int_size;
+    deg_file.read(reinterpret_cast<char *>(&int_size), 4);
+    cout << "int size:" << int_size << "\n";
 
-    int tt;
-    fread(&tt, sizeof(int), 1, f);
-    if (tt != (int) sizeof(int)) {
-        printf("sizeof int is different: edge.bin(%d), machine(%d)\n", tt, (int) sizeof(int));
-        return;
+    deg_file.read(reinterpret_cast<char *>(&n), 4);
+    deg_file.read(reinterpret_cast<char *>(&m), 4);
+    cout << "n:" << n << ", m:" << m << "\n";
+
+    degree.resize(static_cast<unsigned long>(n));
+    deg_file.read(reinterpret_cast<char *>(&degree.front()), sizeof(int) * n);
+    cout << "degree list:" << degree << "\n";
+}
+
+void read_adj_bin(const string &dir) {
+    ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
+    offset_out_edges.resize(n + 1);
+    out_edges.resize(m);
+    reverse_.resize(m);
+
+    offset_out_edges[0] = 0;
+    for (auto i = 0; i < n; i++) { offset_out_edges[i + 1] = offset_out_edges[i] + degree[i]; }
+    for (auto i = 0; i < n; i++) {
+        if (degree[i] > 0) {
+            adj_file.read(reinterpret_cast<char *>(&out_edges[offset_out_edges[i]]), degree[i] * sizeof(int));
+        }
     }
-    fread(&n, sizeof(int), 1, f);
-    fread(&m, sizeof(int), 1, f);
+    cout << "out_edges dst vertices:" << out_edges << endl;
+}
 
-    degree = new int[n];
-    fread(degree, sizeof(int), n, f);
-
-#ifdef _DEBUG_
-    long long sum = 0;
-    for (ui i = 0; i < n; i++) sum += degree[i];
-    if (sum != m) printf("WA input graph\n");
-#endif
-
-    fclose(f);
-
-    f = open_file((dir + string("/b_adj.bin")).c_str(), "rb");
-
-    pstart = new ui[n + 1];
-    edges = new int[m];
-    reverse_ = new ui[m];
-    min_cn = new int[m];
-    memset(min_cn, 0, sizeof(int) * m);
-
-    auto *buf = new int[n];
-
-    pstart[0] = 0;
-    for (ui i = 0; i < n; i++) {
-        //printf("%d %d\n", i, degree[i]);
-        if (degree[i] > 0) fread(buf, sizeof(int), degree[i], f);
-
-        for (ui j = 0; j < degree[i]; j++) edges[pstart[i] + j] = buf[j];
-
-        pstart[i + 1] = pstart[i] + degree[i];
-
-        ++degree[i];
-    }
-
-    delete[] buf;
-
-    fclose(f);
-
-    for (ui i = 0; i < n; i++) {
-        for (ui j = pstart[i]; j < pstart[i + 1]; j++) {
-            if (edges[j] == i) {
-                cout << "Self loop\n";
-                //exit(1);
-            }
-            if (j > pstart[i] && edges[j] <= edges[j - 1]) {
+void check_graph() {
+    for (auto i = 0; i < n; i++) {
+        for (auto j = offset_out_edges[i]; j < offset_out_edges[i + 1]; j++) {
+            if (out_edges[j] == i) { cout << "Self loop\n"; }
+            if (j > offset_out_edges[i] && out_edges[j] <= out_edges[j - 1]) {
                 cout << "Edges not sorted in increasing id order!\nThe program may not run properly!\n";
-                //exit(1);
             }
         }
     }
+}
+
+void read_graph(const string &dir) {
+    read_degree_bin(dir);
+    read_adj_bin(dir);
+    check_graph();
 }
 
 int main(int argc, char **argv) {
