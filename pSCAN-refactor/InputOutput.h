@@ -7,8 +7,8 @@
 
 #include <fstream>
 #include <vector>
-#include "Utility.h"
 
+using ui=unsigned int;
 using namespace std;
 
 class InputOutput {
@@ -40,7 +40,7 @@ public:
 
     void read_graph();
 
-    void output(const char *eps_s, const char *min_u, vector<pair<int, int>>& noncore_cluster,
+    void output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<int> &similar_degree, vector<int> &cid, vector<int> &pa);
 };
 

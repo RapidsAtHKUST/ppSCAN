@@ -54,6 +54,8 @@ public:
     void output(const char *eps_s, const char *miu);
 
 private:
+    pair<int, int> get_eps(const char *eps_s);
+
     // disjoint-set related, see CLRS chapter 22 for detail
     void make_disjoint_set_batch();
 

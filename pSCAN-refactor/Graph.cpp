@@ -7,6 +7,25 @@
 
 using namespace std::chrono;
 
+pair<int, int> Graph::get_eps(const char *eps_s) {
+    int i = 0, eps_numerator = 0, eps_denominator = 1;
+    while (eps_s[i] != '\0' && eps_s[i] != '.') {
+        eps_numerator = eps_numerator * 10 + (eps_s[i] - '0');
+        ++i;
+    }
+
+    if (eps_s[i] == '.') {
+        ++i;
+        while (eps_s[i] != '\0') {
+            eps_numerator = eps_numerator * 10 + (eps_s[i] - '0');
+            eps_denominator *= 10;
+            ++i;
+        }
+    }
+
+    return make_pair(eps_numerator * eps_numerator, eps_denominator * eps_denominator);
+}
+
 Graph::Graph(const char *dir_string, const char *eps_s, int miu) {
     // 1st: parameter
     std::tie(eps_a2, eps_b2) = get_eps(eps_s);
@@ -370,4 +389,5 @@ void Graph::pSCAN() {
     // 3rd: non-core clustering
     cluster_noncore_vertices();
 }
+
 
