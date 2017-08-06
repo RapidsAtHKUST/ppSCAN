@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void play_swap() {
+void PlaySwap() {
     cout << sizeof(int) << endl;
 
     int a = 20;
@@ -24,7 +24,7 @@ void play_swap() {
     std::cout << a << ' ' << b << '\n';
 }
 
-void play_epsa_and_epsb() {
+void PlayEpsaAndEpsb() {
     const char *eps_s = string("0.13").c_str();
     int i = 0, eps_a = 0, eps_b = 1;
     while (eps_s[i] != '\0' && eps_s[i] != '.') {
@@ -50,7 +50,7 @@ void play_epsa_and_epsb() {
     }
 }
 
-void play_increment() {
+void PlaySelfIncrement() {
     auto my_vec = vector<int>{1, 2, 3, 4};
     cout << my_vec << endl;
     auto i = 1;
@@ -60,6 +60,7 @@ void play_increment() {
 }
 
 int main() {
-//    play_epsa_and_epsb();
-    play_increment();
+    PlaySwap();
+    PlayEpsaAndEpsb();
+    PlaySelfIncrement();
 }

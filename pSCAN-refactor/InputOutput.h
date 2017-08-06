@@ -15,11 +15,11 @@ class InputOutput {
 private:
     string dir;
 
-    void read_degree();
+    void ReadDegree();
 
-    void check_input_graph();
+    void CheckInputGraph();
 
-    void read_adjacency_list();
+    void ReadAdjacencyList();
 
 public:
     explicit InputOutput(const string &dir);
@@ -38,9 +38,9 @@ public:
 // edge property
     vector<ui> reverse_edge_idx;
 
-    void read_graph();
+    void ReadGraph();
 
-    void output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+    void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<int> &similar_degree, vector<int> &cid, vector<int> &pa);
 };
 

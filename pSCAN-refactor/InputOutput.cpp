@@ -9,7 +9,7 @@
 
 InputOutput::InputOutput(const string &dir) : dir(dir) {}
 
-void InputOutput::read_degree() {
+void InputOutput::ReadDegree() {
     ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
     int int_size;
     deg_file.read(reinterpret_cast<char *>(&int_size), 4);
@@ -23,7 +23,7 @@ void InputOutput::read_degree() {
     deg_file.read(reinterpret_cast<char *>(&degree.front()), sizeof(int) * n);
 }
 
-void InputOutput::read_adjacency_list() {
+void InputOutput::ReadAdjacencyList() {
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
     offset_out_edges.resize(n + 1);
     out_edges.resize(m);
@@ -35,11 +35,12 @@ void InputOutput::read_adjacency_list() {
         if (degree[i] > 0) {
             adj_file.read(reinterpret_cast<char *>(&out_edges[offset_out_edges[i]]), degree[i] * sizeof(int));
         }
+        // inclusive
         degree[i]++;
     }
 }
 
-void InputOutput::check_input_graph() {
+void InputOutput::CheckInputGraph() {
     for (auto i = 0; i < n; i++) {
         for (auto j = offset_out_edges[i]; j < offset_out_edges[i + 1]; j++) {
             if (out_edges[j] == i) { cout << "Self loop\n"; }
@@ -50,13 +51,13 @@ void InputOutput::check_input_graph() {
     }
 }
 
-void InputOutput::read_graph() {
-    read_degree();
-    read_adjacency_list();
-    check_input_graph();
+void InputOutput::ReadGraph() {
+    ReadDegree();
+    ReadAdjacencyList();
+    CheckInputGraph();
 }
 
-void InputOutput::output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                          vector<int> &similar_degree, vector<int> &cid, vector<int> &pa) {
     cout << "\t*** Start write result into disk!\n";
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";

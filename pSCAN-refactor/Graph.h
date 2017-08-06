@@ -44,42 +44,42 @@ private:
     vector<int> cid;    // observation 2: core vertex clusters are disjoint
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
     vector<int> cores;
-    vector<ui> edge_buf;
+    vector<ui> dst_vertices;
 
 public:
     explicit Graph(const char *dir_string, const char *eps_s, int miu);
 
     void pSCAN();
 
-    void output(const char *eps_s, const char *miu);
+    void Output(const char *eps_s, const char *miu);
 
 private:
-    pair<int, int> get_eps(const char *eps_s);
+    pair<int, int> ParseEps(const char *eps_s);
 
     // disjoint-set related, see CLRS chapter 22 for detail
-    void make_disjoint_set_batch();
+    void MakeDisjointSetBatch();
 
-    int find_root(int u);
+    int FindRoot(int u);
 
-    void union_if_not_same_set(int u, int v);
+    void Union(int u, int v);
 
-    // 1st phase core implementation: prune_and_cross_link related, for cores clustering:
-    ui binary_search(vector<int> &array, ui offset_beg, ui offset_end, int val);
+    // 1st phase
+    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
-    int compute_cn_lower_bound(int u, int v);
+    int ComputeCnLowerBound(int u, int v);
 
-    void prune_and_cross_link();
+    void PruneAndCrossLink();
 
-    int check_core(int u);
+    int CheckCore(int u);
 
-    void cluster_core_vertex(int u, int index_i);
+    void ClusterCore(int u, int index_i);
 
-    // 2nd phase core implementation:  non-core vertices clustering related:
-    int check_common_neighbor(int u, int v, int c);
+    // 2nd phase
+    int CheckCn(int u, int v, int c);
 
-    int similar_check_OP(int u, ui idx);
+    int SimilarCheckOpt(int u, ui idx);
 
-    void cluster_noncore_vertices();
+    void ClusterNonCores();
 
 };
 

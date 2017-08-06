@@ -4,13 +4,13 @@
 
 #include "Graph.h"
 
-void usage() {
-    cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold [4]density-threshold [5 optional]output\n";
+void Usage() {
+    cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold [4]density-threshold [5 optional]Output\n";
 }
 
 int main(int argc, char *argv[]) {
     if (argc < 4) {
-        usage();
+        Usage();
         return 0;
     }
     // input
@@ -23,10 +23,8 @@ int main(int argc, char *argv[]) {
     auto end = high_resolution_clock::now();
     cout << "Total time without IO:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
-    // output
-    if (argc >= 5 && strcmp(argv[4], "output") == 0) {
-        graph->output(argv[2], argv[3]);
-    }
+    // Output
+    if (argc >= 5 && strcmp(argv[4], "Output") == 0) { graph->Output(argv[2], argv[3]); }
     return 0;
 }
 

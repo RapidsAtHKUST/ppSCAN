@@ -5,7 +5,7 @@ pSCAN: Fast and Exact Structural Graph Clustering
 make
 
 # Usage
-./pscan graph_directory epsilon mu output[optional]
+./pscan graph_directory epsilon mu Output[optional]
 
 # Note
 If you are using this code, please kindly cite the following paper.
