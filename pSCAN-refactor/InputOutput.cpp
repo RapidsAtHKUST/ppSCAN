@@ -57,23 +57,6 @@ void InputOutput::ReadGraph() {
     CheckInputGraph();
 }
 
-void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
-                         vector<int> &similar_degree, vector<int> &cid, vector<int> &parent) {
-    cout << "\t*** Start write result into disk!\n";
-    string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
-    ofstream ofs(out_name);
-    ofs << "c/n vertex_id cluster_id\n";
-
-    int mu = atoi(min_u);
-    for (auto i = 0; i < n; i++) {
-        if (similar_degree[i] >= mu) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }
-    }
-
-    sort(noncore_cluster.begin(), noncore_cluster.end());
-    noncore_cluster.erase(unique(noncore_cluster.begin(), noncore_cluster.end()), noncore_cluster.end());
-    for (auto &i : noncore_cluster) { ofs << "n " << i.second << " " << i.first << "\n"; }
-}
-
 pair<int, int> InputOutput::ParseEps(const char *eps_s) {
     int i = 0, eps_numerator = 0, eps_denominator = 1;
     while (eps_s[i] != '\0' && eps_s[i] != '.') {
@@ -93,4 +76,21 @@ pair<int, int> InputOutput::ParseEps(const char *eps_s) {
         exit(1);
     }
     return make_pair(eps_numerator * eps_numerator, eps_denominator * eps_denominator);
+}
+
+void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                         vector<int> &similar_degree, vector<int> &cid, vector<int> &parent) {
+    cout << "\t*** Start write result into disk!\n";
+    string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
+    ofstream ofs(out_name);
+    ofs << "c/n vertex_id cluster_id\n";
+
+    int mu = atoi(min_u);
+    for (auto i = 0; i < n; i++) {
+        if (similar_degree[i] >= mu) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }
+    }
+
+    sort(noncore_cluster.begin(), noncore_cluster.end());
+    noncore_cluster.erase(unique(noncore_cluster.begin(), noncore_cluster.end()), noncore_cluster.end());
+    for (auto &i : noncore_cluster) { ofs << "n " << i.second << " " << i.first << "\n"; }
 }

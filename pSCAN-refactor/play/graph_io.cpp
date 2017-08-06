@@ -24,7 +24,7 @@ vector<ui> reverse_;
 
 using namespace std;
 
-void read_degree_bin(const string &dir) {
+void ReadDegreeBin(const string &dir) {
     ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
     int int_size;
     deg_file.read(reinterpret_cast<char *>(&int_size), 4);
@@ -39,7 +39,7 @@ void read_degree_bin(const string &dir) {
     cout << "degree list:" << degree << "\n";
 }
 
-void read_adj_bin(const string &dir) {
+void ReadAdjBin(const string &dir) {
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
     offset_out_edges.resize(n + 1);
     out_edges.resize(m);
@@ -55,7 +55,7 @@ void read_adj_bin(const string &dir) {
     cout << "out_edges dst vertices:" << out_edges << endl;
 }
 
-void check_graph() {
+void CheckGraph() {
     for (auto i = 0; i < n; i++) {
         for (auto j = offset_out_edges[i]; j < offset_out_edges[i + 1]; j++) {
             if (out_edges[j] == i) { cout << "Self loop\n"; }
@@ -66,12 +66,12 @@ void check_graph() {
     }
 }
 
-void read_graph(const string &dir) {
-    read_degree_bin(dir);
-    read_adj_bin(dir);
-    check_graph();
+void ReadGraph(const string &dir) {
+    ReadDegreeBin(dir);
+    ReadAdjBin(dir);
+    CheckGraph();
 }
 
 int main(int argc, char **argv) {
-    read_graph(argv[1]);
+    ReadGraph(argv[1]);
 }
