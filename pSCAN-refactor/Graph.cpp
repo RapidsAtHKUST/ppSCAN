@@ -4,39 +4,19 @@
 #include <cmath>
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 
 using namespace std::chrono;
 
-pair<int, int> Graph::ParseEps(const char *eps_s) {
-    int i = 0, eps_numerator = 0, eps_denominator = 1;
-    while (eps_s[i] != '\0' && eps_s[i] != '.') {
-        eps_numerator = eps_numerator * 10 + (eps_s[i] - '0');
-        ++i;
-    }
-    if (eps_s[i] == '.') {
-        ++i;
-        while (eps_s[i] != '\0') {
-            eps_numerator = eps_numerator * 10 + (eps_s[i] - '0');
-            eps_denominator *= 10;
-            ++i;
-        }
-    }
-    if (eps_numerator > eps_denominator || eps_denominator > 100 || eps_numerator <= 0) {
-        cout << "eps err";
-        exit(1);
-    }
-    return make_pair(eps_numerator * eps_numerator, eps_denominator * eps_denominator);
-}
-
-Graph::Graph(const char *dir_string, const char *eps_s, int miu) {
-    // 1st: parameter
-    std::tie(eps_a2, eps_b2) = ParseEps(eps_s);
-    this->min_u = miu;
-
-    // 2nd: graph
+Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     io_helper_ptr = make_unique<InputOutput>(dir_string);
     io_helper_ptr->ReadGraph();
 
+    // 1st: parameter
+    std::tie(eps_a2, eps_b2) = io_helper_ptr->ParseEps(eps_s);
+    this->min_u = min_u;
+
+    // 2nd: graph
     // csr representation
     n = static_cast<ui>(io_helper_ptr->n);
     out_edge_start = std::move(io_helper_ptr->offset_out_edges);
@@ -44,59 +24,23 @@ Graph::Graph(const char *dir_string, const char *eps_s, int miu) {
 
     // edge properties
     reverse_edge_idx = std::move(io_helper_ptr->reverse_edge_idx);
-    min_cn = vector<int>(static_cast<ui>(io_helper_ptr->m));
+    min_cn = vector<int>(io_helper_ptr->m);
     std::fill(min_cn.begin(), min_cn.end(), NOT_SURE);
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
     similar_degree = vector<int>(n);
     std::fill(similar_degree.begin(), similar_degree.end(), 0);
-    effective_degree = vector<int>(n);
-    for (ui i = 0; i < n; i++) { effective_degree[i] = degree[i] - 1; }
+    effective_degree.reserve(n);
+    std::transform(degree.begin(), degree.end(), back_inserter(effective_degree),
+                   [](auto degree_val) { return degree_val - 1; });
 
     // 3rd: disjoint-set, make-set at the beginning
-    MakeDisjointSetBatch();
+    disjoint_set_ptr = make_unique<DisjointSet>(n);
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, similar_degree, cid, parent);
-}
-
-// data structure related: union-find disjoint set
-void Graph::MakeDisjointSetBatch() {
-    parent = vector<int>(n);
-    rank = vector<int>(n);
-    for (ui i = 0; i < n; i++) { parent[i] = i; }
-    std::fill(rank.begin(), rank.end(), 0);
-}
-
-int Graph::FindRoot(int u) {
-    int x = u;
-    while (parent[x] != x) { x = parent[x]; }
-
-    while (parent[u] != x) {
-        int tmp = parent[u];
-        parent[u] = x;
-        u = tmp;
-    }
-    return x;
-}
-
-void Graph::Union(int u, int v) {
-    int ru = FindRoot(u);
-    int rv = FindRoot(v);
-
-    if (ru == rv) { return; }
-
-    // link: ru and rv
-    if (rank[ru] < rank[rv]) {
-        parent[ru] = rv;
-    } else if (rank[ru] > rank[rv]) {
-        parent[rv] = ru;
-    } else {
-        parent[rv] = ru;
-        ++rank[ru];
-    }
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, similar_degree, cid, disjoint_set_ptr->parent);
 }
 
 // 1st phase: core clustering
@@ -128,14 +72,15 @@ void Graph::PruneAndCrossLink() {
     for (ui i = 0; i < n; i++) {
         for (ui j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
             if (out_edges[j] < i) {
+                // edge should already be explored
                 if (min_cn[j] == NOT_SURE) { min_cn[j] = NOT_SIMILAR; }
             } else {
                 int v = out_edges[j];
-
                 // use pruning rule
                 int a = degree[i], b = degree[v];
                 if (a > b) { swap(a, b); }
                 if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+                    // can be pruned
                     min_cn[j] = NOT_SIMILAR;
 
                     --effective_degree[i];
@@ -149,13 +94,8 @@ void Graph::PruneAndCrossLink() {
 
                         ++similar_degree[i];
                         ++similar_degree[v];
-
-                        if (similar_degree[i] == min_u) {
-                            cores.emplace_back(i);
-                        }
-                        if (similar_degree[v] == min_u) {
-                            cores.emplace_back(v);
-                        }
+                        if (similar_degree[i] == min_u) { cores.emplace_back(i); }
+                        if (similar_degree[v] == min_u) { cores.emplace_back(v); }
                     } else {
                         min_cn[j] = c;
                     }
@@ -177,18 +117,19 @@ void Graph::PruneAndCrossLink() {
     cout << "prune and cross link execution time:" << duration_cast<milliseconds>(end1 - start).count() << " ms\n";
 }
 
-
 int Graph::CheckCore(int u) {
     dst_vertices.clear();
-    for (ui j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-        if (min_cn[j] != NOT_SIMILAR && (similar_degree[u] < min_u || FindRoot(u) != FindRoot(out_edges[j]))) {
-            dst_vertices.emplace_back(j);
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        if (min_cn[j] != NOT_SIMILAR) {
+            if (similar_degree[u] < min_u || !disjoint_set_ptr->IsSameSet(u, out_edges[j])) {
+                dst_vertices.emplace_back(j);
+            }
         }
     }
 
     int i = 0;
     for (; similar_degree[u] < min_u && effective_degree[u] >= min_u && i < dst_vertices.size(); ++i) {
-        ui idx = dst_vertices[i];
+        auto idx = dst_vertices[i];
         if (min_cn[idx] != SIMILAR) {
             int v = out_edges[idx];
 
@@ -223,14 +164,14 @@ void Graph::ClusterCore(int u, int index_i) {
     for (auto idx : dst_vertices) {
         // u and v similar, and v is also a core vertex
         if (min_cn[idx] == SIMILAR && similar_degree[out_edges[idx]] >= min_u) {
-            Union(u, out_edges[idx]);
+            disjoint_set_ptr->Union(u, out_edges[idx]);
         }
     }
 
     for (int i = index_i; i < dst_vertices.size(); ++i) {
         ui idx = dst_vertices[i];
         int v = out_edges[idx];
-        if (!(min_cn[idx] < 0 || similar_degree[v] < min_u || FindRoot(u) == FindRoot(v))) {
+        if (!(min_cn[idx] < 0 || similar_degree[v] < min_u || disjoint_set_ptr->IsSameSet(u, v))) {
             min_cn[idx] = min_cn[reverse_edge_idx[idx]] = SimilarCheckOpt(u, idx);
 
             if (effective_degree[v] != ALREADY_EXPLORED) {
@@ -242,15 +183,13 @@ void Graph::ClusterCore(int u, int index_i) {
                 }
             }
 
-            if (min_cn[idx] == SIMILAR) {
-                Union(u, v);
-            }
+            if (min_cn[idx] == SIMILAR) { disjoint_set_ptr->Union(u, v); }
         }
     }
 }
 
 // 2nd phase:  non-core vertices clustering
-int Graph::CheckCn(int u, int v, int c) {
+int Graph::CheckCnMerge(int u, int v, int min_c) {
     int cn = 2;
 
     if (degree[u] > degree[v]) { swap(u, v); }
@@ -258,7 +197,7 @@ int Graph::CheckCn(int u, int v, int c) {
     // merge-operation for two sorted edge-list
     int du = degree[u] + 1, dv = degree[v] + 1;
     ui i = out_edge_start[u], j = out_edge_start[v];
-    while (i < out_edge_start[u + 1] && j < out_edge_start[v + 1] && cn < c && du >= c && dv >= c) {
+    while (i < out_edge_start[u + 1] && j < out_edge_start[v + 1] && cn < min_c && du >= min_c && dv >= min_c) {
         if (out_edges[i] < out_edges[j]) {
             --du;
             ++i;
@@ -267,11 +206,12 @@ int Graph::CheckCn(int u, int v, int c) {
             ++j;
         } else {
             ++cn;
-            if (cn >= c) { return SIMILAR; }
             ++i;
             ++j;
         }
     }
+
+    if (cn >= min_c) { return SIMILAR; }
     return NOT_SIMILAR;
 }
 
@@ -287,30 +227,30 @@ int Graph::SimilarCheckOpt(int u, ui idx) {
         min_cn[idx] = min_cn[reverse_edge_idx[idx]] = c;
     }
 
-    return CheckCn(u, v, min_cn[idx]);
+    return CheckCnMerge(u, v, min_cn[idx]);
 }
 
 void Graph::ClusterNonCores() {
     // cluster related
     noncore_cluster = vector<pair<int, int>>();
     noncore_cluster.reserve(n);
+
     cid = vector<int>(n);
     std::fill(cid.begin(), cid.end(), n);
 
-    for (ui i = 0; i < n; i++) {
+    for (auto i = 0; i < n; i++) {
         if (similar_degree[i] >= min_u) {
-            int x = FindRoot(i);
+            int x = disjoint_set_ptr->FindRoot(i);
             if (i < cid[x]) { cid[x] = i; }
         }
     }
 
-    for (ui i = 0; i < n; i++) {
+    for (auto i = 0; i < n; i++) {
         if (similar_degree[i] >= min_u) {
-            for (ui j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+            for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 if (similar_degree[out_edges[j]] < min_u) {
                     if (min_cn[j] >= 0) {
                         min_cn[j] = SimilarCheckOpt(i, j);
-                        if (reverse_edge_idx[reverse_edge_idx[j]] != j) { cout << "WA cluster_noncore\n"; }
                         min_cn[reverse_edge_idx[j]] = min_cn[j];
                         if (min_cn[j] == SIMILAR) {
                             ++similar_degree[i];
@@ -318,7 +258,9 @@ void Graph::ClusterNonCores() {
                         }
                     }
 
-                    if (min_cn[j] == SIMILAR) { noncore_cluster.emplace_back(cid[parent[i]], out_edges[j]); }
+                    if (min_cn[j] == SIMILAR) {
+                        noncore_cluster.emplace_back(cid[disjoint_set_ptr->parent[i]], out_edges[j]);
+                    }
                 }
             }
         }
@@ -326,19 +268,21 @@ void Graph::ClusterNonCores() {
 }
 
 void Graph::pSCAN() {
-    cores.reserve(n);
     // 1st
+    cores.reserve(n);
     PruneAndCrossLink();
 
+    // 2nd: explore vertex in effective-degree non-increasing order
     auto start = high_resolution_clock::now();
 
     dst_vertices.reserve(n);
+    // bin_head, bin_next adopted to mimic the max priority queue
     auto bin_next = vector<int>(n);
     auto bin_head = vector<int>(n);
     std::fill(bin_head.begin(), bin_head.end(), INVALID_VERTEX_IDX);
 
     int max_ed = 0;
-    for (ui i = 0; i < n; i++) {
+    for (auto i = 0; i < n; i++) {
         if (effective_degree[i] >= min_u) {
             int ed = effective_degree[i];
             if (ed > max_ed) { max_ed = ed; }
@@ -347,9 +291,9 @@ void Graph::pSCAN() {
         }
     }
 
-    // 2nd: explore vertex in effective-degree non-increasing order
     while (true) {
         int u = INVALID_VERTEX_IDX;
+        // 1st: cluster
         if (!cores.empty()) {
             u = cores.back();
             cores.pop_back();
@@ -358,6 +302,7 @@ void Graph::pSCAN() {
                 for (int x = bin_head[max_ed]; x != -1;) {
                     int tmp = bin_next[x];
                     int ed = effective_degree[x];
+                    // dynamically maintain the max priority queue
                     if (ed == max_ed) {
                         u = x;
                         bin_head[max_ed] = bin_next[x];
@@ -390,5 +335,3 @@ void Graph::pSCAN() {
     // 3rd: non-core clustering
     ClusterNonCores();
 }
-
-

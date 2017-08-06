@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "InputOutput.h"
+#include "DisjointSet.h"
 
 using namespace std;
 
@@ -18,8 +19,8 @@ constexpr int ALREADY_EXPLORED = -1;
 class Graph {
 private:
     unique_ptr<InputOutput> io_helper_ptr;
-    // algorithm parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
-    // algorithm parameter2: min_u: 5, 5 nearest neighbor as threshold
+    // parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
+    // parameter2: min_u: 5, 5 nearest neighbor as threshold
     int eps_a2, eps_b2, min_u;
 
     // compressed spare row graph
@@ -36,33 +37,18 @@ private:
     vector<int> similar_degree;
     vector<int> effective_degree;
 
-    // disjoint-set: used for core-vertex induced connected components
-    vector<int> parent;
-    vector<int> rank;
-
     // clusters: core and non-core(hubs)
     vector<int> cid;    // observation 2: core vertex clusters are disjoint
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
+
+    // intermediate-state variables
     vector<int> cores;
     vector<ui> dst_vertices;
 
-public:
-    explicit Graph(const char *dir_string, const char *eps_s, int miu);
-
-    void pSCAN();
-
-    void Output(const char *eps_s, const char *miu);
+    // disjoint-set: used for core-vertex induced connected components
+    unique_ptr<DisjointSet> disjoint_set_ptr;
 
 private:
-    pair<int, int> ParseEps(const char *eps_s);
-
-    // disjoint-set related, see CLRS chapter 22 for detail
-    void MakeDisjointSetBatch();
-
-    int FindRoot(int u);
-
-    void Union(int u, int v);
-
     // 1st phase
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
@@ -75,12 +61,18 @@ private:
     void ClusterCore(int u, int index_i);
 
     // 2nd phase
-    int CheckCn(int u, int v, int c);
+    int CheckCnMerge(int u, int v, int min_c);
 
     int SimilarCheckOpt(int u, ui idx);
 
     void ClusterNonCores();
 
+public:
+    explicit Graph(const char *dir_string, const char *eps_s, int min_u);
+
+    void pSCAN();
+
+    void Output(const char *eps_s, const char *miu);
 };
 
 #endif

@@ -32,7 +32,6 @@ public:
     vector<int> out_edges;
 
 // vertex property
-
     vector<int> degree;
 
 // edge property
@@ -40,8 +39,10 @@ public:
 
     void ReadGraph();
 
+    pair<int, int> ParseEps(const char *eps_s);
+
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
-                vector<int> &similar_degree, vector<int> &cid, vector<int> &pa);
+                vector<int> &similar_degree, vector<int> &cid, vector<int> &parent);
 };
 
 
