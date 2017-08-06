@@ -27,7 +27,6 @@ void InputOutput::ReadAdjacencyList() {
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
     offset_out_edges.resize(n + 1);
     out_edges.resize(m);
-    reverse_edge_idx.resize(m);
 
     offset_out_edges[0] = 0;
     for (auto i = 0; i < n; i++) { offset_out_edges[i + 1] = offset_out_edges[i] + degree[i]; }
@@ -86,11 +85,12 @@ void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, 
     ofs << "c/n vertex_id cluster_id\n";
 
     int mu = atoi(min_u);
-    for (auto i = 0; i < n; i++) {
-        if (similar_degree[i] >= mu) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }
-    }
+    // observation 2: unique belonging
+    for (auto i = 0; i < n; i++) { if (similar_degree[i] >= mu) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }}
 
+    // possibly multiple belongings
     sort(noncore_cluster.begin(), noncore_cluster.end());
-    noncore_cluster.erase(unique(noncore_cluster.begin(), noncore_cluster.end()), noncore_cluster.end());
-    for (auto &i : noncore_cluster) { ofs << "n " << i.second << " " << i.first << "\n"; }
+    auto iter_end = unique(noncore_cluster.begin(), noncore_cluster.end());
+    for_each(noncore_cluster.begin(), iter_end,
+             [&ofs](auto my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }

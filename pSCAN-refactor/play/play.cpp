@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "pretty_print.h"
 
@@ -59,8 +60,22 @@ void PlaySelfIncrement() {
     cout << my_vec << endl;
 }
 
+
+void PlayUnique() {
+    vector<pair<int, int>> my_vec = {{1, 2},
+                                     {1, 2},
+                                     {1, 3},
+                                     {4, 5},
+                                     {3, 2},
+                                     {3, 2}};
+    sort(my_vec.begin(), my_vec.end());
+    auto iter = unique(my_vec.begin(), my_vec.end());
+    for_each(my_vec.begin(), iter, [](auto ele) { cout << ele << "\n"; });
+}
+
 int main() {
     PlaySwap();
     PlayEpsaAndEpsb();
     PlaySelfIncrement();
+    PlayUnique();
 }

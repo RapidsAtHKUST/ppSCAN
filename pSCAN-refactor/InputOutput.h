@@ -34,9 +34,6 @@ public:
 // vertex property
     vector<int> degree;
 
-// edge property
-    vector<ui> reverse_edge_idx;
-
     void ReadGraph();
 
     pair<int, int> ParseEps(const char *eps_s);

@@ -10,4 +10,4 @@ add_executable(other_play play/play.cpp)
 
 add_executable(pSCAN ${SOURCE_FILES})
 target_compile_definitions(pSCAN PRIVATE _DEBUG_=1 FOO=1)
-target_compile_options(pSCAN PRIVATE -O3)
+target_compile_options(pSCAN PRIVATE -O3 -g)

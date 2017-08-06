@@ -38,7 +38,8 @@ private:
     vector<int> effective_degree;
 
     // clusters: core and non-core(hubs)
-    vector<int> cid;    // observation 2: core vertex clusters are disjoint
+    vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
+    // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
 
     // intermediate-state variables
@@ -58,12 +59,14 @@ private:
 
     int CheckCore(int u);
 
+    bool IsCoreVertex(int u);
+
     void ClusterCore(int u, int index_i);
 
     // 2nd phase
     int CheckCnMerge(int u, int v, int min_c);
 
-    int SimilarCheckOpt(int u, ui idx);
+    int SimilarityCheck(int u, ui idx);
 
     void ClusterNonCores();
 
