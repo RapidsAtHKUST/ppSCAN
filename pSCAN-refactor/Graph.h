@@ -12,7 +12,6 @@ constexpr int NOT_SIMILAR = -2;
 constexpr int SIMILAR = -1;
 constexpr int NOT_SURE = 0;
 
-constexpr int INVALID_VERTEX_IDX = -1;
 constexpr int ALREADY_EXPLORED = -1;
 
 // Graph instance: fast consumption object
@@ -48,7 +47,6 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
-
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index

@@ -6,6 +6,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "MaxPriorityQueueWithLazyUpdate.h"
+
 using namespace std::chrono;
 
 Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
@@ -200,6 +202,7 @@ bool Graph::IsDefiniteCoreVertex(int u) {
 
 // core vertices connected component
 void Graph::ClusterCore(int u, int index_i) {
+    // for these already checked, either from check or cross link
     for (auto idx : dst_vertices) {
         // u and v similar, and v is also a core vertex
         if (min_cn[idx] == SIMILAR && IsDefiniteCoreVertex(out_edges[idx])) {
@@ -207,6 +210,7 @@ void Graph::ClusterCore(int u, int index_i) {
         }
     }
 
+    // for these may have not checked
     for (int i = index_i; i < dst_vertices.size(); ++i) {
         ui edge_idx = dst_vertices[i];
         int v = out_edges[edge_idx];
@@ -263,20 +267,7 @@ void Graph::pSCAN() {
     auto start = high_resolution_clock::now();
 
     dst_vertices.reserve(n);
-    // bin_head, bin_next adopted to mimic the max-priority-queue(heap)
-    auto bin_next = vector<int>(n);
-    auto bin_head = vector<int>(n);
-    std::fill(bin_head.begin(), bin_head.end(), INVALID_VERTEX_IDX);
-
-    int cur_max_ed = 0;
-    for (auto i = 0; i < n; i++) {
-        if (effective_degree[i] >= min_u) {
-            int ed = effective_degree[i];
-            if (ed > cur_max_ed) { cur_max_ed = ed; }
-            bin_next[i] = bin_head[ed];
-            bin_head[ed] = i;
-        }
-    }
+    MaxPriorityQueueWithLazyUpdate max_priority_queue(n, &effective_degree, min_u);
 
     while (true) {
         int u = INVALID_VERTEX_IDX;
@@ -286,29 +277,7 @@ void Graph::pSCAN() {
             cores.pop_back();
         } else {
             // find-max, if there delete-max
-            while (cur_max_ed >= min_u && u == INVALID_VERTEX_IDX) {
-                for (int x = bin_head[cur_max_ed]; x != -1;) {
-                    int tmp = bin_next[x];
-                    int ed = effective_degree[x];
-                    // dynamically maintain the max-priority-queue(heap)
-                    if (ed == cur_max_ed) {
-                        u = x;
-                        bin_head[cur_max_ed] = bin_next[x];
-                        break;
-                    }
-                    // lazy update
-                    if (ed >= min_u) {
-                        bin_next[x] = bin_head[ed];
-                        bin_head[ed] = x;
-                    }
-                    x = tmp;
-                }
-                // reach the tail of linked list, within underlying array
-                if (u == INVALID_VERTEX_IDX) {
-                    bin_head[cur_max_ed] = -1;
-                    --cur_max_ed;
-                }
-            }
+            u = max_priority_queue.pop();
         }
 
         if (u == INVALID_VERTEX_IDX) { break; }
@@ -325,9 +294,3 @@ void Graph::pSCAN() {
     // 3rd: non-core clustering
     ClusterNonCores();
 }
-
-
-
-
-
-

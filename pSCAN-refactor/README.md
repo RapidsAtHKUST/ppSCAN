@@ -148,3 +148,55 @@ void Graph::ClusterCore(int u, int index_i) {
     }
 }
 ```
+
+```cpp
+    MaxPriorityQueueWithLazyUpdate max_priority_queue(n, &effective_degree, min_u);
+
+    // bin_head, bin_next adopted to mimic the max-priority-queue(heap)
+//    auto bin_next = vector<int>(n);
+//    auto bin_head = vector<int>(n);
+//    std::fill(bin_head.begin(), bin_head.end(), INVALID_VERTEX_IDX);
+//    int cur_max_ed = 0;
+//    for (auto i = 0; i < n; i++) {
+//        if (effective_degree[i] >= min_u) {
+//            int ed = effective_degree[i];
+//            if (ed > cur_max_ed) { cur_max_ed = ed; }
+//            bin_next[i] = bin_head[ed];
+//            bin_head[ed] = i;
+//        }
+//    }
+
+    while (true) {
+        int u = INVALID_VERTEX_IDX;
+        // deal with already known cores and then deal with unexplored vertices
+        if (!cores.empty()) {
+            u = cores.back();
+            cores.pop_back();
+        } else {
+            // find-max, if there delete-max
+           u= max_priority_queue.pop();
+//            while (cur_max_ed >= min_u && u == INVALID_VERTEX_IDX) {
+//                for (int x = bin_head[cur_max_ed]; x != -1;) {
+//                    int tmp = bin_next[x];
+//                    int ed = effective_degree[x];
+//                    // dynamically maintain the max-priority-queue(heap)
+//                    if (ed == cur_max_ed) {
+//                        u = x;
+//                        bin_head[cur_max_ed] = bin_next[x];
+//                        break;
+//                    }
+//                    // lazy update
+//                    if (ed >= min_u) {
+//                        bin_next[x] = bin_head[ed];
+//                        bin_head[ed] = x;
+//                    }
+//                    x = tmp;
+//                }
+//                // reach the tail of linked list, within underlying array
+//                if (u == INVALID_VERTEX_IDX) {
+//                    bin_head[cur_max_ed] = -1;
+//                    --cur_max_ed;
+//                }
+//            }
+        }
+```
