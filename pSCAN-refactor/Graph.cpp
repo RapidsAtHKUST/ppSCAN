@@ -143,16 +143,16 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 }
 
-int Graph::EvalDensity(int u, ui idx) {
+int Graph::EvalDensity(int u, ui edge_idx) {
     // check density for edge (u,v)
-    int v = out_edges[idx];
-    if (min_cn[idx] == NOT_SURE) {
+    int v = out_edges[edge_idx];
+    if (min_cn[edge_idx] == NOT_SURE) {
         int c = ComputeCnLowerBound(degree[u], degree[v]);
         if (c <= 2) { return SIMILAR; }
-        min_cn[idx] = c;
-        UpdateViaCrossLink(idx);
+        min_cn[edge_idx] = c;
+        UpdateViaCrossLink(edge_idx);
     }
-    return IntersectNeighborSets(u, v, min_cn[idx]);
+    return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
 // 1st phase: core clustering
@@ -239,6 +239,7 @@ void Graph::MarkClusterMinEleAsId() {
 
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) {
+            // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
             int x = disjoint_set_ptr->FindRoot(i);
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
         }
@@ -257,11 +258,6 @@ void Graph::ClusterNonCores() {
                 if (!IsDefiniteCoreVertex(out_edges[j])) {
                     if (min_cn[j] >= 0) {
                         min_cn[j] = EvalDensity(i, j);
-                        UpdateViaCrossLink(j);
-                        if (min_cn[j] == SIMILAR) {
-                            ++similar_degree[i];
-                            ++similar_degree[out_edges[j]];
-                        }
                     }
                     if (min_cn[j] == SIMILAR) {
                         // root must be parent since already disjoint_set_ptr->FindRoot(i) previously

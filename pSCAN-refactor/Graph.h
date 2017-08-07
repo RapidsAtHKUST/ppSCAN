@@ -66,7 +66,7 @@ private:
     // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
-    int EvalDensity(int u, ui idx);
+    int EvalDensity(int u, ui edge_idx);
 
     // 1st phase computation: core check and cluster
     int CheckCore(int u);
