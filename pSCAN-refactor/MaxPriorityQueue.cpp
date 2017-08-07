@@ -2,9 +2,9 @@
 // Created by yche on 8/7/17.
 //
 
-#include "MaxPriorityQueueWithLazyUpdate.h"
+#include "MaxPriorityQueue.h"
 
-MaxPriorityQueueWithLazyUpdate::MaxPriorityQueueWithLazyUpdate(unsigned int vertex_num, vector<int> *effective_deg_ptr, int min_u) {
+MaxPriorityQueue::MaxPriorityQueue(unsigned int vertex_num, vector<int> *effective_deg_ptr, int min_u) {
     bin_head = vector<int>(vertex_num);
     bin_next = vector<int>(vertex_num);
     std::fill(bin_head.begin(), bin_head.end(), INVALID_VERTEX_IDX);
@@ -23,7 +23,7 @@ MaxPriorityQueueWithLazyUpdate::MaxPriorityQueueWithLazyUpdate(unsigned int vert
     }
 }
 
-int MaxPriorityQueueWithLazyUpdate::pop() {
+int MaxPriorityQueue::pop() {
     int u = INVALID_VERTEX_IDX;
     auto &effective_degree = *effective_deg_ptr_;
     while (cur_max_ed >= min_u_ && u == INVALID_VERTEX_IDX) {

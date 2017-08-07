@@ -10,7 +10,8 @@
 using namespace std;
 constexpr int INVALID_VERTEX_IDX = -1;
 
-class MaxPriorityQueueWithLazyUpdate {
+// adopt lazy update strategy, see pop() for detail
+class MaxPriorityQueue {
 private:
     vector<int> bin_next;
     vector<int> bin_head;
@@ -19,7 +20,7 @@ private:
     int cur_max_ed;
     int min_u_;
 public:
-    MaxPriorityQueueWithLazyUpdate(unsigned int vertex_num, vector<int> *effective_deg_ptr, int min_u);
+    MaxPriorityQueue(unsigned int vertex_num, vector<int> *effective_deg_ptr, int min_u);
 
     int pop();
 };

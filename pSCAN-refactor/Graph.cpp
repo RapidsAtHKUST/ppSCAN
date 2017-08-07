@@ -6,7 +6,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "MaxPriorityQueueWithLazyUpdate.h"
+#include "MaxPriorityQueue.h"
 
 using namespace std::chrono;
 
@@ -267,7 +267,7 @@ void Graph::pSCAN() {
     auto start = high_resolution_clock::now();
 
     dst_vertices.reserve(n);
-    MaxPriorityQueueWithLazyUpdate max_priority_queue(n, &effective_degree, min_u);
+    MaxPriorityQueue max_priority_queue(n, &effective_degree, min_u);
 
     while (true) {
         int u = INVALID_VERTEX_IDX;
