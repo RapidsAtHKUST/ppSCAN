@@ -7,7 +7,7 @@
 void DisjointSet::MakeDisjointSetBatch(ui capacity) {
     parent = vector<int>(capacity);
     rank = vector<int>(capacity);
-    for (ui i = 0; i < capacity; i++) { parent[i] = i; }
+    for (auto i = 0; i < capacity; i++) { parent[i] = i; }
     std::fill(rank.begin(), rank.end(), 0);
 }
 

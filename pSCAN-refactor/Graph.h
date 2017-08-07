@@ -43,40 +43,39 @@ private:
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
 
     // intermediate-state variables
-    vector<int> cores;
+    vector<ui> cores;
     vector<ui> dst_vertices;
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
 private:
+    // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
-    // cross-link optimization related
     void InitCrossLink(ui edge_idx, ui rev_edge_idx);
 
     void UpdateViaCrossLink(int edge_idx);
 
-    // common-neighbor check pruning optimization related
+    // 2nd optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
     void PruneAndCrossLink();
 
-    // density-refinement related
-    int CheckCnIntersection(int u, int v, int min_c);
+    // density-eval related
+    int IntersectNeighborSets(int u, int v, int min_cn_num);
 
-    int CheckDensity(int u, ui idx);
+    int EvalDensity(int u, ui idx);
 
-    // 1st phase: core check and cluster
+    // 1st phase computation: core check and cluster
     int CheckCore(int u);
 
     bool IsDefiniteCoreVertex(int u);
 
     void ClusterCore(int u, int index_i);
 
-    // 2nd phase
-
+    // 2nd phase computation
     void ClusterNonCores();
 
 public:
