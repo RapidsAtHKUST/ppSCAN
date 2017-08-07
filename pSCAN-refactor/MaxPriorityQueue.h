@@ -10,6 +10,7 @@
 using namespace std;
 constexpr int INVALID_VERTEX_IDX = -1;
 
+// MaxPriorityQueue instance: fast consumption object
 // adopt lazy update strategy, see pop() for detail
 class MaxPriorityQueue {
 private:

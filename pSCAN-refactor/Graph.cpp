@@ -119,11 +119,11 @@ void Graph::PruneAndCrossLink() {
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
-    int cn = 2;
+    int cn = 2; // count for self and v, count for self and u
     if (degree[u] > degree[v]) { swap(u, v); }
 
     // merge-operation for two sorted edge-list
-    int du = degree[u] + 1, dv = degree[v] + 1;
+    int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
     ui i = out_edge_start[u], j = out_edge_start[v];
     while (i < out_edge_start[u + 1] && j < out_edge_start[v + 1] &&
            cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num) {
