@@ -21,7 +21,6 @@
 /*   Storage and Analysis (Supercomputing, SC'12), pp.62:1-62:11, 2012.	     */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 #ifndef _CLUSTER_
 #define _CLUSTER_
 
@@ -37,7 +36,7 @@ namespace NWUClustering {
 
     class Clusters {
     public:
-        Clusters() : m_pts(NULL), m_kdtree(NULL) {}
+        Clusters();
 
         virtual ~Clusters();
 

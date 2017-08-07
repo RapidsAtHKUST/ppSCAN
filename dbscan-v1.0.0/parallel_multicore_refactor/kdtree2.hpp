@@ -7,8 +7,6 @@
 // Licensed under the Academic Free License version 1.1 found in file LICENSE
 // with additional provisions in that same file.
 
-
-
 //
 // Implement a kd tree for fast searching of points in a fixed data base
 // in k-dimensional Euclidean space.
@@ -17,22 +15,14 @@
 
 #include "utils.h"
 
-
 typedef struct {
     float lower, upper;
 } interval;
 
-
-// let the compiler know that this is a names of classes. 
+// let the compiler know that this is a names of classes.
 class kdtree2_node;
 
 class searchrecord;
-
-//
-// struct KDTREE2_RESULT
-// class  KDTREE2_RESULT
-//
-
 
 struct kdtree2_result {
     //
@@ -186,7 +176,6 @@ private:
 // a node in the tree.  Many are created per tree dynamically.. 
 //
 
-
 class kdtree2_node {
 public:
     // constructor
@@ -223,9 +212,6 @@ private:
     void process_terminal_node(searchrecord &sr);
 
     void process_terminal_node_fixedball(searchrecord &sr);
-
-
 };
-
 
 #endif

@@ -27,7 +27,7 @@
 float findKMedian(vector<float> &A, int K) {
     int l, m;
     l = 0;
-    m = A.size() - 1;
+    m = static_cast<int>(A.size() - 1);
     while (l < m) {
         float x = A[K];
         int i = l;

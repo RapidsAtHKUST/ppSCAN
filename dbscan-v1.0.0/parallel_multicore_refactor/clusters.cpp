@@ -21,21 +21,19 @@
 /*   Storage and Analysis (Supercomputing, SC'12), pp.62:1-62:11, 2012.	     */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
 #include "clusters.h"
 
 namespace NWUClustering {
     Clusters::~Clusters() {
-        if (m_pts) {
+        if (m_pts != nullptr) {
             m_pts->m_points.clear();
             delete m_pts;
-            m_pts = NULL;
+            m_pts = nullptr;
         }
 
-        if (m_kdtree) {
+        if (m_kdtree != nullptr) {
             delete m_kdtree;
-            m_kdtree = NULL;
+            m_kdtree = nullptr;
         }
     }
 
@@ -59,9 +57,9 @@ namespace NWUClustering {
                 m_pts->m_i_num_points = num_points;
 
                 //allocate memory for the points
-                m_pts->m_points.resize(num_points);
+                m_pts->m_points.resize(static_cast<unsigned long>(num_points));
                 for (int ll = 0; ll < num_points; ll++)
-                    m_pts->m_points[ll].resize(dims);
+                    m_pts->m_points[ll].resize(static_cast<unsigned long>(dims));
 
 
                 point_coord_type *pt;
@@ -111,9 +109,9 @@ namespace NWUClustering {
 
                 // allocate memory for points
                 m_pts = new Points;
-                m_pts->m_points.resize(num_points);
+                m_pts->m_points.resize(static_cast<unsigned long>(num_points));
                 for (int ll = 0; ll < num_points; ll++)
-                    m_pts->m_points[ll].resize(dims);
+                    m_pts->m_points[ll].resize(static_cast<unsigned long>(dims));
 
 
                 file.clear();
@@ -133,7 +131,7 @@ namespace NWUClustering {
                     j = 0;
                     while (ss >> buf && j < dims) // get the corordinate of the points
                     {
-                        m_pts->m_points[i][j] = atof(buf.c_str());
+                        m_pts->m_points[i][j] = static_cast<float>(atof(buf.c_str()));
                         j++;
                     }
 
@@ -155,18 +153,20 @@ namespace NWUClustering {
     }
 
     int Clusters::build_kdtree() {
-        if (m_pts == NULL) {
+        if (m_pts == nullptr) {
             cout << "Point set is empty" << endl;
             return -1;
         }
 
         m_kdtree = new kdtree2(m_pts->m_points, false);
 
-        if (m_kdtree == NULL) {
+        if (m_kdtree == nullptr) {
             cout << "Falied to allocate new kd tree" << endl;
             return -1;
         }
 
         return 0;
     }
+
+    Clusters::Clusters() : m_pts(nullptr), m_kdtree(nullptr) {}
 }

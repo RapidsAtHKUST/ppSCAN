@@ -1,16 +1,12 @@
-
 //
 // (c) Matthew B. Kennel, Institute for Nonlinear Science, UCSD (2004)
 //
 // Licensed under the Academic Free License version 1.1 found in file LICENSE
 // with additional provisions in that same file.
 
-
 #include "kdtree2.hpp"
 
-
 // utility
-
 inline float squared(const float x) {
     return (x * x);
 }
@@ -29,8 +25,6 @@ inline void swap(float &a, float &b) {
     b = tmp;
 }
 
-
-//
 //       KDTREE2_RESULT implementation
 // 
 
@@ -38,7 +32,6 @@ inline bool operator<(const kdtree2_result &e1, const kdtree2_result &e2) {
     return (e1.dis < e2.dis);
 }
 
-//
 //       KDTREE2_RESULT_VECTOR implementation
 // 
 float kdtree2_result_vector::max_value() {
@@ -63,9 +56,7 @@ float kdtree2_result_vector::replace_maxpri_elt_return_new_maxpri(kdtree2_result
     return ((*this)[0].dis);
 }
 
-//
 //        KDTREE2 implementation
-//
 
 // constructor
 kdtree2::kdtree2(array2dfloat &data_in, bool rearrange_in, int dim_in)
@@ -85,7 +76,6 @@ kdtree2::kdtree2(array2dfloat &data_in, bool rearrange_in, int dim_in)
     regular_median = 0;
 #endif
 
-
     //
     // initialize the constant references using this unusual C++
     // feature.
@@ -100,9 +90,6 @@ kdtree2::kdtree2(array2dfloat &data_in, bool rearrange_in, int dim_in)
     if (rearrange) {
         // if we have a rearranged tree.
         // allocate the memory for it.
-
-
-        //printf("rearranging\n");
 
         //rearranged_data.resize( extents[N][dim] );
         rearranged_data.resize(N);

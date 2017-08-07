@@ -22,9 +22,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #include "dbscan.h"
-#include "utils.h"
-#include "kdtree2.hpp"
-
 
 static void usage(char *argv0) {
     const char *params =
@@ -48,16 +45,16 @@ int main(int argc, char **argv) {
     int minPts, threads;
     int classical = 0;
     double eps;
-    char *outfilename = NULL;
+    char *outfilename = nullptr;
     int isBinaryFile;
-    char *infilename = NULL;
+    char *infilename = nullptr;
 
     // some default values
     minPts = -1;
     eps = -1;
     isBinaryFile = 0;
-    outfilename = NULL;
-    infilename = NULL;
+    outfilename = nullptr;
+    infilename = nullptr;
     threads = -1;
 
     while ((opt = getopt(argc, argv, "i:t:d:p:m:e:o:v:z:bxghncul")) != EOF) {
@@ -92,7 +89,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (infilename == NULL || minPts < 0 || eps < 0 || threads < 1) {
+    if (infilename == nullptr || minPts < 0 || eps < 0 || threads < 1) {
         usage(argv[0]);
         exit(-1);
     }
@@ -120,7 +117,7 @@ int main(int argc, char **argv) {
     run_dbscan_algo_uf(dbs);
     cout << "DBSCAN (total) took " << omp_get_wtime() - start << " seconds." << endl;
 
-    if (outfilename != NULL) {
+    if (outfilename != nullptr) {
         ofstream outfile;
         outfile.open(outfilename);
         dbs.writeClusters_uf(outfile);

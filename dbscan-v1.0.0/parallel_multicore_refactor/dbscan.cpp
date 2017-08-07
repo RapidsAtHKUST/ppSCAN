@@ -21,7 +21,6 @@
 /*   Storage and Analysis (Supercomputing, SC'12), pp.62:1-62:11, 2012.	     */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 #include "dbscan.h"
 
 namespace NWUClustering {
@@ -42,7 +41,7 @@ namespace NWUClustering {
 
     void ClusteringAlgo::writeClusters(ostream &o) {
         // writing point id and cluster id pairs per line, noise has cluster id 0
-        int iMaxID = m_clusters.size(), id, i, j;
+        int iMaxID = static_cast<int>(m_clusters.size()), id, i, j;
         for (i = 0; i < m_pts->m_i_num_points; i++) {
             //for (j = 0; j < m_pts->m_i_dims; j++)
             //	o << " " << m_pts->m_points[i][j];
@@ -71,7 +70,7 @@ namespace NWUClustering {
     void ClusteringAlgo::writeClusters_uf(ostream &o) {
         // writing point id and cluster id pairs per line, noise has cluster id 0
         vector<int> clusters;
-        clusters.resize(m_pts->m_i_num_points, 0);
+        clusters.resize(static_cast<unsigned long>(m_pts->m_i_num_points), 0);
 
         int i, j, sum_points = 0, noise = 0, root, rootcount = 0, tmp;
 
@@ -362,12 +361,8 @@ namespace NWUClustering {
         dbs.m_clusters.clear();
 
         // get the neighbor of the first point and print them
-
-        //cout << "DBSCAN ALGORITHMS============================" << endl;
-
         kdtree2_result_vector ne;
         kdtree2_result_vector ne2;
-        //kdtree2_result_vector ne3;
         ne.reserve(dbs.m_pts->m_i_num_points);
         ne2.reserve(dbs.m_pts->m_i_num_points);
 
@@ -429,7 +424,6 @@ namespace NWUClustering {
         double stop = omp_get_wtime();
         cout << "Local computation took " << stop - start << " seconds." << endl;
         cout << "No merging stage in classical DBSCAN" << endl;
-        ind = NULL;
         ne.clear();
         ne2.clear();
     }
