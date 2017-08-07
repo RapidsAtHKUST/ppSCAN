@@ -107,7 +107,7 @@ void Graph::PruneAndCrossLink() {
 
                 // find edge, in order to build cross link
                 if (min_cn[j] != NOT_SIMILAR) {
-                    ui r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
+                    auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
                     InitCrossLink(j, r_id);
                     UpdateViaCrossLink(j);
                 }
@@ -171,7 +171,6 @@ int Graph::CheckCore(int u) {
         auto idx = dst_vertices[i];
         if (min_cn[idx] != SIMILAR) {
             int v = out_edges[idx];
-
             // 1st: compute density, build cross link
             min_cn[idx] = EvalDensity(u, idx);
             UpdateViaCrossLink(idx);
@@ -234,10 +233,7 @@ void Graph::ClusterCore(int u, int index_i) {
 }
 
 // 2nd phase:  non-core vertices clustering
-void Graph::ClusterNonCores() {
-    noncore_cluster = vector<pair<int, int>>();
-    noncore_cluster.reserve(n);
-
+void Graph::MarkClusterMinEleAsId() {
     cluster_dict = vector<int>(n);
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
@@ -247,7 +243,13 @@ void Graph::ClusterNonCores() {
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
         }
     }
+}
 
+void Graph::ClusterNonCores() {
+    noncore_cluster = vector<pair<int, int>>();
+    noncore_cluster.reserve(n);
+
+    MarkClusterMinEleAsId();
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
@@ -285,11 +287,11 @@ void Graph::pSCAN() {
     auto bin_head = vector<int>(n);
     std::fill(bin_head.begin(), bin_head.end(), INVALID_VERTEX_IDX);
 
-    int max_ed = 0;
+    int cur_max_ed = 0;
     for (auto i = 0; i < n; i++) {
         if (effective_degree[i] >= min_u) {
             int ed = effective_degree[i];
-            if (ed > max_ed) { max_ed = ed; }
+            if (ed > cur_max_ed) { cur_max_ed = ed; }
             bin_next[i] = bin_head[ed];
             bin_head[ed] = i;
         }
@@ -303,14 +305,14 @@ void Graph::pSCAN() {
             cores.pop_back();
         } else {
             // find-max, if there delete-max
-            while (max_ed >= min_u && u == INVALID_VERTEX_IDX) {
-                for (int x = bin_head[max_ed]; x != -1;) {
+            while (cur_max_ed >= min_u && u == INVALID_VERTEX_IDX) {
+                for (int x = bin_head[cur_max_ed]; x != -1;) {
                     int tmp = bin_next[x];
                     int ed = effective_degree[x];
                     // dynamically maintain the max-priority-queue(heap)
-                    if (ed == max_ed) {
+                    if (ed == cur_max_ed) {
                         u = x;
-                        bin_head[max_ed] = bin_next[x];
+                        bin_head[cur_max_ed] = bin_next[x];
                         break;
                     }
                     // lazy update
@@ -322,8 +324,8 @@ void Graph::pSCAN() {
                 }
                 // reach the tail of linked list, within underlying array
                 if (u == INVALID_VERTEX_IDX) {
-                    bin_head[max_ed] = -1;
-                    --max_ed;
+                    bin_head[cur_max_ed] = -1;
+                    --cur_max_ed;
                 }
             }
         }
@@ -342,6 +344,7 @@ void Graph::pSCAN() {
     // 3rd: non-core clustering
     ClusterNonCores();
 }
+
 
 
 
