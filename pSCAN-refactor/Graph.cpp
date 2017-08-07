@@ -143,12 +143,6 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 int Graph::EvalDensity(int u, ui edge_idx) {
     // check density for edge (u,v)
     int v = out_edges[edge_idx];
-    if (min_cn[edge_idx] == NOT_SURE) {
-        int c = ComputeCnLowerBound(degree[u], degree[v]);
-        if (c <= 2) { return SIMILAR; }
-        min_cn[edge_idx] = c;
-        UpdateViaCrossLink(edge_idx);
-    }
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
@@ -191,7 +185,7 @@ int Graph::CheckCore(int u) {
         }
     }
 
-    // mark u as already explored
+    // mark u as already explored, to avoid duplicated in cores
     effective_degree[u] = ALREADY_EXPLORED;
     return i;
 }

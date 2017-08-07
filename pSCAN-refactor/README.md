@@ -100,3 +100,20 @@ void Graph::PruneAndCrossLink() {
     cout << "prune and cross link execution time:" << duration_cast<milliseconds>(end1 - start).count() << " ms\n";
 }
 ```
+
+
+```cpp
+int Graph::EvalDensity(int u, ui edge_idx) {
+    // check density for edge (u,v)
+    int v = out_edges[edge_idx];
+    
+// it seems useless
+//    if (min_cn[edge_idx] == NOT_SURE) {
+//        int c = ComputeCnLowerBound(degree[u], degree[v]);
+//        if (c <= 2) { return SIMILAR; }
+//        min_cn[edge_idx] = c;
+//        UpdateViaCrossLink(edge_idx);
+//    }
+    return IntersectNeighborSets(u, v, min_cn[edge_idx]);
+}
+```
