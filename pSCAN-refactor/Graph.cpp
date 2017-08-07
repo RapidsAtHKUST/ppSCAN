@@ -146,6 +146,10 @@ int Graph::EvalDensity(int u, ui edge_idx) {
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
+bool Graph::IsSimilarityUnKnow(ui edge_idx) {
+    return min_cn[edge_idx] > 0;
+}
+
 // 1st phase: core clustering
 int Graph::CheckCore(int u) {
     dst_vertices.clear();
@@ -194,6 +198,7 @@ bool Graph::IsDefiniteCoreVertex(int u) {
     return similar_degree[u] >= min_u;
 }
 
+// core vertices connected component
 void Graph::ClusterCore(int u, int index_i) {
     for (auto idx : dst_vertices) {
         // u and v similar, and v is also a core vertex
@@ -203,22 +208,13 @@ void Graph::ClusterCore(int u, int index_i) {
     }
 
     for (int i = index_i; i < dst_vertices.size(); ++i) {
-        ui idx = dst_vertices[i];
-        int v = out_edges[idx];
-        if (min_cn[idx] >= 0 && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
-            min_cn[idx] = EvalDensity(u, idx);
-            UpdateViaCrossLink(idx);
-            // core vertices connected component
-            if (min_cn[idx] == SIMILAR) { disjoint_set_ptr->Union(u, v); }
+        ui edge_idx = dst_vertices[i];
+        int v = out_edges[edge_idx];
 
-            if (effective_degree[v] != ALREADY_EXPLORED) {
-                if (min_cn[idx] == SIMILAR) {
-                    ++similar_degree[v];
-                    if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
-                } else {
-                    --effective_degree[v];
-                }
-            }
+        if (IsSimilarityUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+            min_cn[edge_idx] = EvalDensity(u, edge_idx);
+            UpdateViaCrossLink(edge_idx);
+            if (min_cn[edge_idx] == SIMILAR) { disjoint_set_ptr->Union(u, v); }
         }
     }
 }
@@ -247,9 +243,7 @@ void Graph::ClusterNonCores() {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 // observation 3: check non-core neighbors
                 if (!IsDefiniteCoreVertex(out_edges[j])) {
-                    if (min_cn[j] >= 0) {
-                        min_cn[j] = EvalDensity(i, j);
-                    }
+                    if (IsSimilarityUnKnow(j)) { min_cn[j] = EvalDensity(i, j); }
                     if (min_cn[j] == SIMILAR) {
                         // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
                         noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->parent[i]], out_edges[j]);
@@ -331,6 +325,7 @@ void Graph::pSCAN() {
     // 3rd: non-core clustering
     ClusterNonCores();
 }
+
 
 
 

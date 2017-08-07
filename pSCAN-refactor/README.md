@@ -117,3 +117,34 @@ int Graph::EvalDensity(int u, ui edge_idx) {
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 ```
+
+```cpp
+void Graph::ClusterCore(int u, int index_i) {
+    for (auto idx : dst_vertices) {
+        // u and v similar, and v is also a core vertex
+        if (min_cn[idx] == SIMILAR && IsDefiniteCoreVertex(out_edges[idx])) {
+            disjoint_set_ptr->Union(u, out_edges[idx]);
+        }
+    }
+
+    for (int i = index_i; i < dst_vertices.size(); ++i) {
+        ui edge_idx = dst_vertices[i];
+        int v = out_edges[edge_idx];
+        if (IsSimilarityUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+            min_cn[edge_idx] = EvalDensity(u, edge_idx);
+            UpdateViaCrossLink(edge_idx);
+            // core vertices connected component
+            if (min_cn[edge_idx] == SIMILAR) { disjoint_set_ptr->Union(u, v); }
+
+//            if (effective_degree[v] != ALREADY_EXPLORED) {
+//                if (min_cn[edge_idx] == SIMILAR) {
+//                    ++similar_degree[v];
+//                    if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
+//                } else {
+//                    --effective_degree[v];
+//                }
+//            }
+        }
+    }
+}
+```

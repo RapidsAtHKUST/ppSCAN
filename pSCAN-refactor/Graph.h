@@ -68,6 +68,8 @@ private:
 
     int EvalDensity(int u, ui edge_idx);
 
+    bool IsSimilarityUnKnow(ui edge_idx);
+
     // 1st phase computation: core check and cluster
     int CheckCore(int u);
 
