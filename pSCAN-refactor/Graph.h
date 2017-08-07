@@ -50,23 +50,32 @@ private:
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
 private:
-    // 1st phase
+    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
+    // cross-link optimization related
+    void InitCrossLink(ui edge_idx, ui rev_edge_idx);
+
+    void UpdateViaCrossLink(int edge_idx);
+
+    // common-neighbor check pruning optimization related
     int ComputeCnLowerBound(int u, int v);
 
     void PruneAndCrossLink();
 
+    // density-refinement related
+    int CheckCnIntersection(int u, int v, int min_c);
+
+    int CheckDensity(int u, ui idx);
+
+    // 1st phase: core check and cluster
     int CheckCore(int u);
 
-    bool IsCoreVertex(int u);
+    bool IsDefiniteCoreVertex(int u);
 
     void ClusterCore(int u, int index_i);
 
     // 2nd phase
-    int CheckCnMerge(int u, int v, int min_c);
-
-    int SimilarityCheck(int u, ui idx);
 
     void ClusterNonCores();
 
