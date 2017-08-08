@@ -1,0 +1,1167 @@
+events: Hits
+
+fl=(1) /home/yche/GitRepos/ScanOptimizing/pSCAN-refactor/DisjointSet.cpp
+fn=(1) DisjointSet::FindRoot[inline]
+19 1
+
+fl=(1)
+fn=(2) DisjointSet::FindRoot
+20 1
+
+fl=(1)
+fn=(1)
+20 21
+
+fl=(1)
+fn=(1)
+22 2
+
+fl=(1)
+fn=(3) DisjointSet::IsSameSet
+cfl=(1)
+cfn=(1)
+calls=1 22
+32 1
+
+fl=(1)
+fn=(3)
+cfl=(1)
+cfn=(1)
+calls=13 20
+32 13
+
+fl=(1)
+fn=(4) DisjointSet::Union
+cfl=(1)
+cfn=(1)
+calls=1 19
+36 1
+
+fl=(1)
+fn=(4)
+cfl=(1)
+cfn=(1)
+calls=1 20
+36 1
+
+fl=(1)
+fn=(4)
+cfl=(1)
+cfn=(1)
+calls=7 20
+37 7
+
+fl=(1)
+fn=(4)
+cfl=(1)
+cfn=(1)
+calls=1 22
+37 1
+
+fl=(1)
+fn=(4)
+43 3
+
+fl=(1)
+fn=(4)
+44 1
+
+fl=(2) /home/yche/GitRepos/ScanOptimizing/pSCAN-refactor/Graph.cpp
+fn=(5) Graph::BinarySearch[inline]
+49 108
+
+fl=(2)
+fn=(5)
+51 7
+
+fl=(2)
+fn=(5)
+52 54
+
+fl=(2)
+fn=(5)
+53 12
+
+fl=(2)
+fn=(5)
+56 4
+
+fl=(2)
+fn=(6) Graph::InitCrossLink[inline]
+63 2
+
+fl=(2)
+fn=(6)
+64 3
+
+fl=(2)
+fn=(7) Graph::UpdateViaCrossLink[inline]
+68 55
+
+fl=(2)
+fn=(8) Graph::ComputeCnLowerBound[inline]
+72 56
+
+fl=(2)
+fn=(8)
+73 6
+
+fl=(2)
+fn=(9) Graph::PruneAndCrossLink
+81 1
+
+fl=(2)
+fn=(9)
+82 5
+
+fl=(2)
+fn=(9)
+83 1
+
+fl=(2)
+fn=(9)
+85 2
+
+fl=(2)
+fn=(9)
+87 2
+
+fl=(2)
+fn=(9)
+88 35
+
+fl=(2)
+fn=(9)
+89 10
+
+fl=(2)
+fn=(9)
+93 11
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(8)
+calls=6 73
+95 6
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(8)
+calls=56 72
+95 56
+
+fl=(2)
+fn=(9)
+97 1
+
+fl=(2)
+fn=(9)
+98 1
+
+fl=(2)
+fn=(9)
+100 1
+
+fl=(2)
+fn=(9)
+102 5
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(5)
+calls=12 53
+110 12
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(5)
+calls=7 51
+110 7
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(5)
+calls=108 49
+110 108
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(5)
+calls=54 52
+110 54
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(5)
+calls=4 56
+110 4
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(6)
+calls=2 63
+111 2
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(6)
+calls=3 64
+111 3
+
+fl=(2)
+fn=(9)
+cfl=(2)
+cfn=(7)
+calls=18 68
+112 18
+
+fl=(2)
+fn=(10) Graph::IntersectNeighborSets
+121 1
+
+fl=(2)
+fn=(10)
+122 1
+
+fl=(2)
+fn=(10)
+cfl=(3) /usr/include/c++/6.4.1/bits/stl_vector.h
+cfn=(11) std::vector::operator[][inline]
+calls=53 781
+123 53
+
+fl=(2)
+fn=(10)
+123 9
+
+fl=(2)
+fn=(10)
+cfl=(4) /usr/include/c++/6.4.1/bits/move.h
+cfn=(12) std::swap[inline]
+calls=3 192
+123 3
+
+fl=(2)
+fn=(10)
+127 12
+
+fl=(2)
+fn=(10)
+128 69
+
+fl=(2)
+fn=(10)
+cfl=(3)
+cfn=(11)
+calls=6 781
+128 6
+
+fl=(2)
+fn=(10)
+129 211
+
+fl=(2)
+fn=(10)
+130 241
+
+fl=(2)
+fn=(10)
+131 86
+
+fl=(2)
+fn=(10)
+132 181
+
+fl=(2)
+fn=(10)
+133 245
+
+fl=(2)
+fn=(10)
+134 67
+
+fl=(2)
+fn=(10)
+135 12
+
+fl=(2)
+fn=(10)
+137 41
+
+fl=(2)
+fn=(10)
+138 20
+
+fl=(2)
+fn=(10)
+142 10
+
+fl=(2)
+fn=(10)
+143 2
+
+fl=(2)
+fn=(13) Graph::EvalDensity[inline]
+cfl=(2)
+cfn=(10)
+calls=245 133
+148 245
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=1 121
+148 1
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=12 135
+148 12
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=241 130
+148 241
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=10 142
+148 10
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=75 128
+148 75
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=41 137
+148 41
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=181 132
+148 181
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=12 127
+148 12
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=1 122
+148 1
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=67 134
+148 67
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=2 143
+148 2
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=86 131
+148 86
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=211 129
+148 211
+
+fl=(2)
+fn=(13)
+148 3
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=20 138
+148 20
+
+fl=(2)
+fn=(13)
+cfl=(2)
+cfn=(10)
+calls=65 123
+148 65
+
+fl=(2)
+fn=(14) Graph::IsSimilarityUnKnow[inline]
+cfl=(3)
+cfn=(11)
+calls=5 781
+152 5
+
+fl=(2)
+fn=(15) Graph::CheckCore
+158 12
+
+fl=(2)
+fn=(15)
+159 20
+
+fl=(2)
+fn=(15)
+cfl=(1)
+cfn=(3)
+calls=6 32
+160 6
+
+fl=(2)
+fn=(15)
+160 4
+
+fl=(2)
+fn=(15)
+cfl=(5) /usr/include/c++/6.4.1/bits/vector.tcc
+cfn=(16) std::vector::emplace_back[inline]
+calls=2 96
+161 2
+
+fl=(2)
+fn=(15)
+cfl=(5)
+cfn=(16)
+calls=1 94
+161 1
+
+fl=(2)
+fn=(15)
+167 4
+
+fl=(2)
+fn=(15)
+cfl=(3)
+cfn=(11)
+calls=1 781
+167 1
+
+fl=(2)
+fn=(15)
+168 1
+
+fl=(2)
+fn=(15)
+169 1
+
+fl=(2)
+fn=(15)
+170 16
+
+fl=(2)
+fn=(15)
+172 1
+
+fl=(2)
+fn=(15)
+cfl=(2)
+cfn=(13)
+calls=1247 148
+172 1247
+
+fl=(2)
+fn=(15)
+cfl=(2)
+cfn=(7)
+calls=36 68
+173 36
+
+fl=(2)
+fn=(15)
+176 34
+
+fl=(2)
+fn=(15)
+183 112
+
+fl=(2)
+fn=(15)
+184 2
+
+fl=(2)
+fn=(15)
+186 9
+
+fl=(2)
+fn=(15)
+197 1
+
+fl=(2)
+fn=(17) Graph::IsDefiniteCoreVertex[inline]
+200 1
+
+fl=(2)
+fn=(18) Graph::ClusterCore
+208 10
+
+fl=(2)
+fn=(18)
+cfl=(1)
+cfn=(4)
+calls=3 43
+209 3
+
+fl=(2)
+fn=(18)
+cfl=(1)
+cfn=(4)
+calls=2 36
+209 2
+
+fl=(2)
+fn=(18)
+cfl=(1)
+cfn=(4)
+calls=1 44
+209 1
+
+fl=(2)
+fn=(18)
+cfl=(1)
+cfn=(4)
+calls=8 37
+209 8
+
+fl=(2)
+fn=(18)
+cfl=(3)
+cfn=(19) std::vector::size[inline]
+calls=11 656
+214 11
+
+fl=(2)
+fn=(18)
+218 7
+
+fl=(2)
+fn=(18)
+cfl=(1)
+cfn=(3)
+calls=8 32
+218 8
+
+fl=(2)
+fn=(18)
+cfl=(2)
+cfn=(13)
+calls=3 148
+219 3
+
+fl=(2)
+fn=(18)
+cfl=(2)
+cfn=(7)
+calls=1 68
+220 1
+
+fl=(2)
+fn=(20) Graph::MarkClusterMinEleAsId
+cfl=(6) /usr/include/c++/6.4.1/bits/stl_algobase.h
+cfn=(21) std::fill[inline]
+calls=1 731
+229 1
+
+fl=(2)
+fn=(20)
+231 1
+
+fl=(2)
+fn=(20)
+cfl=(1)
+cfn=(2)
+calls=1 20
+234 1
+
+fl=(2)
+fn=(22) Graph::ClusterNonCores
+cfl=(2)
+cfn=(20)
+calls=1 229
+244 1
+
+fl=(2)
+fn=(22)
+cfl=(2)
+cfn=(20)
+calls=1 234
+244 1
+
+fl=(2)
+fn=(22)
+cfl=(2)
+cfn=(20)
+calls=1 231
+244 1
+
+fl=(2)
+fn=(22)
+cfl=(2)
+cfn=(17)
+calls=1 200
+246 1
+
+fl=(2)
+fn=(22)
+246 1
+
+fl=(2)
+fn=(22)
+247 1
+
+fl=(2)
+fn=(22)
+249 25
+
+fl=(2)
+fn=(22)
+cfl=(2)
+cfn=(14)
+calls=5 152
+250 5
+
+fl=(2)
+fn=(22)
+cfl=(2)
+cfn=(13)
+calls=23 148
+250 23
+
+fl=(2)
+fn=(22)
+cfl=(3)
+cfn=(11)
+calls=1 781
+253 1
+
+fl=(2)
+fn=(23) Graph::pSCAN
+cfl=(2)
+cfn=(9)
+calls=5 111
+264 5
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=10 89
+264 10
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=1 100
+264 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=35 88
+264 35
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=1 97
+264 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=18 112
+264 18
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=5 82
+264 5
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=1 83
+264 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=2 85
+264 2
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=62 95
+264 62
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=185 110
+264 185
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=5 102
+264 5
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=11 93
+264 11
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=2 87
+264 2
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=1 81
+264 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(9)
+calls=1 98
+264 1
+
+fl=(2)
+fn=(23)
+cfl=(7) /home/yche/GitRepos/ScanOptimizing/pSCAN-refactor/MaxPriorityQueue.cpp
+cfn=(24) MaxPriorityQueue::MaxPriorityQueue
+calls=1 20
+270 1
+
+fl=(2)
+fn=(23)
+cfl=(7)
+cfn=(24)
+calls=1 8
+270 1
+
+fl=(2)
+fn=(23)
+cfl=(7)
+cfn=(25) MaxPriorityQueue::pop
+calls=1 30
+280 1
+
+fl=(2)
+fn=(23)
+cfl=(7)
+cfn=(25)
+calls=14 31
+280 14
+
+fl=(2)
+fn=(23)
+cfl=(7)
+cfn=(25)
+calls=7 34
+280 7
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=1 168
+285 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=3 161
+285 3
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=1 197
+285 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=2 184
+285 2
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=10 160
+285 10
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=112 183
+285 112
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=34 176
+285 34
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=5 167
+285 5
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=1 169
+285 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=16 170
+285 16
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=20 159
+285 20
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=36 173
+285 36
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=12 158
+285 12
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=1248 172
+285 1248
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(15)
+calls=9 186
+285 9
+
+fl=(2)
+fn=(23)
+287 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(18)
+calls=15 218
+287 15
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(18)
+calls=10 208
+287 10
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(18)
+calls=1 220
+287 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(18)
+calls=3 219
+287 3
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(18)
+calls=14 209
+287 14
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(18)
+calls=11 214
+287 11
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(22)
+calls=28 250
+295 28
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(22)
+calls=3 244
+295 3
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(22)
+calls=25 249
+295 25
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(22)
+calls=1 253
+295 1
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(22)
+calls=2 246
+295 2
+
+fl=(2)
+fn=(23)
+cfl=(2)
+cfn=(22)
+calls=1 247
+295 1
+
+fl=(7)
+fn=(24)
+cfl=(3)
+cfn=(26) std::vector::vector[inline]
+calls=1 280
+8 1
+
+fl=(7)
+fn=(24)
+cfl=(3)
+cfn=(11)
+calls=1 781
+20 1
+
+fl=(7)
+fn=(25)
+30 1
+
+fl=(7)
+fn=(25)
+31 14
+
+fl=(7)
+fn=(25)
+34 7
+
+fl=(8) /home/yche/GitRepos/ScanOptimizing/pSCAN-refactor/main.cpp
+fn=(27) main
+cfl=(2)
+cfn=(23)
+calls=60 295
+31 60
+
+fl=(8)
+fn=(27)
+cfl=(2)
+cfn=(23)
+calls=1 270
+31 1
+
+fl=(8)
+fn=(27)
+cfl=(2)
+cfn=(23)
+calls=345 264
+31 345
+
+fl=(8)
+fn=(27)
+cfl=(2)
+cfn=(23)
+calls=55 287
+31 55
+
+fl=(8)
+fn=(27)
+cfl=(2)
+cfn=(23)
+calls=22 280
+31 22
+
+fl=(8)
+fn=(27)
+cfl=(2)
+cfn=(23)
+calls=1508 285
+31 1508
+
+fl=(9) /usr/include/c++/6.4.1/bits/alloc_traits.h
+fn=(28) std::allocator_traits::construct[inline]
+cfl=(10) /usr/include/c++/6.4.1/ext/new_allocator.h
+cfn=(29) __gnu_cxx::new_allocator::construct[inline]
+calls=2 120
+475 2
+
+fl=(4)
+fn=(12)
+192 3
+
+fl=(6)
+fn=(30) std::__fill_a[inline]
+695 1
+
+fl=(6)
+fn=(21)
+cfl=(6)
+cfn=(30)
+calls=1 695
+731 1
+
+fl=(3)
+fn=(31) std::_Vector_base::_Vector_base[inline]
+cfl=(3)
+cfn=(32) std::_Vector_base::_M_create_storage[inline]
+calls=1 187
+136 1
+
+fl=(3)
+fn=(32)
+cfl=??
+cfn=(33) __memset_erms
+calls=1 0
+187 1
+
+fl=(3)
+fn=(26)
+cfl=(3)
+cfn=(31)
+calls=1 136
+280 1
+
+fl=(3)
+fn=(19)
+656 11
+
+fl=(3)
+fn=(11)
+781 67
+
+fl=(5)
+fn=(16)
+94 1
+
+fl=(5)
+fn=(16)
+cfl=(9)
+cfn=(28)
+calls=2 475
+96 2
+
+fl=(10)
+fn=(29)
+120 2
+
+fl=??
+fn=(33)
+0 1
+
+fl=??
+fn=(34) __libc_start_main
+cfl=(8)
+cfn=(27)
+calls=1923 31
+0 1923
+
+fl=??
+fn=(35) _start
+cfl=??
+cfn=(34)
+calls=365 0
+0 365
+

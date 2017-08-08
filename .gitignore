@@ -1,4 +1,6 @@
 dataset
+*.log
+*.out
 *.bin
 .idea
 *.pyc
