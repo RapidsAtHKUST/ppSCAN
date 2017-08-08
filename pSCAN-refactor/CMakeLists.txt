@@ -12,3 +12,6 @@ add_executable(other_play play/play.cpp)
 add_executable(pSCAN ${SOURCE_FILES})
 target_compile_definitions(pSCAN PRIVATE DEBUG=1 FOO=1)
 target_compile_options(pSCAN PRIVATE -O3 -g)
+
+add_executable(converter converter/EdgeListToBinsConverter.cpp)
+target_compile_options(converter PRIVATE -O3 -g)

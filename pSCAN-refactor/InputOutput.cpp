@@ -10,7 +10,8 @@
 InputOutput::InputOutput(const string &dir) : dir(dir) {}
 
 void InputOutput::ReadDegree() {
-    ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
+//    ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
+    ifstream deg_file(dir + string("/com-lj.ungraph_deg.bin"), ios::binary);
     int int_size;
     deg_file.read(reinterpret_cast<char *>(&int_size), 4);
     cout << "int size:" << int_size << "\n";
@@ -24,7 +25,8 @@ void InputOutput::ReadDegree() {
 }
 
 void InputOutput::ReadAdjacencyList() {
-    ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
+//    ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
+    ifstream adj_file(dir + string("/com-lj.ungraph_adj.bin"), ios::binary);
     offset_out_edges.resize(n + 1);
     out_edges.resize(m);
 
