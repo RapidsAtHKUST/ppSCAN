@@ -1,4 +1,5 @@
 dataset
+*.bin
 .idea
 *.pyc
 build
