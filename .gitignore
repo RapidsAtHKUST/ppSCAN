@@ -1,4 +1,5 @@
 dataset
+*.callgrind
 *.log
 *.out
 *.bin
