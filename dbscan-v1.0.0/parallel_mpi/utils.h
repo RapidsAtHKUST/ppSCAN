@@ -56,14 +56,14 @@
 using namespace std;
 
 typedef float point_coord_type;
-typedef vector <vector <point_coord_type> >         array2dfloat;
+typedef vector <vector<point_coord_type>> array2dfloat;
 
-float findKMedian(vector<float>& A,int K);
+float findKMedian(vector<float> &A, int K);
 
 #ifdef NETCDF_FORMAT
 static void handle_error(int status, int lineno)
 {
-	fprintf(stderr, "Error at line %d: %s\n", lineno, ncmpi_strerror(status));
+    fprintf(stderr, "Error at line %d: %s\n", lineno, ncmpi_strerror(status));
 //	MPI_Abort(MPI_COMM_WORLD, 1);
 }
 #endif
