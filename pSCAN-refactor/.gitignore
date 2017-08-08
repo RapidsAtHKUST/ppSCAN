@@ -1,2 +1,3 @@
 pscan
-perf.data
+perf.data*
+callgrind*
