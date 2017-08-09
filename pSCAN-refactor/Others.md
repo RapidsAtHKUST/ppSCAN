@@ -58,6 +58,52 @@ void Graph::PruneAndCrossLink() {
 }
 ```
 
+# Removes
+
+core change in pre-processing phase
+
+```cpp
+                    if (c <= 2) {
+                        min_cn[j] = SIMILAR;
+                        ++similar_degree[i];
+//                        if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
+                        ++similar_degree[v];
+//                        if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
+                    } 
+```
+
+```cpp
+//    void ReactAfterEvalDensity(int v, ui edge_idx);
+
+
+//void Graph::ReactAfterEvalDensity(int v, ui edge_idx) {
+//    if (effective_degree[v] != ALREADY_EXPLORED) {
+//        if (min_cn[edge_idx] == SIMILAR) {
+//            ++similar_degree[v];
+//            if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
+//        } else {
+//            --effective_degree[v];
+//        }
+//    }
+//}
+
+```
+
+CheckCore
+
+```cpp
+            // 3rd: update sd and ed for v
+//            ReactAfterEvalDensity(v, idx);
+```
+
+ClusterCore
+
+```cpp
+
+            // 3rd: update sd and ed for v
+//            ReactAfterEvalDensity(v, edge_idx);
+```
+
 # Others(Changes)
 
 ```cpp

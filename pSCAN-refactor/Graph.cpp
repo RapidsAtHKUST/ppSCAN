@@ -99,9 +99,7 @@ void Graph::PruneAndCrossLink() {
                     if (c <= 2) {
                         min_cn[j] = SIMILAR;
                         ++similar_degree[i];
-                        if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
                         ++similar_degree[v];
-                        if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
                     } else {
                         // need to refine later
                         min_cn[j] = c;
@@ -175,18 +173,10 @@ int Graph::CheckCore(int u) {
             // 2nd: update sd and ed for u
             if (min_cn[idx] == SIMILAR) {
                 ++similar_degree[u];
+                ++similar_degree[v];
             } else {
                 --effective_degree[u];
-            }
-
-            // 3rd: update sd and ed for v
-            if (effective_degree[v] != ALREADY_EXPLORED) {
-                if (min_cn[idx] == SIMILAR) {
-                    ++similar_degree[v];
-                    if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
-                } else {
-                    --effective_degree[v];
-                }
+                --effective_degree[v];
             }
         }
     }
