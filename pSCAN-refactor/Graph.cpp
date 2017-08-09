@@ -79,52 +79,43 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 void Graph::PruneAndCrossLink() {
     auto thread_num = std::thread::hardware_concurrency();
     cout << "thread num:" << thread_num << "\n";
-    auto batch_num = 16u * thread_num;
-    auto batch_size = n / batch_num;
-    //must iterate from 0 to n-1
-    ThreadPool pool(thread_num);
-    for (auto v_i = 0; v_i < n; v_i += batch_size) {
-        int my_start = v_i;
-        int my_end = min(n, my_start + batch_size);
 
-        // correctness guaranteed by i <= v
-        pool.enqueue([this](int i_start, int i_end) {
-            for (auto i = i_start; i < i_end; i++)
-                for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
-                    auto v = out_edges[j];
-                    //edge (i,v)
-                    if (i <= v) {
-                        // use pruning rule
-                        int a = degree[i], b = degree[v];
-                        if (a > b) { swap(a, b); }
-                        if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
-                            // can be pruned
-                            min_cn[j] = NOT_SIMILAR;
-                            --effective_degree[i];
-                            --effective_degree[v];
-                        } else {
-                            int c = ComputeCnLowerBound(a, b);
-                            // can be pruned
-                            if (c <= 2) {
-                                min_cn[j] = SIMILAR;
-                                ++similar_degree[i];
-                                if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
-                                ++similar_degree[v];
-                                if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
-                            } else {
-                                // need to refine later
-                                min_cn[j] = c;
-                            }
-                        }
-
-                        // find edge, in order to build cross link
-                        auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
-                        InitCrossLink(j, r_id);
-                        UpdateViaCrossLink(j);
+    for (auto i = 0; i < n; i++) {
+        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+            auto v = out_edges[j];
+            //edge (i,v)
+            if (i <= v) {
+                // use pruning rule
+                int a = degree[i], b = degree[v];
+                if (a > b) { swap(a, b); }
+                if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+                    // can be pruned
+                    min_cn[j] = NOT_SIMILAR;
+                    --effective_degree[i];
+                    --effective_degree[v];
+                } else {
+                    int c = ComputeCnLowerBound(a, b);
+                    // can be pruned
+                    if (c <= 2) {
+                        min_cn[j] = SIMILAR;
+                        ++similar_degree[i];
+                        if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
+                        ++similar_degree[v];
+                        if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
+                    } else {
+                        // need to refine later
+                        min_cn[j] = c;
                     }
                 }
-        }, my_start, my_end);
+
+                // find edge, in order to build cross link
+                auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
+                InitCrossLink(j, r_id);
+                UpdateViaCrossLink(j);
+            }
+        }
     }
+
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {

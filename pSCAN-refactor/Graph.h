@@ -2,6 +2,7 @@
 #define _GRAPH_H_
 
 #include <memory>
+#include <atomic>
 
 #include "InputOutput.h"
 #include "DisjointSet.h"

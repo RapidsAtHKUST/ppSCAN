@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <vector>
+#include <atomic>
 
 using ui=unsigned int;
 using namespace std;
