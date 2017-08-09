@@ -1,0 +1,3 @@
+[submodule "boost.simd"]
+	path = boost.simd
+	url = https://github.com/NumScale/boost.simd.git
