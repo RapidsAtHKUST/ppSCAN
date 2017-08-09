@@ -4,7 +4,7 @@ Project: pScan (Graph Clustering) Optimization
 
 ## My Work
 
-* all my works
+### all my works
 
 description | folder link
 --- | ---
@@ -12,7 +12,7 @@ pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
 python scripts during study | [python](python)
 simd study codes | [simd_study](simd_study)
 
-* pSCAN organization
+### pSCAN organization
 
 pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
 
@@ -26,7 +26,7 @@ file | utility
 [Graph.h](pSCAN-refactor/Graph.h), [Graph.cpp](pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
 [InputOutput.h](pSCAN-refactor/InputOutput.h), [InputOutput.cpp](pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
 
-* some profiling information
+### some profiling information
 
 see [run_pscan_gperftools.sh](pSCAN-refactor/run_pscan_gperftools.sh), [run_pscan_perf.sh](pSCAN-refactor/run_pscan_perf.sh), [run_pscan_valgrind.sh](pSCAN-refactor/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
 
