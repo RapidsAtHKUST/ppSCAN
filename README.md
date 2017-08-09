@@ -14,13 +14,21 @@ simd study codes | [simd_study](simd_study)
 
 * pSCAN organization
 
+pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
+
 file | utility
 --- | ---
-[ThreadPool.h](pSCAN-refactor/run_pscan_valgrind.sh) | third-party thread pool, a simple impl
+[ThreadPool.h](pSCAN-refactor/ThreadPool.h) | third-party thread pool, a simple impl
 [MaxPriorityQueue.h](pSCAN-refactor/MaxPriorityQueue.h) | use array implementation to mimic heap
 [DisjointSet.h](pSCAN-refactor/DisjointSet.h) | see CLRS for detail, for connected componet
 [Graph.h](pSCAN-refactor/Graph.h) | graph representation and algorithm  related
 [InputOutput.h](pSCAN-refactor/InputOutput.h) | read binary degree/adjacent edges utility
+
+* some profiling information
+
+see [run_pscan_gperftools.sh](pSCAN-refactor/run_pscan_gperftools.sh), [run_pscan_perf.sh](pSCAN-refactor/run_pscan_perf.sh), [run_pscan_valgrind.sh](pSCAN-refactor/run_pscan_valgrind.sh).
+
+**set-intersection** is the bottleneck in the current pScan design.
 
 ## Related Projects
 
