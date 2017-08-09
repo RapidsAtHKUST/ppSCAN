@@ -43,7 +43,6 @@ private:
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
 
     // intermediate-state variables
-    vector<ui> cores;
     vector<ui> dst_vertices;
 
     // disjoint-set: used for core-vertex induced connected components
@@ -66,7 +65,6 @@ private:
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
     int EvalDensity(int u, ui edge_idx);
-
 
     bool IsSimilarityUnKnow(ui edge_idx);
 

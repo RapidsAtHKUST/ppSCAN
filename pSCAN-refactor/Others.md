@@ -60,6 +60,39 @@ void Graph::PruneAndCrossLink() {
 
 # Removes
 
+remove `cores` member
+
+```cpp
+//    vector<ui> cores;
+
+```
+
+```cpp
+//    cores.reserve(n);
+
+    while (true) {
+        int u;
+        // deal with already known cores and then deal with unexplored vertices
+//        if (!cores.empty()) {
+//            u = cores.back();
+//            cores.pop_back();
+//        } else {
+        // find-max, if there delete-max
+        u = max_priority_queue.pop();
+//        }
+
+        if (u == INVALID_VERTEX_IDX) { break; }
+
+        int index_i = CheckCore(u);
+
+        if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
+    }
+
+//    {
+//        auto tmp = std::move(cores);
+//    }
+```
+
 core change in pre-processing phase
 
 ```cpp

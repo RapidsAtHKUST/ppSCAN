@@ -7,7 +7,6 @@
 #include <algorithm>
 
 #include "ThreadPool.h"
-
 #include "MaxPriorityQueue.h"
 
 using namespace std::chrono;
@@ -79,41 +78,64 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 void Graph::PruneAndCrossLink() {
     auto thread_num = std::thread::hardware_concurrency();
     cout << "thread num:" << thread_num << "\n";
+    vector<std::mutex> mutex_arr(n);
 
-    for (auto i = 0; i < n; i++) {
-        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
-            auto v = out_edges[j];
-            //edge (i,v)
-            if (i <= v) {
-                // use pruning rule
-                int a = degree[i], b = degree[v];
-                if (a > b) { swap(a, b); }
-                if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
-                    // can be pruned
-                    min_cn[j] = NOT_SIMILAR;
-                    --effective_degree[i];
-                    --effective_degree[v];
-                } else {
-                    int c = ComputeCnLowerBound(a, b);
-                    // can be pruned
-                    if (c <= 2) {
-                        min_cn[j] = SIMILAR;
-                        ++similar_degree[i];
-                        ++similar_degree[v];
-                    } else {
-                        // need to refine later
-                        min_cn[j] = c;
+    auto batch_num = 16u * thread_num;
+    auto batch_size = n / batch_num;
+    //must iterate from 0 to n-1
+    ThreadPool pool(thread_num);
+    for (auto v_i = 0; v_i < n; v_i += batch_size) {
+        int my_start = v_i;
+        int my_end = min(n, my_start + batch_size);
+
+        pool.enqueue([this, &mutex_arr](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+                    auto v = out_edges[j];
+                    //edge (i,v)
+                    if (i <= v) {
+                        // use pruning rule
+                        int a = degree[i], b = degree[v];
+                        if (a > b) { swap(a, b); }
+                        if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+                            // can be pruned
+                            min_cn[j] = NOT_SIMILAR;
+                            {
+                                unique_lock<std::mutex> lock(mutex_arr[i]);
+                                --effective_degree[i];
+                            }
+                            {
+                                unique_lock<std::mutex> lock(mutex_arr[v]);
+                                --effective_degree[v];
+                            }
+                        } else {
+                            int c = ComputeCnLowerBound(a, b);
+                            // can be pruned
+                            if (c <= 2) {
+                                min_cn[j] = SIMILAR;
+                                {
+                                    unique_lock<std::mutex> lock(mutex_arr[i]);
+                                    ++similar_degree[i];
+                                }
+                                {
+                                    unique_lock<std::mutex> lock(mutex_arr[v]);
+                                    ++similar_degree[v];
+                                }
+                            } else {
+                                // need to refine later
+                                min_cn[j] = c;
+                            }
+                        }
+
+                        // find edge, in order to build cross link
+                        auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
+                        InitCrossLink(j, r_id);
+                        UpdateViaCrossLink(j);
                     }
                 }
-
-                // find edge, in order to build cross link
-                auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
-                InitCrossLink(j, r_id);
-                UpdateViaCrossLink(j);
             }
-        }
+        }, my_start, my_end);
     }
-
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -250,7 +272,6 @@ void Graph::ClusterNonCores() {
 
 void Graph::pSCAN() {
     // 1st
-    cores.reserve(n);
     auto prune_start = high_resolution_clock::now();
     PruneAndCrossLink();
     auto prune_end = high_resolution_clock::now();
@@ -259,30 +280,14 @@ void Graph::pSCAN() {
 
     // 2nd: explore vertex in effective-degree non-increasing order
     auto start = high_resolution_clock::now();
-
     dst_vertices.reserve(n);
     MaxPriorityQueue max_priority_queue(n, &effective_degree, min_u);
-
     while (true) {
         int u;
-        // deal with already known cores and then deal with unexplored vertices
-        if (!cores.empty()) {
-            u = cores.back();
-            cores.pop_back();
-        } else {
-            // find-max, if there delete-max
-            u = max_priority_queue.pop();
-        }
-
+        u = max_priority_queue.pop();
         if (u == INVALID_VERTEX_IDX) { break; }
-
         int index_i = CheckCore(u);
-
         if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
-    }
-
-    {
-        auto tmp = std::move(cores);
     }
     auto end = high_resolution_clock::now();
     cout << "core clustering time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
