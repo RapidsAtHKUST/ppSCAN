@@ -77,14 +77,17 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 }
 
 void Graph::PruneAndCrossLink() {
-    auto thread_num = 8u;
+    auto thread_num = std::thread::hardware_concurrency();
+    cout << "thread num:" << thread_num << "\n";
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
     //must iterate from 0 to n-1
     ThreadPool pool(thread_num);
     for (auto v_i = 0; v_i < n; v_i += batch_size) {
-         int my_start = v_i;
-        int my_end = min(n , my_start + batch_size);
+        int my_start = v_i;
+        int my_end = min(n, my_start + batch_size);
+
+        // correctness guaranteed by i <= v
         pool.enqueue([this](int i_start, int i_end) {
             for (auto i = i_start; i < i_end; i++)
                 for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
@@ -122,8 +125,6 @@ void Graph::PruneAndCrossLink() {
                 }
         }, my_start, my_end);
     }
-
-
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -272,7 +273,8 @@ void Graph::pSCAN() {
     auto prune_start = high_resolution_clock::now();
     PruneAndCrossLink();
     auto prune_end = high_resolution_clock::now();
-    cout << "prune and cross link execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
+    cout << "prune and cross link execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count()
+         << " ms\n";
 
     // 2nd: explore vertex in effective-degree non-increasing order
     auto start = high_resolution_clock::now();
@@ -298,7 +300,9 @@ void Graph::pSCAN() {
         if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
     }
 
-    auto tmp = std::move(cores);
+    {
+        auto tmp = std::move(cores);
+    }
     auto end = high_resolution_clock::now();
     cout << "core clustering time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
