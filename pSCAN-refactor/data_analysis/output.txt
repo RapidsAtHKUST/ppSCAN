@@ -1,0 +1,14 @@
+int size:4
+n:4036538, m:69362378
+with google perf start
+thread num:8
+1st: prune and cross link execution time:1103 ms
+2nd: core clustering time:16270 ms
+3rd: non-core clustering time:602 ms
+25121224 715258284 1810511910 154796461
+with google perf end
+PROFILE: interrupts/evictions/bytes = 2526/1089/86640
+Total time without IO:17978 ms
+	*** Start write result into disk!
+Using local file build/pSCAN.
+Using local file pscanProfile.log.

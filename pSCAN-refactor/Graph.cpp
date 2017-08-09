@@ -145,18 +145,23 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     // merge-operation for two sorted edge-list
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
     ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    intersection_times++;
     while (offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
            cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
+            ++all_cmp0;
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
             ++offset_nei_v;
+            ++all_cmp1;
         } else {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
+            ++all_cmp2;
         }
     }
     return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
@@ -275,23 +280,26 @@ void Graph::pSCAN() {
     auto prune_start = high_resolution_clock::now();
     PruneAndCrossLink();
     auto prune_end = high_resolution_clock::now();
-    cout << "prune and cross link execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count()
+    cout << "1st: prune and cross link execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count()
          << " ms\n";
 
     // 2nd: explore vertex in effective-degree non-increasing order
     auto start = high_resolution_clock::now();
-    dst_vertices.reserve(n);
     MaxPriorityQueue max_priority_queue(n, &effective_degree, min_u);
     while (true) {
-        int u;
-        u = max_priority_queue.pop();
+        auto u = max_priority_queue.pop();
         if (u == INVALID_VERTEX_IDX) { break; }
+
         int index_i = CheckCore(u);
         if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
     }
     auto end = high_resolution_clock::now();
-    cout << "core clustering time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
+    cout << "2nd: core clustering time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
     // 3rd: non-core clustering
     ClusterNonCores();
+    auto all_end = high_resolution_clock::now();
+    cout << "3rd: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
+
+    cout << intersection_times << " " << all_cmp0 << " " << all_cmp1 << " " << all_cmp2 << endl;
 }

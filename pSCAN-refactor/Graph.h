@@ -47,6 +47,11 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
+
+    long long all_cmp0 = 0;
+    long long all_cmp1 = 0;
+    long long all_cmp2 = 0;
+    long long intersection_times = 0;
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
