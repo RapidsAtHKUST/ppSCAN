@@ -73,9 +73,19 @@ void PlayUnique() {
     for_each(my_vec.begin(), iter, [](auto ele) { cout << ele << "\n"; });
 }
 
+
+void PlaySetUnion() {
+    vector<int> my_vec0 = {1, 4, 6};
+    vector<int> my_vec1 = {1, 2, 3};
+    vector<int> another;
+    std::merge(my_vec0.begin(), my_vec0.end(), my_vec1.begin(), my_vec1.end(), back_inserter(another));
+    cout << another << endl;
+}
+
 int main() {
     PlaySwap();
     PlayEpsaAndEpsb();
     PlaySelfIncrement();
     PlayUnique();
+    PlaySetUnion();
 }
