@@ -4,7 +4,30 @@ Project: pScan (Graph Clustering) Optimization
 
 ## My Work
 
-### all my works
+### Understanding and Works
+
+pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on unweighted, undirected not dynamic graph.
+
+two parameters: density threshold, min number of neighbors, input graph representation: csr representation.
+
+density function: `number of common neighbors` / `(sqrt(du * dv))`
+
+pSCAN:
+
+basic concepts:
+
+* introduce `similar_degree`, `effective_degree` to help checking core, if a vertex is a core iff `sd <= number of reachable neighbors <=ed`, which can be used as a pruning rule,
+* introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core
+
+pruning:
+
+* pre-processing, `PruneAndCrossLink`, prune not reachable `if (((long long) a) * eps_b2 < ((long long) b) * eps_a2)`, which is easy to deduced when the max of`number of common neighbors` is `min(du,dv)`, and utilize cross-link
+
+* `common neighbor lower bound <=2`, must be similar, self and neighbor vertices
+
+* compute common neighbor with early exit, via utilizing `sd` and `ed`
+
+* other tricks to reduce the number of evaluations of reachability
 
 description | folder link
 --- | ---
@@ -12,7 +35,7 @@ pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
 python scripts during study | [python](python)
 simd study codes | [simd_study](simd_study)
 
-### pSCAN organization
+### Package Organization
 
 pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
 
@@ -26,7 +49,7 @@ file | utility
 [Graph.h](pSCAN-refactor/Graph.h), [Graph.cpp](pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
 [InputOutput.h](pSCAN-refactor/InputOutput.h), [InputOutput.cpp](pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
 
-### some profiling information
+### Profiling
 
 see [run_pscan_gperftools.sh](pSCAN-refactor/run_pscan_gperftools.sh), [run_pscan_perf.sh](pSCAN-refactor/run_pscan_perf.sh), [run_pscan_valgrind.sh](pSCAN-refactor/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
 
