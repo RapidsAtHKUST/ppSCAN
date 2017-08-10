@@ -143,40 +143,45 @@ void Graph::PruneAndCrossLink() {
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
-    if (degree[u] > degree[v]) { swap(u, v); }
-
-    // merge-operation for two sorted edge-list
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
-    ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-
+#ifdef STATISTICS
     intersection_times++;
     auto tmp0 = 0;
     auto tmp1 = 0;
-    while (offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
-           cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num) {
+#endif
+    // merge-operation for two sorted edge-list
+    for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
+         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
+#ifdef STATISTICS
             ++all_cmp0;
             ++tmp0;
+#endif
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
             ++offset_nei_v;
+#ifdef STATISTICS
             ++all_cmp1;
             ++tmp1;
+#endif
         } else {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
+#ifdef STATISTICS
             ++all_cmp2;
             ++tmp0;
             ++tmp1;
+#endif
         }
     }
-
-    // statistics
+#ifdef STATISTICS
     ++distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0];
     portion = max(portion, tmp0 == 0 ? tmp1 : tmp1 / tmp0);
+#endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
@@ -321,6 +326,8 @@ void Graph::pSCAN() {
     auto all_end = high_resolution_clock::now();
     cout << "3rd: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
 
+#ifdef STATISTICS
     cout << intersection_times << "\n" << all_cmp0 << "\n" << all_cmp1 << "\n" << all_cmp2 << endl;
     cout << portion << endl;
+#endif
 }

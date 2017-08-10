@@ -50,12 +50,14 @@ private:
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
     // statistics for profiling
+#ifdef STATISTICS
     long all_cmp0;
     long all_cmp1;
     long all_cmp2;
     long intersection_times;
     int portion = 0;
     vector<int> distribution = vector<int>(900, 0);
+#endif
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index

@@ -60,6 +60,13 @@ void Graph::PruneAndCrossLink() {
 
 # Removes
 
+remove useless swap in intersection
+
+```cpp
+//    if (degree[u] > degree[v]) { swap(u, v); }
+
+```
+
 remove `cores` member
 
 ```cpp
