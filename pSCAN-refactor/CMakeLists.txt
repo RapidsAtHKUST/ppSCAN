@@ -12,7 +12,7 @@ add_executable(other_play play/play.cpp)
 add_executable(pSCAN ${SOURCE_FILES})
 #target_compile_definitions(pSCAN PRIVATE DEBUG=1 FOO=1 WITHGPERFTOOLS=1 STATISTICS=1)
 target_compile_definitions(pSCAN PRIVATE DEBUG=1 FOO=1 WITHGPERFTOOLS=1)
-target_compile_options(pSCAN PRIVATE -O3 -g)
+target_compile_options(pSCAN PRIVATE -O2 -g)
 target_link_libraries(pSCAN profiler)
 target_link_libraries(pSCAN pthread)
 

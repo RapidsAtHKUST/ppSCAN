@@ -19,25 +19,31 @@ int main(int argc, char *argv[]) {
         Usage();
     } else {
         // input
+        using namespace std::chrono;
+        auto io_start = high_resolution_clock::now();
         auto *graph = new Graph(argv[1], argv[2], atoi(argv[3]));
+        auto io_end = high_resolution_clock::now();
+        cout << "Total input cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n";
 
         // compute
-        using namespace std::chrono;
         auto start = high_resolution_clock::now();
 #ifdef WITHGPERFTOOLS
-        cout << "with google perf start" << endl;
+        cout << "\nwith google perf start\n";
         ProfilerStart("pscanProfile.log");
 #endif
         graph->pSCAN();
 #ifdef WITHGPERFTOOLS
-        cout << "with google perf end" << endl;
+        cout << "\nwith google perf end\n";
         ProfilerStop();
 #endif
         auto end = high_resolution_clock::now();
         cout << "Total time without IO:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
         // Output
+        io_start = high_resolution_clock::now();
         if (argc >= 5 && strcmp(argv[4], "output") == 0) { graph->Output(argv[2], argv[3]); }
+        io_end = high_resolution_clock::now();
+        cout << "Total output cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n";
     }
     return 0;
 }

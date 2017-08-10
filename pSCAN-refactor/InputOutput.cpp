@@ -81,7 +81,6 @@ pair<int, int> InputOutput::ParseEps(const char *eps_s) {
 
 void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                          vector<int> &similar_degree, vector<int> &cid, vector<int> &parent) {
-    cout << "\t*** Start write result into disk!\n";
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
     ofstream ofs(out_name);
     ofs << "c/n vertex_id cluster_id\n";
