@@ -50,23 +50,12 @@ private:
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
     // statistics for profiling
-#ifdef PARALLEL
-    atomic_long all_cmp0;
-    atomic_long all_cmp1;
-    atomic_long all_cmp2;
-    atomic_long intersection_times;
-    mutex portion_mutex;
-    int portion = 0;
-    vector<int> distribution = vector<int>(900, 0);
-    vector<mutex> mutex_vec = vector<mutex>(900);
-#else
     long all_cmp0;
     long all_cmp1;
     long all_cmp2;
     long intersection_times;
     int portion = 0;
     vector<int> distribution = vector<int>(900, 0);
-#endif
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index

@@ -175,20 +175,8 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     }
 
     // statistics
-#ifdef PARALLEL
-    {
-        unique_lock<mutex> lock(mutex_vec[tmp0 == 0 ? tmp1 : tmp1 / tmp0]);
-        distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0]++;
-    }
-    {
-        unique_lock<mutex> lock(portion_mutex);
-        portion = max(portion, tmp0 == 0 ? tmp1 : tmp1 / tmp0);
-    }
-#else
-    distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0]++;
+    ++distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0];
     portion = max(portion, tmp0 == 0 ? tmp1 : tmp1 / tmp0);
-
-#endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
@@ -201,7 +189,6 @@ int Graph::EvalReachable(int u, ui edge_idx) {
 bool Graph::IsReachableUnKnow(ui edge_idx) {
     return min_cn[edge_idx] > 0;
 }
-
 
 bool Graph::IsCoreStatusUnKnow(int u) {
     return similar_degree[u] < min_u && effective_degree[u] >= min_u;
@@ -337,5 +324,3 @@ void Graph::pSCAN() {
     cout << intersection_times << "\n" << all_cmp0 << "\n" << all_cmp1 << "\n" << all_cmp2 << endl;
     cout << portion << endl;
 }
-
-

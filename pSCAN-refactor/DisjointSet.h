@@ -27,5 +27,4 @@ public:
     bool IsSameSet(int u, int v);
 };
 
-
 #endif //PSCAN_DISJOINTSET_H

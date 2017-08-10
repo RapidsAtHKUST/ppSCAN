@@ -49,5 +49,3 @@ void DisjointSet::Union(int u, int v) {
         ++rank[ru];
     }
 }
-
-
