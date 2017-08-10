@@ -29,14 +29,14 @@ void Graph::PruneAndCrossLink() {
                         if (a > b) { swap(a, b); }
                         if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
                             // can be pruned
-                            min_cn[j] = NOT_SIMILAR;
+                            min_cn[j] = NOT_DIRECT_REACHABLE;
                             --effective_degree[i];
                             --effective_degree[v];
                         } else {
                             int c = ComputeCnLowerBound(a, b);
                             // can be pruned
                             if (c <= 2) {
-                                min_cn[j] = SIMILAR;
+                                min_cn[j] = DIRECT_REACHABLE;
                                 ++similar_degree[i];
                                 if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
                                 ++similar_degree[v];
@@ -97,7 +97,7 @@ core change in pre-processing phase
 
 ```cpp
                     if (c <= 2) {
-                        min_cn[j] = SIMILAR;
+                        min_cn[j] = DIRECT_REACHABLE;
                         ++similar_degree[i];
 //                        if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
                         ++similar_degree[v];
@@ -111,7 +111,7 @@ core change in pre-processing phase
 
 //void Graph::ReactAfterEvalDensity(int v, ui edge_idx) {
 //    if (effective_degree[v] != ALREADY_EXPLORED) {
-//        if (min_cn[edge_idx] == SIMILAR) {
+//        if (min_cn[edge_idx] == DIRECT_REACHABLE) {
 //            ++similar_degree[v];
 //            if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
 //        } else {
@@ -151,16 +151,16 @@ void Graph::ClusterNonCores() {
                 // observation 3: check non-core neighbors
                 if (!IsDefiniteCoreVertex(out_edges[j])) {
                     if (min_cn[j] >= 0) {
-                        min_cn[j] = EvalDensity(i, j);
+                        min_cn[j] = EvalReachable(i, j);
 
 // it seems to be useless
 //                        UpdateViaCrossLink(j);
-//                        if (min_cn[j] == SIMILAR) {
+//                        if (min_cn[j] == DIRECT_REACHABLE) {
 //                            ++similar_degree[i];
 //                            ++similar_degree[out_edges[j]];
 //                        }
                     }
-                    if (min_cn[j] == SIMILAR) {
+                    if (min_cn[j] == DIRECT_REACHABLE) {
                         // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
                         noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->parent[i]], out_edges[j]);
                     }
@@ -183,7 +183,7 @@ void Graph::PruneAndCrossLink() {
 // it seems to be useless
 //            if (v < i) {
 //                // edge should already be explored
-//                if (min_cn[j] == NOT_SURE) { min_cn[j] = NOT_SIMILAR; }
+//                if (min_cn[j] == NOT_SURE) { min_cn[j] = NOT_DIRECT_REACHABLE; }
 //            }
 //            else {
             if (i <= v) {
@@ -192,14 +192,14 @@ void Graph::PruneAndCrossLink() {
                 if (a > b) { swap(a, b); }
                 if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
                     // can be pruned
-                    min_cn[j] = NOT_SIMILAR;
+                    min_cn[j] = NOT_DIRECT_REACHABLE;
                     --effective_degree[i];
                     --effective_degree[v];
                 } else {
                     // cannot be pruned
                     int c = ComputeCnLowerBound(a, b);
                     if (c <= 2) {
-                        min_cn[j] = SIMILAR;
+                        min_cn[j] = DIRECT_REACHABLE;
                         ++similar_degree[i];
                         if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
                         ++similar_degree[v];
@@ -210,7 +210,7 @@ void Graph::PruneAndCrossLink() {
                 }
 
                 // find edge, in order to build cross link
-//                if (min_cn[j] != NOT_SIMILAR) {
+//                if (min_cn[j] != NOT_DIRECT_REACHABLE) {
                 auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
                 InitCrossLink(j, r_id);
                 UpdateViaCrossLink(j);
@@ -226,14 +226,14 @@ void Graph::PruneAndCrossLink() {
 
 
 ```cpp
-int Graph::EvalDensity(int u, ui edge_idx) {
+int Graph::EvalReachable(int u, ui edge_idx) {
     // check density for edge (u,v)
     int v = out_edges[edge_idx];
     
 // it seems useless
 //    if (min_cn[edge_idx] == NOT_SURE) {
 //        int c = ComputeCnLowerBound(degree[u], degree[v]);
-//        if (c <= 2) { return SIMILAR; }
+//        if (c <= 2) { return DIRECT_REACHABLE; }
 //        min_cn[edge_idx] = c;
 //        UpdateViaCrossLink(edge_idx);
 //    }
@@ -245,7 +245,7 @@ int Graph::EvalDensity(int u, ui edge_idx) {
 void Graph::ClusterCore(int u, int index_i) {
     for (auto idx : reachable_candidate_vertices) {
         // u and v similar, and v is also a core vertex
-        if (min_cn[idx] == SIMILAR && IsDefiniteCoreVertex(out_edges[idx])) {
+        if (min_cn[idx] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[idx])) {
             disjoint_set_ptr->Union(u, out_edges[idx]);
         }
     }
@@ -253,14 +253,14 @@ void Graph::ClusterCore(int u, int index_i) {
     for (int i = index_i; i < reachable_candidate_vertices.size(); ++i) {
         ui edge_idx = reachable_candidate_vertices[i];
         int v = out_edges[edge_idx];
-        if (IsSimilarityUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
-            min_cn[edge_idx] = EvalDensity(u, edge_idx);
+        if (IsReachableUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+            min_cn[edge_idx] = EvalReachable(u, edge_idx);
             UpdateViaCrossLink(edge_idx);
             // core vertices connected component
-            if (min_cn[edge_idx] == SIMILAR) { disjoint_set_ptr->Union(u, v); }
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) { disjoint_set_ptr->Union(u, v); }
 
 //            if (effective_degree[v] != ALREADY_EXPLORED) {
-//                if (min_cn[edge_idx] == SIMILAR) {
+//                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
 //                    ++similar_degree[v];
 //                    if (IsDefiniteCoreVertex(v)) { cores.emplace_back(v); }
 //                } else {

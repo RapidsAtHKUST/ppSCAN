@@ -3,14 +3,15 @@
 
 #include <memory>
 #include <atomic>
+#include <mutex>
 
 #include "InputOutput.h"
 #include "DisjointSet.h"
 
 using namespace std;
 
-constexpr int NOT_SIMILAR = -2;
-constexpr int SIMILAR = -1;
+constexpr int NOT_DIRECT_REACHABLE = -2;
+constexpr int DIRECT_REACHABLE = -1;
 constexpr int NOT_SURE = 0;
 
 constexpr int ALREADY_EXPLORED = -1;
@@ -49,12 +50,23 @@ private:
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
     // statistics for profiling
-    long long all_cmp0 = 0;
-    long long all_cmp1 = 0;
-    long long all_cmp2 = 0;
-    long long intersection_times = 0;
+#ifdef PARALLEL
+    atomic_long all_cmp0;
+    atomic_long all_cmp1;
+    atomic_long all_cmp2;
+    atomic_long intersection_times;
+    mutex portion_mutex;
     int portion = 0;
     vector<int> distribution = vector<int>(900, 0);
+    vector<mutex> mutex_vec = vector<mutex>(900);
+#else
+    long all_cmp0;
+    long all_cmp1;
+    long all_cmp2;
+    long intersection_times;
+    int portion = 0;
+    vector<int> distribution = vector<int>(900, 0);
+#endif
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
@@ -72,9 +84,9 @@ private:
     // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
-    int EvalDensity(int u, ui edge_idx);
+    int EvalReachable(int u, ui edge_idx);
 
-    bool IsSimilarityUnKnow(ui edge_idx);
+    bool IsReachableUnKnow(ui edge_idx);
 
     // 1st phase computation: core check and cluster
     bool IsCoreStatusUnKnow(int u);
@@ -83,7 +95,7 @@ private:
 
     int CheckCore(int u);
 
-    void ClusterCore(int u, int index_i);
+    void ClusterCore(int u, int early_start_idx);
 
     // 2nd phase computation
     void MarkClusterMinEleAsId();

@@ -90,18 +90,19 @@ void Graph::PruneAndCrossLink() {
         int my_start = v_i;
         int my_end = min(n, my_start + batch_size);
 
+        // compute min_cn, sd, ed, create cross link in parallel
         pool.enqueue([this, &mutex_arr](int i_start, int i_end) {
             for (auto i = i_start; i < i_end; i++) {
                 for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                     auto v = out_edges[j];
-                    //edge (i,v)
+                    //edge (i,v), correctness of sd/ed updates guaranteed by i<=v
                     if (i <= v) {
                         // use pruning rule
                         int a = degree[i], b = degree[v];
                         if (a > b) { swap(a, b); }
                         if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
                             // can be pruned
-                            min_cn[j] = NOT_SIMILAR;
+                            min_cn[j] = NOT_DIRECT_REACHABLE;
                             {
                                 unique_lock<std::mutex> lock(mutex_arr[i]);
                                 --effective_degree[i];
@@ -114,7 +115,7 @@ void Graph::PruneAndCrossLink() {
                             int c = ComputeCnLowerBound(a, b);
                             // can be pruned
                             if (c <= 2) {
-                                min_cn[j] = SIMILAR;
+                                min_cn[j] = DIRECT_REACHABLE;
                                 {
                                     unique_lock<std::mutex> lock(mutex_arr[i]);
                                     ++similar_degree[i];
@@ -172,18 +173,32 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++tmp1;
         }
     }
+
+    // statistics
+#ifdef PARALLEL
+    {
+        unique_lock<mutex> lock(mutex_vec[tmp0 == 0 ? tmp1 : tmp1 / tmp0]);
+        distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0]++;
+    }
+    {
+        unique_lock<mutex> lock(portion_mutex);
+        portion = max(portion, tmp0 == 0 ? tmp1 : tmp1 / tmp0);
+    }
+#else
     distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0]++;
     portion = max(portion, tmp0 == 0 ? tmp1 : tmp1 / tmp0);
-    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+
+#endif
+    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
-int Graph::EvalDensity(int u, ui edge_idx) {
+int Graph::EvalReachable(int u, ui edge_idx) {
     // check density for edge (u,v)
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
-bool Graph::IsSimilarityUnKnow(ui edge_idx) {
+bool Graph::IsReachableUnKnow(ui edge_idx) {
     return min_cn[edge_idx] > 0;
 }
 
@@ -200,8 +215,8 @@ bool Graph::IsDefiniteCoreVertex(int u) {
 int Graph::CheckCore(int u) {
     reachable_candidate_vertices.clear();
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-        if (min_cn[j] != NOT_SIMILAR) {
-            if (similar_degree[u] < min_u || !disjoint_set_ptr->IsSameSet(u, out_edges[j])) {
+        if (min_cn[j] != NOT_DIRECT_REACHABLE) {
+            if (!IsDefiniteCoreVertex(u) || !disjoint_set_ptr->IsSameSet(u, out_edges[j])) {
                 reachable_candidate_vertices.emplace_back(j);
             }
         }
@@ -211,15 +226,15 @@ int Graph::CheckCore(int u) {
     for (; IsCoreStatusUnKnow(u) && early_stop_idx < reachable_candidate_vertices.size(); ++early_stop_idx) {
         auto idx = reachable_candidate_vertices[early_stop_idx];
 
-        // correctness guaranteed by  reachable_candidate_vertices[early_stop_idx] are all not similar status, early_stop_idx.e, >0
-        if (min_cn[idx] != SIMILAR) {
+        // correctness guaranteed by reachable_candidate_vertices[early_stop_idx] are all in not-similar status
+        if (min_cn[idx] != DIRECT_REACHABLE) {
             int v = out_edges[idx];
             // 1st: compute density, build cross link
-            min_cn[idx] = EvalDensity(u, idx);
+            min_cn[idx] = EvalReachable(u, idx);
             UpdateViaCrossLink(idx);
 
             // 2nd: update sd and ed for u
-            if (min_cn[idx] == SIMILAR) {
+            if (min_cn[idx] == DIRECT_REACHABLE) {
                 ++similar_degree[u];
                 ++similar_degree[v];
             } else {
@@ -235,24 +250,25 @@ int Graph::CheckCore(int u) {
 }
 
 // core vertices connected component
-void Graph::ClusterCore(int u, int index_i) {
+void Graph::ClusterCore(int u, int early_start_idx) {
     // for these already checked, either from check or cross link
     for (auto idx : reachable_candidate_vertices) {
         // u and v similar, and v is also a core vertex
-        if (min_cn[idx] == SIMILAR && IsDefiniteCoreVertex(out_edges[idx])) {
+        if (min_cn[idx] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[idx])) {
             disjoint_set_ptr->Union(u, out_edges[idx]);
         }
     }
 
     // for these may have not checked
-    for (int i = index_i; i < reachable_candidate_vertices.size(); ++i) {
+    for (int i = early_start_idx; i < reachable_candidate_vertices.size(); ++i) {
         ui edge_idx = reachable_candidate_vertices[i];
         int v = out_edges[edge_idx];
 
-        if (IsSimilarityUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
-            min_cn[edge_idx] = EvalDensity(u, edge_idx);
+        // !disjoint_set_ptr->IsSameSet(u, v) adopted to reduce the number of EvalReachable check
+        if (IsReachableUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+            min_cn[edge_idx] = EvalReachable(u, edge_idx);
             UpdateViaCrossLink(edge_idx);
-            if (min_cn[edge_idx] == SIMILAR) { disjoint_set_ptr->Union(u, v); }
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) { disjoint_set_ptr->Union(u, v); }
         }
     }
 }
@@ -281,10 +297,10 @@ void Graph::ClusterNonCores() {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 // observation 3: check non-core neighbors
                 if (!IsDefiniteCoreVertex(out_edges[j])) {
-                    if (IsSimilarityUnKnow(j)) { min_cn[j] = EvalDensity(i, j); }
-                    if (min_cn[j] == SIMILAR) {
+                    if (IsReachableUnKnow(j)) { min_cn[j] = EvalReachable(i, j); }
+                    if (min_cn[j] == DIRECT_REACHABLE) {
                         // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
-                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->parent[i]], out_edges[j]);
+                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
                     }
                 }
             }
@@ -318,8 +334,8 @@ void Graph::pSCAN() {
     auto all_end = high_resolution_clock::now();
     cout << "3rd: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
 
-    cout << intersection_times << " " << all_cmp0 << " " << all_cmp1 << " " << all_cmp2 << endl;
+    cout << intersection_times << "\n" << all_cmp0 << "\n" << all_cmp1 << "\n" << all_cmp2 << endl;
     cout << portion << endl;
-//    cout << distribution << endl;
 }
+
 
