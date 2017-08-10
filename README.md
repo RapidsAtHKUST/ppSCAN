@@ -6,15 +6,13 @@ Project: pScan (Graph Clustering) Optimization
 
 ### Understanding and Works
 
-pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on unweighted, undirected not dynamic graph.
+pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on **unweighted, undirected not dynamic** graph.
 
-two parameters: density threshold, min number of neighbors, input graph representation: csr representation.
+two parameters: **density threshold**, **min number of neighbors**, input graph representation: csr representation.
 
 density function: `number of common neighbors` / `(sqrt(du * dv))`
 
-pSCAN:
-
-basic concepts:
+pScan basic concepts:
 
 * introduce `similar_degree`, `effective_degree` to help checking core, if a vertex is a core iff `sd <= number of reachable neighbors <=ed`, which can be used as a pruning rule,
 * introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core
