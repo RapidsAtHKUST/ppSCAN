@@ -6,6 +6,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "play/pretty_print.h"
+
 #include "ThreadPool.h"
 #include "MaxPriorityQueue.h"
 
@@ -147,23 +149,31 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
 
     intersection_times++;
+    auto tmp0 = 0;
+    auto tmp1 = 0;
     while (offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
            cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
             ++all_cmp0;
+            ++tmp0;
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
             ++offset_nei_v;
             ++all_cmp1;
+            ++tmp1;
         } else {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
             ++all_cmp2;
+            ++tmp0;
+            ++tmp1;
         }
     }
+    distribution[tmp0 == 0 ? tmp1 : tmp1 / tmp0]++;
+    portion = max(portion, tmp0 == 0 ? tmp1 : tmp1 / tmp0);
     return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 }
 
@@ -177,20 +187,31 @@ bool Graph::IsSimilarityUnKnow(ui edge_idx) {
     return min_cn[edge_idx] > 0;
 }
 
+
+bool Graph::IsCoreStatusUnKnow(int u) {
+    return similar_degree[u] < min_u && effective_degree[u] >= min_u;
+}
+
+bool Graph::IsDefiniteCoreVertex(int u) {
+    return similar_degree[u] >= min_u;
+}
+
 // 1st phase: core clustering
 int Graph::CheckCore(int u) {
-    dst_vertices.clear();
+    reachable_candidate_vertices.clear();
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         if (min_cn[j] != NOT_SIMILAR) {
             if (similar_degree[u] < min_u || !disjoint_set_ptr->IsSameSet(u, out_edges[j])) {
-                dst_vertices.emplace_back(j);
+                reachable_candidate_vertices.emplace_back(j);
             }
         }
     }
 
-    int i = 0;
-    for (; similar_degree[u] < min_u && effective_degree[u] >= min_u && i < dst_vertices.size(); ++i) {
-        auto idx = dst_vertices[i];
+    int early_stop_idx = 0;
+    for (; IsCoreStatusUnKnow(u) && early_stop_idx < reachable_candidate_vertices.size(); ++early_stop_idx) {
+        auto idx = reachable_candidate_vertices[early_stop_idx];
+
+        // correctness guaranteed by  reachable_candidate_vertices[early_stop_idx] are all not similar status, early_stop_idx.e, >0
         if (min_cn[idx] != SIMILAR) {
             int v = out_edges[idx];
             // 1st: compute density, build cross link
@@ -210,17 +231,13 @@ int Graph::CheckCore(int u) {
 
     // mark u as already explored, to avoid duplicated in cores
     effective_degree[u] = ALREADY_EXPLORED;
-    return i;
-}
-
-bool Graph::IsDefiniteCoreVertex(int u) {
-    return similar_degree[u] >= min_u;
+    return early_stop_idx;
 }
 
 // core vertices connected component
 void Graph::ClusterCore(int u, int index_i) {
     // for these already checked, either from check or cross link
-    for (auto idx : dst_vertices) {
+    for (auto idx : reachable_candidate_vertices) {
         // u and v similar, and v is also a core vertex
         if (min_cn[idx] == SIMILAR && IsDefiniteCoreVertex(out_edges[idx])) {
             disjoint_set_ptr->Union(u, out_edges[idx]);
@@ -228,8 +245,8 @@ void Graph::ClusterCore(int u, int index_i) {
     }
 
     // for these may have not checked
-    for (int i = index_i; i < dst_vertices.size(); ++i) {
-        ui edge_idx = dst_vertices[i];
+    for (int i = index_i; i < reachable_candidate_vertices.size(); ++i) {
+        ui edge_idx = reachable_candidate_vertices[i];
         int v = out_edges[edge_idx];
 
         if (IsSimilarityUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -302,4 +319,7 @@ void Graph::pSCAN() {
     cout << "3rd: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
 
     cout << intersection_times << " " << all_cmp0 << " " << all_cmp1 << " " << all_cmp2 << endl;
+    cout << portion << endl;
+//    cout << distribution << endl;
 }
+

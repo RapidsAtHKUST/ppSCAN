@@ -243,15 +243,15 @@ int Graph::EvalDensity(int u, ui edge_idx) {
 
 ```cpp
 void Graph::ClusterCore(int u, int index_i) {
-    for (auto idx : dst_vertices) {
+    for (auto idx : reachable_candidate_vertices) {
         // u and v similar, and v is also a core vertex
         if (min_cn[idx] == SIMILAR && IsDefiniteCoreVertex(out_edges[idx])) {
             disjoint_set_ptr->Union(u, out_edges[idx]);
         }
     }
 
-    for (int i = index_i; i < dst_vertices.size(); ++i) {
-        ui edge_idx = dst_vertices[i];
+    for (int i = index_i; i < reachable_candidate_vertices.size(); ++i) {
+        ui edge_idx = reachable_candidate_vertices[i];
         int v = out_edges[edge_idx];
         if (IsSimilarityUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
             min_cn[edge_idx] = EvalDensity(u, edge_idx);

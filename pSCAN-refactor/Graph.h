@@ -43,15 +43,18 @@ private:
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
 
     // intermediate-state variables
-    vector<ui> dst_vertices;
+    vector<ui> reachable_candidate_vertices;
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
+    // statistics for profiling
     long long all_cmp0 = 0;
     long long all_cmp1 = 0;
     long long all_cmp2 = 0;
     long long intersection_times = 0;
+    int portion = 0;
+    vector<int> distribution = vector<int>(900, 0);
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
@@ -74,9 +77,11 @@ private:
     bool IsSimilarityUnKnow(ui edge_idx);
 
     // 1st phase computation: core check and cluster
-    int CheckCore(int u);
+    bool IsCoreStatusUnKnow(int u);
 
     bool IsDefiniteCoreVertex(int u);
+
+    int CheckCore(int u);
 
     void ClusterCore(int u, int index_i);
 
