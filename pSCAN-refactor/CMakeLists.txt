@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.8)
 project(pSCAN)
 
 set(CMAKE_CXX_STANDARD 17)
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif ()
 
 set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
         DisjointSet.cpp DisjointSet.h MaxPriorityQueue.cpp MaxPriorityQueue.h ThreadPool.h)

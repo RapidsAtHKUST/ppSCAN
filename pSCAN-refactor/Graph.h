@@ -43,7 +43,7 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
-
+    vector<mutex> mutex_arr;
     // statistics for profiling
 #ifdef STATISTICS
     mutex prune0_mutex;
