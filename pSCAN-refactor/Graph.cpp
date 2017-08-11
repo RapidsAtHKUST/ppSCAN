@@ -80,7 +80,6 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 void Graph::PruneAndCrossLink() {
     auto thread_num = std::thread::hardware_concurrency();
     cout << "thread num:" << thread_num << "\n";
-    vector<std::mutex> mutex_arr(n);
 
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
@@ -91,55 +90,21 @@ void Graph::PruneAndCrossLink() {
         int my_end = min(n, my_start + batch_size);
 
         // compute min_cn, sd, ed, create cross link in parallel
-        pool.enqueue([this, &mutex_arr](int i_start, int i_end) {
+        pool.enqueue([this](int i_start, int i_end) {
             for (auto i = i_start; i < i_end; i++) {
                 for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                     auto v = out_edges[j];
                     //edge (i,v), correctness of sd/ed updates guaranteed by i<=v
                     if (i <= v) {
-                        // use pruning rule
                         int a = degree[i], b = degree[v];
                         if (a > b) { swap(a, b); }
                         if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
                             // can be pruned
                             min_cn[j] = NOT_DIRECT_REACHABLE;
-#ifdef STATISTICS
-                            {
-                                unique_lock<std::mutex> lock(prune0_mutex);
-                                ++prune0;
-                            }
-#endif
-                            {
-                                unique_lock<std::mutex> lock(mutex_arr[i]);
-                                --effective_degree[i];
-                            }
-                            {
-                                unique_lock<std::mutex> lock(mutex_arr[v]);
-                                --effective_degree[v];
-                            }
                         } else {
+                            // can be pruned, when c <= 2
                             int c = ComputeCnLowerBound(a, b);
-                            // can be pruned
-                            if (c <= 2) {
-                                min_cn[j] = DIRECT_REACHABLE;
-#ifdef STATISTICS
-                                {
-                                    unique_lock<std::mutex> lock(prune1_mutex);
-                                    ++prune1;
-                                }
-#endif
-                                {
-                                    unique_lock<std::mutex> lock(mutex_arr[i]);
-                                    ++similar_degree[i];
-                                }
-                                {
-                                    unique_lock<std::mutex> lock(mutex_arr[v]);
-                                    ++similar_degree[v];
-                                }
-                            } else {
-                                // need to refine later
-                                min_cn[j] = c;
-                            }
+                            min_cn[j] = c <= 2 ? DIRECT_REACHABLE : c;
                         }
 
                         // find edge, in order to build cross link
@@ -213,20 +178,17 @@ bool Graph::IsDefiniteCoreVertex(int u) {
 // 1st phase: core clustering
 void Graph::CheckCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        // 1st: compute density, build cross link
         if (min_cn[j] > 0) {
-            int v = out_edges[j];
-            // 1st: compute density, build cross link
             min_cn[j] = EvalReachable(u, j);
             UpdateViaCrossLink(j);
+        }
 
-            // 2nd: update sd and ed for u
-            if (min_cn[j] == DIRECT_REACHABLE) {
-                ++similar_degree[u];
-                ++similar_degree[v];
-            } else {
-                --effective_degree[u];
-                --effective_degree[v];
-            }
+        // 2nd: update sd and ed for u
+        if (min_cn[j] == DIRECT_REACHABLE) {
+            ++similar_degree[u];
+        } else {
+            --effective_degree[u];
         }
     }
 }
@@ -264,7 +226,6 @@ void Graph::ClusterNonCores() {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 // observation 3: check non-core neighbors
                 if (!IsDefiniteCoreVertex(out_edges[j]) && min_cn[j] == DIRECT_REACHABLE) {
-                    // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
                     noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
                 }
             }
