@@ -29,10 +29,15 @@ def statistics_pruning():
 if __name__ == '__main__':
     with_early_exit_lst = [25121224, 715258284, 1810511910, 154796461]
     without_early_exit_lst = [25121224, 2776231078, 1640997995, 202595282]
+    without_early_stop_check_core_list = [26355704, 1827106259, 771060399, 167979628]
     statistics_intersection(with_early_exit_lst)
-    statistics_intersection(without_early_exit_lst)
-    print 'cmp count:', sum(without_early_exit_lst[1:]), sum(with_early_exit_lst[1:]), 'ratio:', sum(
-        with_early_exit_lst[1:]) / float(sum(without_early_exit_lst[1:])), '\n'
+    statistics_intersection(without_early_stop_check_core_list)
+    print 'cmp count(to without early exit):', sum(without_early_exit_lst[1:]), sum(
+        with_early_exit_lst[1:]), 'ratio:', sum(
+        with_early_exit_lst[1:]) / float(sum(without_early_exit_lst[1:]))
+
+    print 'cmp count(to without early stop check core):', sum(with_early_exit_lst[1:]) / float(
+        sum(without_early_stop_check_core_list[1:])), '\n'
 
     statistics_histogram()
 

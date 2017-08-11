@@ -208,20 +208,12 @@ int Graph::EvalReachable(int u, ui edge_idx) {
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
-bool Graph::IsReachableUnKnow(ui edge_idx) {
-    return min_cn[edge_idx] > 0;
-}
-
-bool Graph::IsCoreStatusUnKnow(int u) {
-    return similar_degree[u] < min_u && effective_degree[u] >= min_u;
-}
-
 bool Graph::IsDefiniteCoreVertex(int u) {
     return similar_degree[u] >= min_u;
 }
 
 // 1st phase: core clustering
-int Graph::CheckCore(int u) {
+void Graph::CheckCore(int u) {
     reachable_candidate_vertices.clear();
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         if (min_cn[j] != NOT_DIRECT_REACHABLE) {
@@ -231,10 +223,7 @@ int Graph::CheckCore(int u) {
         }
     }
 
-    int early_stop_idx = 0;
-    for (; IsCoreStatusUnKnow(u) && early_stop_idx < reachable_candidate_vertices.size(); ++early_stop_idx) {
-        auto idx = reachable_candidate_vertices[early_stop_idx];
-
+    for (unsigned int idx : reachable_candidate_vertices) {
         // correctness guaranteed by reachable_candidate_vertices[early_stop_idx] are all in not-similar status
         if (min_cn[idx] != DIRECT_REACHABLE) {
             int v = out_edges[idx];
@@ -252,29 +241,15 @@ int Graph::CheckCore(int u) {
             }
         }
     }
-    return early_stop_idx;
 }
 
 // core vertices connected component
-void Graph::ClusterCore(int u, int early_start_idx) {
+void Graph::ClusterCore(int u) {
     // for these already checked, either from check or cross link
     for (auto idx : reachable_candidate_vertices) {
         // u and v similar, and v is also a core vertex
         if (min_cn[idx] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[idx])) {
             disjoint_set_ptr->Union(u, out_edges[idx]);
-        }
-    }
-
-    // for these may have not checked
-    for (int i = early_start_idx; i < reachable_candidate_vertices.size(); ++i) {
-        ui edge_idx = reachable_candidate_vertices[i];
-        int v = out_edges[edge_idx];
-
-        // !disjoint_set_ptr->IsSameSet(u, v) adopted to reduce the number of EvalReachable check
-        if (IsReachableUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
-            min_cn[edge_idx] = EvalReachable(u, edge_idx);
-            UpdateViaCrossLink(edge_idx);
-            if (min_cn[edge_idx] == DIRECT_REACHABLE) { disjoint_set_ptr->Union(u, v); }
         }
     }
 }
@@ -302,12 +277,9 @@ void Graph::ClusterNonCores() {
         if (IsDefiniteCoreVertex(i)) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 // observation 3: check non-core neighbors
-                if (!IsDefiniteCoreVertex(out_edges[j])) {
-                    if (IsReachableUnKnow(j)) { min_cn[j] = EvalReachable(i, j); }
-                    if (min_cn[j] == DIRECT_REACHABLE) {
-                        // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
-                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
-                    }
+                if (!IsDefiniteCoreVertex(out_edges[j]) && min_cn[j] == DIRECT_REACHABLE) {
+                    // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
+                    noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
                 }
             }
         }
@@ -329,8 +301,8 @@ void Graph::pSCAN() {
         auto u = max_priority_queue.pop();
         if (u == INVALID_VERTEX_IDX) { break; }
 
-        int index_i = CheckCore(u);
-        if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
+        CheckCore(u);
+        if (IsDefiniteCoreVertex(u)) { ClusterCore(u); }
     }
     auto end = high_resolution_clock::now();
     cout << "2nd: core clustering time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";

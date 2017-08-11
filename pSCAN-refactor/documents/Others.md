@@ -58,6 +58,65 @@ void Graph::PruneAndCrossLink() {
 }
 ```
 
+# Changes
+
+remove useless based on the change
+
+```cpp
+            for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+                // observation 3: check non-core neighbors
+                if (!IsDefiniteCoreVertex(out_edges[j])) {
+//                    if (IsReachableUnKnow(j)) { min_cn[j] = EvalReachable(i, j); }
+                    if (min_cn[j] == DIRECT_REACHABLE) {
+                        // root must be parent since already disjoint_set_ptr->FindRoot(i) previously
+                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
+                    }
+                }
+            }
+```
+
+remove early stop check cores, seem to be useless
+
+```cpp
+//    for (; IsCoreStatusUnKnow(u) && early_stop_idx < reachable_candidate_vertices.size(); ++early_stop_idx) {
+    for (; early_stop_idx < reachable_candidate_vertices.size(); ++early_stop_idx) {
+        auto idx = reachable_candidate_vertices[early_stop_idx];
+
+        // correctness guaranteed by reachable_candidate_vertices[early_stop_idx] are all in not-similar status
+        if (min_cn[idx] != DIRECT_REACHABLE) {
+            int v = out_edges[idx];
+            // 1st: compute density, build cross link
+            min_cn[idx] = EvalReachable(u, idx);
+            UpdateViaCrossLink(idx);
+
+            // 2nd: update sd and ed for u
+            if (min_cn[idx] == DIRECT_REACHABLE) {
+                ++similar_degree[u];
+                ++similar_degree[v];
+            } else {
+                --effective_degree[u];
+                --effective_degree[v];
+            }
+        }
+    }
+    return early_stop_idx;
+```
+
+```cpp
+    // for these may have not checked
+//    for (int i = early_start_idx; i < reachable_candidate_vertices.size(); ++i) {
+//        ui edge_idx = reachable_candidate_vertices[i];
+//        int v = out_edges[edge_idx];
+//
+//        // !disjoint_set_ptr->IsSameSet(u, v) adopted to reduce the number of EvalReachable check
+//        if (IsReachableUnKnow(edge_idx) && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+//            min_cn[edge_idx] = EvalReachable(u, edge_idx);
+//            UpdateViaCrossLink(edge_idx);
+//            if (min_cn[edge_idx] == DIRECT_REACHABLE) { disjoint_set_ptr->Union(u, v); }
+//        }
+//    }
+```
+
 # Removes
 
 remove useless state update

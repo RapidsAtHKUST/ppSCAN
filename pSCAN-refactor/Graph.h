@@ -82,16 +82,13 @@ private:
 
     int EvalReachable(int u, ui edge_idx);
 
-    bool IsReachableUnKnow(ui edge_idx);
-
     // 1st phase computation: core check and cluster
-    bool IsCoreStatusUnKnow(int u);
 
     bool IsDefiniteCoreVertex(int u);
 
-    int CheckCore(int u);
+    void CheckCore(int u);
 
-    void ClusterCore(int u, int early_start_idx);
+    void ClusterCore(int u);
 
     // 2nd phase computation
     void MarkClusterMinEleAsId();
