@@ -124,7 +124,6 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     auto tmp0 = 0;
     auto tmp1 = 0;
 #endif
-    // merge-operation for two sorted edge-list
     for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
@@ -164,7 +163,6 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 }
 
 int Graph::EvalReachable(int u, ui edge_idx) {
-    // check density for edge (u,v)
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
@@ -173,7 +171,6 @@ bool Graph::IsDefiniteCoreVertex(int u) {
     return similar_degree[u] >= min_u;
 }
 
-// 1st phase: core clustering
 void Graph::CheckCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         // 1st: compute density, build cross link
@@ -191,7 +188,6 @@ void Graph::CheckCore(int u) {
     }
 }
 
-// core vertices connected component
 void Graph::ClusterCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         if (min_cn[j] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[j])) {
@@ -200,7 +196,6 @@ void Graph::ClusterCore(int u) {
     }
 }
 
-// 2nd phase:  non-core vertices clustering
 void Graph::MarkClusterMinEleAsId() {
     cluster_dict = vector<int>(n);
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);

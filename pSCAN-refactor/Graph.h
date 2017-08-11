@@ -78,7 +78,6 @@ private:
     int EvalReachable(int u, ui edge_idx);
 
     // 1st phase computation: core check and cluster
-
     bool IsDefiniteCoreVertex(int u);
 
     void CheckCore(int u);
