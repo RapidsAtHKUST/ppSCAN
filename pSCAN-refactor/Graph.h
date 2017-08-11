@@ -51,10 +51,15 @@ private:
 
     // statistics for profiling
 #ifdef STATISTICS
-    long all_cmp0;
-    long all_cmp1;
-    long all_cmp2;
-    long intersection_times;
+    mutex prune0_mutex;
+    mutex prune1_mutex;
+    long prune0 = 0;
+    long prune1 = 0;
+
+    long all_cmp0 = 0;
+    long all_cmp1 = 0;
+    long all_cmp2 = 0;
+    long intersection_times = 0;
     int portion = 0;
     vector<int> distribution = vector<int>(900, 0);
 #endif

@@ -1,0 +1,21 @@
+int size:4
+n:4036538, m:69362378
+Total input cost:572 ms
+
+with google perf start
+thread num:8
+1st: prune and cross link execution time:1196 ms
+2nd: core clustering time:16145 ms
+3rd: non-core clustering time:619 ms
+
+prune0 definitely not reachable:3369420
+prune1 definitely reachable:1001839
+intersection times:25121224
+cmp0:1502006908
+cmp1:1023763286
+equal cmp:154796461
+max portion:875
+
+with google perf end
+PROFILE: interrupts/evictions/bytes = 2568/1175/93152
+Total time without IO:17963 ms

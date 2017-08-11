@@ -104,6 +104,10 @@ void Graph::PruneAndCrossLink() {
                             // can be pruned
                             min_cn[j] = NOT_DIRECT_REACHABLE;
                             {
+                                unique_lock<std::mutex> lock(prune0_mutex);
+                                ++prune0;
+                            }
+                            {
                                 unique_lock<std::mutex> lock(mutex_arr[i]);
                                 --effective_degree[i];
                             }
@@ -116,6 +120,10 @@ void Graph::PruneAndCrossLink() {
                             // can be pruned
                             if (c <= 2) {
                                 min_cn[j] = DIRECT_REACHABLE;
+                                {
+                                    unique_lock<std::mutex> lock(prune1_mutex);
+                                    ++prune1;
+                                }
                                 {
                                     unique_lock<std::mutex> lock(mutex_arr[i]);
                                     ++similar_degree[i];
@@ -181,7 +189,7 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 #ifdef STATISTICS
     int max_val = max(tmp0, tmp1);
     int min_val = min(tmp0, tmp1);
-    int local_portion = min_val  0 ? max_val : max_val / min_val;
+    int local_portion = min_val == 0 ? max_val : max_val / min_val;
     ++distribution[local_portion];
     portion = max(portion, local_portion);
 #endif
@@ -330,7 +338,9 @@ void Graph::pSCAN() {
     cout << "3rd: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
 
 #ifdef STATISTICS
-    cout << intersection_times << "\n" << all_cmp0 << "\n" << all_cmp1 << "\n" << all_cmp2 << endl;
-    cout << portion << endl;
+    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
+    cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
+         << "\nequal cmp:" << all_cmp2 << "\n";
+    cout << "max portion:" << portion << endl;
 #endif
 }
