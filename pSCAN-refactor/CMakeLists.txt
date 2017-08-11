@@ -9,7 +9,7 @@ if (OPENMP_FOUND)
 endif ()
 
 set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
-        DisjointSet.cpp DisjointSet.h MaxPriorityQueue.cpp MaxPriorityQueue.h ThreadPool.h)
+        DisjointSet.cpp DisjointSet.h ThreadPool.h)
 
 add_executable(io_play play/graph_io.cpp)
 add_executable(other_play play/play.cpp)

@@ -8,7 +8,6 @@
 #include "play/pretty_print.h"
 
 #include "ThreadPool.h"
-#include "MaxPriorityQueue.h"
 
 using namespace std::chrono;
 
@@ -176,7 +175,6 @@ bool Graph::IsDefiniteCoreVertex(int u) {
 
 // 1st phase: core clustering
 void Graph::CheckCore(int u) {
-#pragma omp parallel for
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         // 1st: compute density, build cross link
         if (min_cn[j] > 0) {
@@ -186,10 +184,8 @@ void Graph::CheckCore(int u) {
 
         // 2nd: update sd and ed for u
         if (min_cn[j] == DIRECT_REACHABLE) {
-#pragma omp critical
             ++similar_degree[u];
         } else {
-#pragma omp critical
             --effective_degree[u];
         }
     }
@@ -246,13 +242,11 @@ void Graph::pSCAN() {
     // 2nd: find all cores
     auto candidates = vector<int>();
     auto find_core_start = high_resolution_clock::now();
-    MaxPriorityQueue max_priority_queue(n, &effective_degree, min_u);
-    while (true) {
-        auto u = max_priority_queue.pop();
-        if (u == INVALID_VERTEX_IDX) { break; }
-
-        CheckCore(u);
-        if (IsDefiniteCoreVertex(u)) { candidates.emplace_back(u); }
+    for (auto i = 0; i < n; i++) {
+        if (effective_degree[i] >= min_u) {
+            CheckCore(i);
+            if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+        }
     }
     auto find_core_end = high_resolution_clock::now();
     cout << "2nd: core check time:" << duration_cast<milliseconds>(find_core_end - find_core_start).count() << " ms\n";
@@ -260,12 +254,14 @@ void Graph::pSCAN() {
     // 3rd: cluster cores
     for (auto candidate:candidates) { ClusterCore(candidate); }
     auto end_core_cluster = high_resolution_clock::now();
-    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - find_core_end).count() << " ms\n";
+    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - find_core_end).count()
+         << " ms\n";
 
     // 4th: non-core clustering
     ClusterNonCores();
     auto all_end = high_resolution_clock::now();
-    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count() << " ms\n";
+    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
+         << " ms\n";
 
 #ifdef STATISTICS
     cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
