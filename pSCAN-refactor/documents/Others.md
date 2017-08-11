@@ -60,6 +60,55 @@ void Graph::PruneAndCrossLink() {
 
 # Changes
 
+remove ed 
+
+```cpp
+//    vector<int> effective_degree;
+
+//    effective_degree.reserve(n);
+//    std::transform(degree.begin(), degree.end(), back_inserter(effective_degree),
+//                   [](int degree_val) { return degree_val - 1; });
+
+//        else {
+//            --effective_degree[u];
+//        }
+```
+
+```cpp
+#ifdef STATISTICS
+    vector<int> candidates;
+    for (auto i = 0; i < n; i++) {
+//        if (effective_degree[i] >= min_u) {
+            CheckCore(i);
+            if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+//        }
+    }
+#else
+    auto thread_num = std::thread::hardware_concurrency();
+    auto batch_num = 16u * thread_num;
+    auto batch_size = n / batch_num;
+    vector<std::future<vector<int>>> future_vec;
+    {
+        ThreadPool pool(thread_num);
+
+        for (auto v_i = 0; v_i < n; v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(n, my_start + batch_size);
+            future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
+                auto candidates = vector<int>();
+                for (auto i = i_start; i < i_end; i++) {
+//                    if (effective_degree[i] >= min_u) {
+                        CheckCore(i);
+                        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+//                    }
+                }
+                return candidates;
+            }, my_start, my_end));
+        }
+    }
+#endif
+```
+
 remove useless based on the change
 
 ```cpp

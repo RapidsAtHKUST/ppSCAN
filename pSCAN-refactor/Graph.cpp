@@ -33,9 +33,6 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
     similar_degree = vector<int>(n, 0);
-    effective_degree.reserve(n);
-    std::transform(degree.begin(), degree.end(), back_inserter(effective_degree),
-                   [](int degree_val) { return degree_val - 1; });
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
@@ -209,8 +206,6 @@ void Graph::CheckCore(int u) {
         // 2nd: update sd and ed for u
         if (min_cn[j] == DIRECT_REACHABLE) {
             ++similar_degree[u];
-        } else {
-            --effective_degree[u];
         }
     }
 }
@@ -267,10 +262,8 @@ void Graph::pSCAN() {
 #ifdef STATISTICS
     vector<int> candidates;
     for (auto i = 0; i < n; i++) {
-        if (effective_degree[i] >= min_u) {
             CheckCore(i);
             if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
-        }
     }
 #else
     auto thread_num = std::thread::hardware_concurrency();
@@ -286,10 +279,8 @@ void Graph::pSCAN() {
             future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
                 auto candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) {
-                    if (effective_degree[i] >= min_u) {
-                        CheckCore(i);
-                        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
-                    }
+                    CheckCore(i);
+                    if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
                 }
                 return candidates;
             }, my_start, my_end));
