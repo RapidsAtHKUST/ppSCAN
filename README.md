@@ -42,10 +42,24 @@ pSCAN-fork-optimization implementations follow modern cpp rules, to make things 
 file | utility
 --- | ---
 [ThreadPool.h](pSCAN-refactor/ThreadPool.h) | third-party thread pool, a simple impl
-[MaxPriorityQueue.h](pSCAN-refactor/MaxPriorityQueue.h), [MaxPriorityQueue.cpp](pSCAN-refactor/MaxPriorityQueue.cpp) | use array implementation to mimic heap
 [DisjointSet.h](pSCAN-refactor/DisjointSet.h), [DisjointSet.cpp](pSCAN-refactor/DisjointSet.cpp) | see CLRS for detail, for connected componet
 [Graph.h](pSCAN-refactor/Graph.h), [Graph.cpp](pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
 [InputOutput.h](pSCAN-refactor/InputOutput.h), [InputOutput.cpp](pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
+
+utils and plays
+
+file | utility
+--- | ---
+[pretty_print.h](pSCAN-refactor/play/pretty_print.h) | third-party pretty print utilities
+[graph_io.cpp](pSCAN-refactor/play/graph_io.cpp) | play ground about i/o
+[play.cpp](pSCAN-refactor/play/play.cpp) | play ground others
+
+deprecated
+
+file | utility
+--- | ---
+[MaxPriorityQueue.h](pSCAN-refactor/play/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](pSCAN-refactor/play/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
+[ThreadSafeDisjointSet.h](pSCAN-refactor/play/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
 
 ### Profiling
 
