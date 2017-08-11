@@ -158,11 +158,11 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     auto tmp1 = 0;
 #endif
     // merge-operation for two sorted edge-list
-//    for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-//         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
-//         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
     for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1];) {
+         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
+         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
+//    for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+//         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1];) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;

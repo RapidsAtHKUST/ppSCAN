@@ -1,5 +1,4 @@
 def statistics_intersection(lst):
-    # lst = [25121224, 715258284, 1810511910, 154796461]
     times = lst[0]
     print 'avg cmp times:', sum(lst[1:]) / float(times)
     print 'cmp(<,>,=) portion:', map(lambda ele: float(ele) / sum(lst[1:]), lst[1:]), '\n'
