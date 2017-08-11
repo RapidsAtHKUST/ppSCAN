@@ -77,8 +77,6 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 
 void Graph::PruneAndCrossLink() {
     auto thread_num = std::thread::hardware_concurrency();
-    cout << "thread num:" << thread_num << "\n";
-
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
     //must iterate from 0 to n-1
@@ -235,19 +233,41 @@ void Graph::pSCAN() {
          << " ms\n";
 
     // 2nd: find all cores
-    auto candidates = vector<int>();
     auto find_core_start = high_resolution_clock::now();
-    for (auto i = 0; i < n; i++) {
-        if (effective_degree[i] >= min_u) {
-            CheckCore(i);
-            if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+
+    auto thread_num = std::thread::hardware_concurrency();
+    auto batch_num = 16u * thread_num;
+    auto batch_size = n / batch_num;
+    //must iterate from 0 to n-1
+
+    vector<std::future<vector<int>>> future_vec;
+    {
+        ThreadPool pool(thread_num);
+
+        for (auto v_i = 0; v_i < n; v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(n, my_start + batch_size);
+            future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
+                auto candidates = vector<int>();
+                for (auto i = i_start; i < i_end; i++) {
+                    if (effective_degree[i] >= min_u) {
+                        CheckCore(i);
+                        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+                    }
+                }
+                return candidates;
+            }, my_start, my_end));
         }
     }
+
     auto find_core_end = high_resolution_clock::now();
     cout << "2nd: core check time:" << duration_cast<milliseconds>(find_core_end - find_core_start).count() << " ms\n";
 
     // 3rd: cluster cores
-    for (auto candidate:candidates) { ClusterCore(candidate); }
+    for (auto &future:future_vec) {
+        auto candidates = future.get();
+        for (auto candidate:candidates) { ClusterCore(candidate); }
+    }
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - find_core_end).count()
          << " ms\n";
