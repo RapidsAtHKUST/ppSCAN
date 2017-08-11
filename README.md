@@ -6,26 +6,21 @@ Project: pScan (Graph Clustering) Optimization
 
 ### Understanding and Works
 
-pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on **unweighted, undirected not dynamic** graph.
+* pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on **unweighted, undirected not dynamic** graph.
 
-two parameters: **density threshold**, **min number of neighbors**, input graph representation: csr representation.
+* two parameters: **density threshold**, **min number of neighbors**, input graph representation: csr representation.
 
-density function: `number of common neighbors` / `(sqrt(du * dv))`
+* density function: `number of common neighbors` / `(sqrt(du * dv))`
 
-pScan basic concepts:
+* pScan basic concepts:
+  * introduce `similar_degree`, `effective_degree` to help checking core, if a vertex is a core iff `sd <= number of reachable neighbors <=ed`, which can be used as a pruning rule,
+  * introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core
 
-* introduce `similar_degree`, `effective_degree` to help checking core, if a vertex is a core iff `sd <= number of reachable neighbors <=ed`, which can be used as a pruning rule,
-* introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core
-
-pruning:
-
-* pre-processing, `PruneAndCrossLink`, prune not reachable `if (((long long) a) * eps_b2 < ((long long) b) * eps_a2)`, which is easy to deduced when the max of`number of common neighbors` is `min(du,dv)`, and utilize cross-link
-
-* `common neighbor lower bound <=2`, must be similar, self and neighbor vertices
-
-* compute common neighbor with early exit, via utilizing `sd` and `ed`
-
-* other tricks to reduce the number of evaluations of reachability
+* runing:
+  * pre-processing, `PruneAndCrossLink`, prune not reachable `if (((long long) a) * eps_b2 < ((long long) b) * eps_a2)`, which is easy to deduced when the max of`number of common neighbors` is `min(du,dv)`, and utilize cross-link
+  * `common neighbor lower bound <=2`, must be similar, self and neighbor vertices
+  * compute common neighbor with early exit, via utilizing `sd` and `ed`
+  * other tricks to reduce the number of evaluations of reachability
 
 description | folder link
 --- | ---
@@ -37,7 +32,7 @@ simd study codes | [simd_study](simd_study)
 
 pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
 
-pSCAN-fork-optimization implementations follow modern cpp rules, to make things easier without loss of performance.
+* pSCAN-fork-optimization implementations follow modern cpp rules, to make things easier without loss of performance.
 
 file | utility
 --- | ---
@@ -46,7 +41,7 @@ file | utility
 [Graph.h](pSCAN-refactor/Graph.h), [Graph.cpp](pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
 [InputOutput.h](pSCAN-refactor/InputOutput.h), [InputOutput.cpp](pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
 
-utils and plays
+* utils and plays
 
 file | utility
 --- | ---
@@ -54,7 +49,7 @@ file | utility
 [graph_io.cpp](pSCAN-refactor/play/graph_io.cpp) | play ground about i/o
 [play.cpp](pSCAN-refactor/play/play.cpp) | play ground others
 
-deprecated
+* deprecated
 
 file | utility
 --- | ---
