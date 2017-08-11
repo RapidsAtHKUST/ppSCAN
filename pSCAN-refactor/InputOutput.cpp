@@ -93,5 +93,5 @@ void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, 
     sort(noncore_cluster.begin(), noncore_cluster.end());
     auto iter_end = unique(noncore_cluster.begin(), noncore_cluster.end());
     for_each(noncore_cluster.begin(), iter_end,
-             [&ofs](auto my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
+             [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }

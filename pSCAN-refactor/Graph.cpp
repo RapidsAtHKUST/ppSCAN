@@ -12,7 +12,7 @@
 using namespace std::chrono;
 
 Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
-    io_helper_ptr = make_unique<InputOutput>(dir_string);
+    io_helper_ptr = yche::make_unique<InputOutput>(dir_string);
     io_helper_ptr->ReadGraph();
 
     // 1st: parameter
@@ -36,10 +36,10 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     std::fill(similar_degree.begin(), similar_degree.end(), 0);
     effective_degree.reserve(n);
     std::transform(degree.begin(), degree.end(), back_inserter(effective_degree),
-                   [](auto degree_val) { return degree_val - 1; });
+                   [](int degree_val) { return degree_val - 1; });
 
     // 3rd: disjoint-set, make-set at the beginning
-    disjoint_set_ptr = make_unique<DisjointSet>(n);
+    disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {

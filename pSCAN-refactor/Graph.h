@@ -14,6 +14,14 @@ constexpr int NOT_DIRECT_REACHABLE = -2;
 constexpr int DIRECT_REACHABLE = -1;
 constexpr int NOT_SURE = 0;
 
+namespace yche {
+    template<typename T, typename... Args>
+    std::unique_ptr<T> make_unique(Args&&... args)
+    {
+        return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    }
+}
+
 // Graph instance: fast consumption object
 class Graph {
 private:

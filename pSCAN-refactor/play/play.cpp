@@ -70,7 +70,7 @@ void PlayUnique() {
                                      {3, 2}};
     sort(my_vec.begin(), my_vec.end());
     auto iter = unique(my_vec.begin(), my_vec.end());
-    for_each(my_vec.begin(), iter, [](auto ele) { cout << ele << "\n"; });
+    for_each(my_vec.begin(), iter, [](pair<int, int> ele) { cout << ele << "\n"; });
 }
 
 
