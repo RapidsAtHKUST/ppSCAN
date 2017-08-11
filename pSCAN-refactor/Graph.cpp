@@ -103,10 +103,12 @@ void Graph::PruneAndCrossLink() {
                         if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
                             // can be pruned
                             min_cn[j] = NOT_DIRECT_REACHABLE;
+#ifdef STATISTICS
                             {
                                 unique_lock<std::mutex> lock(prune0_mutex);
                                 ++prune0;
                             }
+#endif
                             {
                                 unique_lock<std::mutex> lock(mutex_arr[i]);
                                 --effective_degree[i];
@@ -120,10 +122,12 @@ void Graph::PruneAndCrossLink() {
                             // can be pruned
                             if (c <= 2) {
                                 min_cn[j] = DIRECT_REACHABLE;
+#ifdef STATISTICS
                                 {
                                     unique_lock<std::mutex> lock(prune1_mutex);
                                     ++prune1;
                                 }
+#endif
                                 {
                                     unique_lock<std::mutex> lock(mutex_arr[i]);
                                     ++similar_degree[i];
@@ -248,9 +252,6 @@ int Graph::CheckCore(int u) {
             }
         }
     }
-
-    // mark u as already explored, to avoid duplicated in cores
-    effective_degree[u] = ALREADY_EXPLORED;
     return early_stop_idx;
 }
 

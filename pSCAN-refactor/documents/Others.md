@@ -60,6 +60,13 @@ void Graph::PruneAndCrossLink() {
 
 # Removes
 
+remove useless state update
+
+```cpp
+    // mark u as already explored, to avoid duplicated in cores
+//    effective_degree[u] = ALREADY_EXPLORED;
+```
+
 remove useless swap in intersection
 
 ```cpp
