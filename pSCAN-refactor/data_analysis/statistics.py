@@ -1,9 +1,11 @@
-def statistics_intersection():
-    lst = [25121224, 715258284, 1810511910, 154796461]
+def statistics_intersection(lst):
+    # lst = [25121224, 715258284, 1810511910, 154796461]
     times = lst[0]
     print 'avg cmp times:', sum(lst[1:]) / float(times)
-    print 'cmp(<,>,=) portion:', map(lambda ele: float(ele) / sum(lst[1:]), lst[1:])
+    print 'cmp(<,>,=) portion:', map(lambda ele: float(ele) / sum(lst[1:]), lst[1:]), '\n'
 
+
+def statistics_histogram():
     with open('distribution.txt') as ifs:
         cmp_distribution = eval(ifs.readline())
 
@@ -14,16 +16,25 @@ def statistics_intersection():
         histogram_list = [sum(small_lst), sum(middle_lst), sum(big_lst)]
         print 'cmp histogram:', histogram_list
         portion_list = map(lambda ele: ele / float(sum(histogram_list)), histogram_list)
-        print 'cmp histogram(0:6, 6:10, 10:inf):', portion_list
+        print 'cmp histogram(0:6, 6:10, 10:inf):', portion_list, '\n'
 
 
 def statistics_pruning():
     lst = [3369420, 1001839, 25121224]
     portion_lst = map(lambda ele: float(ele) / sum(lst), lst)
     print '\nprune0, prune1, evaluations:', portion_lst
-    print 'involved:', sum(lst) * 2, 'total:', 69362378
+    edge_num = 69362378
+    print 'involved:', sum(lst) * 2, 'total:', edge_num, 'ratio:', float(sum(lst) * 2) / edge_num
 
 
 if __name__ == '__main__':
-    statistics_intersection()
+    with_early_exit_lst = [25121224, 715258284, 1810511910, 154796461]
+    without_early_exit_lst = [25121224, 2776231078, 1640997995, 202595282]
+    statistics_intersection(with_early_exit_lst)
+    statistics_intersection(without_early_exit_lst)
+    print 'cmp count:', sum(without_early_exit_lst[1:]), sum(with_early_exit_lst[1:]), 'ratio:', sum(
+        with_early_exit_lst[1:]) / float(sum(without_early_exit_lst[1:])), '\n'
+
+    statistics_histogram()
+
     statistics_pruning()
