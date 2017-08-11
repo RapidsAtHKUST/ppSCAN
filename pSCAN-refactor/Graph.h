@@ -16,8 +16,7 @@ constexpr int NOT_SURE = 0;
 
 namespace yche {
     template<typename T, typename... Args>
-    std::unique_ptr<T> make_unique(Args&&... args)
-    {
+    std::unique_ptr<T> make_unique(Args &&... args) {
         return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
     }
 }
@@ -51,14 +50,8 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
-    vector<mutex> mutex_arr;
     // statistics for profiling
 #ifdef STATISTICS
-    mutex prune0_mutex;
-    mutex prune1_mutex;
-    long prune0 = 0;
-    long prune1 = 0;
-
     long all_cmp0 = 0;
     long all_cmp1 = 0;
     long all_cmp2 = 0;

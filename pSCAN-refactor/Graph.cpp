@@ -32,8 +32,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
-    similar_degree = vector<int>(n);
-    std::fill(similar_degree.begin(), similar_degree.end(), 0);
+    similar_degree = vector<int>(n, 0);
     effective_degree.reserve(n);
     std::transform(degree.begin(), degree.end(), back_inserter(effective_degree),
                    [](int degree_val) { return degree_val - 1; });
@@ -79,7 +78,6 @@ void Graph::PruneAndCrossLink() {
     auto thread_num = std::thread::hardware_concurrency();
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
-    //must iterate from 0 to n-1
     ThreadPool pool(thread_num);
     for (auto v_i = 0; v_i < n; v_i += batch_size) {
         int my_start = v_i;
@@ -235,11 +233,18 @@ void Graph::pSCAN() {
     // 2nd: find all cores
     auto find_core_start = high_resolution_clock::now();
 
+#ifdef STATISTICS
+    vector<int> candidates;
+    for (auto i = 0; i < n; i++) {
+        if (effective_degree[i] >= min_u) {
+            CheckCore(i);
+            if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+        }
+    }
+#else
     auto thread_num = std::thread::hardware_concurrency();
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
-    //must iterate from 0 to n-1
-
     vector<std::future<vector<int>>> future_vec;
     {
         ThreadPool pool(thread_num);
@@ -259,27 +264,31 @@ void Graph::pSCAN() {
             }, my_start, my_end));
         }
     }
-
+#endif
     auto find_core_end = high_resolution_clock::now();
     cout << "2nd: core check time:" << duration_cast<milliseconds>(find_core_end - find_core_start).count() << " ms\n";
 
-    // 3rd: cluster cores
+// 3rd: cluster cores
+#ifdef STATISTICS
+    for (auto candidate:candidates) { ClusterCore(candidate); }
+#else
     for (auto &future:future_vec) {
         auto candidates = future.get();
         for (auto candidate:candidates) { ClusterCore(candidate); }
     }
+#endif
+
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - find_core_end).count()
          << " ms\n";
 
-    // 4th: non-core clustering
+// 4th: non-core clustering
     ClusterNonCores();
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
          << " ms\n";
 
 #ifdef STATISTICS
-    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
     cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
     cout << "max portion:" << portion << endl;
