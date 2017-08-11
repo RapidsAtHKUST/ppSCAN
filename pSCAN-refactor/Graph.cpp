@@ -165,8 +165,6 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
-//    for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-//         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1];) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
@@ -214,25 +212,15 @@ bool Graph::IsDefiniteCoreVertex(int u) {
 
 // 1st phase: core clustering
 void Graph::CheckCore(int u) {
-    reachable_candidate_vertices.clear();
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-        if (min_cn[j] != NOT_DIRECT_REACHABLE) {
-            if (!IsDefiniteCoreVertex(u) || !disjoint_set_ptr->IsSameSet(u, out_edges[j])) {
-                reachable_candidate_vertices.emplace_back(j);
-            }
-        }
-    }
-
-    for (unsigned int idx : reachable_candidate_vertices) {
-        // correctness guaranteed by reachable_candidate_vertices[early_stop_idx] are all in not-similar status
-        if (min_cn[idx] != DIRECT_REACHABLE) {
-            int v = out_edges[idx];
+        if (min_cn[j] > 0) {
+            int v = out_edges[j];
             // 1st: compute density, build cross link
-            min_cn[idx] = EvalReachable(u, idx);
-            UpdateViaCrossLink(idx);
+            min_cn[j] = EvalReachable(u, j);
+            UpdateViaCrossLink(j);
 
             // 2nd: update sd and ed for u
-            if (min_cn[idx] == DIRECT_REACHABLE) {
+            if (min_cn[j] == DIRECT_REACHABLE) {
                 ++similar_degree[u];
                 ++similar_degree[v];
             } else {
@@ -245,11 +233,9 @@ void Graph::CheckCore(int u) {
 
 // core vertices connected component
 void Graph::ClusterCore(int u) {
-    // for these already checked, either from check or cross link
-    for (auto idx : reachable_candidate_vertices) {
-        // u and v similar, and v is also a core vertex
-        if (min_cn[idx] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[idx])) {
-            disjoint_set_ptr->Union(u, out_edges[idx]);
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        if (min_cn[j] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[j])) {
+            disjoint_set_ptr->Union(u, out_edges[j]);
         }
     }
 }

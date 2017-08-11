@@ -14,8 +14,6 @@ constexpr int NOT_DIRECT_REACHABLE = -2;
 constexpr int DIRECT_REACHABLE = -1;
 constexpr int NOT_SURE = 0;
 
-constexpr int ALREADY_EXPLORED = -1;
-
 // Graph instance: fast consumption object
 class Graph {
 private:
@@ -42,9 +40,6 @@ private:
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
     // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
-
-    // intermediate-state variables
-    vector<ui> reachable_candidate_vertices;
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
