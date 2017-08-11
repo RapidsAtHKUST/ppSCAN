@@ -2,7 +2,6 @@
 
 #include <cstring>
 #include <cmath>
-#include <chrono>
 #include <iostream>
 #include <algorithm>
 
@@ -234,14 +233,15 @@ void Graph::ClusterNonCores() {
 }
 
 void Graph::pSCAN() {
-    // 1st
+    // 1st: pre-processing
     auto prune_start = high_resolution_clock::now();
     PruneAndCrossLink();
     auto prune_end = high_resolution_clock::now();
     cout << "1st: prune and cross link execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count()
          << " ms\n";
 
-    // 2nd: explore vertex in effective-degree non-increasing order
+    // 2nd: find all cores
+    auto candidates = vector<int>();
     auto start = high_resolution_clock::now();
     MaxPriorityQueue max_priority_queue(n, &effective_degree, min_u);
     while (true) {
@@ -249,15 +249,20 @@ void Graph::pSCAN() {
         if (u == INVALID_VERTEX_IDX) { break; }
 
         CheckCore(u);
-        if (IsDefiniteCoreVertex(u)) { ClusterCore(u); }
+        if (IsDefiniteCoreVertex(u)) { candidates.emplace_back(u); }
     }
     auto end = high_resolution_clock::now();
-    cout << "2nd: core clustering time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
+    cout << "2nd: core check time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
-    // 3rd: non-core clustering
+    // 3rd: cluster cores
+    for (auto candidate:candidates) { ClusterCore(candidate); }
+    auto end_core_cluster = high_resolution_clock::now();
+    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - end).count() << " ms\n";
+
+    // 4th: non-core clustering
     ClusterNonCores();
     auto all_end = high_resolution_clock::now();
-    cout << "3rd: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
+    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end).count() << " ms\n";
 
 #ifdef STATISTICS
     cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
