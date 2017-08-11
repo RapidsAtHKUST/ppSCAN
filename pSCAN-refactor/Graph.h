@@ -52,6 +52,8 @@ private:
     unique_ptr<DisjointSet> disjoint_set_ptr;
     // statistics for profiling
 #ifdef STATISTICS
+    long prune0 = 0;
+    long prune1 = 0;
     long all_cmp0 = 0;
     long all_cmp1 = 0;
     long all_cmp2 = 0;

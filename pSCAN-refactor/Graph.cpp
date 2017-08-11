@@ -75,6 +75,36 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 }
 
 void Graph::PruneAndCrossLink() {
+#ifdef STATISTICS
+    for (auto i = 0; i < n; i++) {
+        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+            auto v = out_edges[j];
+            if (i <= v) {
+                int a = degree[i], b = degree[v];
+                if (a > b) { swap(a, b); };
+                if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+                    // can be pruned
+                    ++prune0;
+                    min_cn[j] = NOT_DIRECT_REACHABLE;
+                } else {
+                    // can be pruned, when c <= 2
+                    int c = ComputeCnLowerBound(a, b);
+                    if (c <= 2) {
+                        ++prune1;
+                        min_cn[j] = DIRECT_REACHABLE;
+                    } else {
+                        min_cn[j] = c;
+                    }
+                }
+
+                // find edge, in order to build cross link
+                auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i);
+                InitCrossLink(j, r_id);
+                UpdateViaCrossLink(j);
+            }
+        }
+    }
+#else
     auto thread_num = std::thread::hardware_concurrency();
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
@@ -110,6 +140,7 @@ void Graph::PruneAndCrossLink() {
             }
         }, my_start, my_end);
     }
+#endif
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -289,6 +320,7 @@ void Graph::pSCAN() {
          << " ms\n";
 
 #ifdef STATISTICS
+    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
     cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
     cout << "max portion:" << portion << endl;
