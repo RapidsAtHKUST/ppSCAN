@@ -7,6 +7,12 @@ make
 # Usage
 ./pscan graph_directory epsilon mu Output[optional]
 
+# Dataset 
+
+* https://snap.stanford.edu/data/com-LiveJournal.html
+* http://law.di.unimi.it/webdata/uk-2002/
+* http://law.di.unimi.it/webdata/twitter-2010/
+
 # Note
 If you are using this code, please kindly cite the following paper.
 

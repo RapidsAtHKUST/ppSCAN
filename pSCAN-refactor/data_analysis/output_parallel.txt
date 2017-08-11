@@ -31,3 +31,14 @@ with google perf end
 PROFILE: interrupts/evictions/bytes = 3546/1934/220152
 Total time without IO:4675 ms
 Total output cost:935 ms
+
+// gpu-23
+int size:4
+n:4036538, m:69362378
+Total input cost:3102 ms
+1st: prune and cross link execution time:537 ms
+2nd: core check time:1656 ms
+3rd: core clustering time:686 ms
+4th: non-core clustering time:409 ms
+Total time without IO:3291 ms
+Total output cost:2189 ms
