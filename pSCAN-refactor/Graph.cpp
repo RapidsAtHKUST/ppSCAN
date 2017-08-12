@@ -44,17 +44,9 @@ void Graph::Output(const char *eps_s, const char *miu) {
 }
 
 ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
-    --offset_end;
-    if (array[offset_end] < val) { return offset_end + 1; }
-    while (offset_beg < offset_end) {
-        auto mid = offset_beg + (offset_end - offset_beg) / 2;
-        if (array[mid] >= val) {
-            offset_end = mid;
-        } else {
-            offset_beg = mid + 1;
-        }
-    }
-    return offset_end;
+    auto mid = (offset_beg + offset_end) / 2;
+    if (array[mid] == val) { return mid; }
+    return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
 
 void Graph::InitCrossLink(ui edge_idx, ui rev_edge_idx) {
