@@ -88,7 +88,7 @@ void PlaySort() {
     lines.emplace_back(2, 4);
     lines.emplace_back(1, 3);
     lines.emplace_back(1, 2);
-    sort(lines.begin(), lines.end(), [](pair<int, int> &left, pair<int, int> &right) {
+    sort(lines.begin(), lines.end(), [](const pair<int, int> &left, const pair<int, int> &right) {
         if (left.first == right.first) {
             return left.second < right.second;
         }
@@ -98,10 +98,10 @@ void PlaySort() {
 }
 
 int main() {
-//    PlaySwap();
-//    PlayEpsaAndEpsb();
-//    PlaySelfIncrement();
-//    PlayUnique();
-//    PlaySetUnion();
+    PlaySwap();
+    PlayEpsaAndEpsb();
+    PlaySelfIncrement();
+    PlayUnique();
+    PlaySetUnion();
     PlaySort();
 }

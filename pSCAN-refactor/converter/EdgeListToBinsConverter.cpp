@@ -78,7 +78,7 @@ void WriteToOutputFiles(string &deg_output_file, string &adj_output_file, vector
     vector<vector<int>> matrix(vertex_num);
 
     ofstream deg_ofs(deg_output_file, ios::binary);
-    sort(lines.begin(), lines.end(), [](pair<int, int> &left, pair<int, int> &right) {
+    sort(lines.begin(), lines.end(), [](const pair<int, int> &left, const pair<int, int> &right) {
         if (left.first == right.first) {
             return left.second < right.second;
         }
