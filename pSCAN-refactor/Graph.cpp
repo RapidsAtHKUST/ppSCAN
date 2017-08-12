@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <cmath>
+
 #include <iostream>
 #include <algorithm>
 
@@ -262,8 +263,8 @@ void Graph::pSCAN() {
 #ifdef STATISTICS
     vector<int> candidates;
     for (auto i = 0; i < n; i++) {
-            CheckCore(i);
-            if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+        CheckCore(i);
+        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
     }
 #else
     auto thread_num = std::thread::hardware_concurrency();

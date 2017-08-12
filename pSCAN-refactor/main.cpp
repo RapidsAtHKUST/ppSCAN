@@ -1,5 +1,6 @@
-#include <iostream>
 #include <cstring>
+
+#include <iostream>
 #include <chrono>
 
 #include "Graph.h"
