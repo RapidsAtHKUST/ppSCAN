@@ -35,7 +35,7 @@ private:
     vector<int> out_edges;
 
     // edge properties
-    vector<ui> reverse_edge_idx; //the position of reverse_edge_idx edge in out_edges
+//    vector<ui> reverse_edge_idx; //the position of reverse_edge_idx edge in out_edges
     vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
 
     // vertex properties
@@ -65,10 +65,6 @@ private:
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
-    void InitCrossLink(ui edge_idx, ui rev_edge_idx);
-
-    void UpdateViaCrossLink(int edge_idx);
-
     // 2nd optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
@@ -82,7 +78,9 @@ private:
     // 1st phase computation: core check and cluster
     bool IsDefiniteCoreVertex(int u);
 
-    void CheckCore(int u);
+    void CheckCoreFirstBSP(int u);
+
+    void CheckCoreSecondBSP(int u);
 
     void ClusterCore(int u);
 

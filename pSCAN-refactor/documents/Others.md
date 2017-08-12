@@ -99,7 +99,7 @@ remove ed
     vector<int> candidates;
     for (auto i = 0; i < n; i++) {
 //        if (effective_degree[i] >= min_u) {
-            CheckCore(i);
+            CheckCoreFirstBSP(i);
             if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
 //        }
     }
@@ -118,7 +118,7 @@ remove ed
                 auto candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) {
 //                    if (effective_degree[i] >= min_u) {
-                        CheckCore(i);
+                        CheckCoreFirstBSP(i);
                         if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
 //                    }
                 }
@@ -225,7 +225,7 @@ remove `cores` member
 
         if (u == INVALID_VERTEX_IDX) { break; }
 
-        int index_i = CheckCore(u);
+        int index_i = CheckCoreFirstBSP(u);
 
         if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
     }
@@ -264,7 +264,7 @@ core change in pre-processing phase
 
 ```
 
-CheckCore
+CheckCoreFirstBSP
 
 ```cpp
             // 3rd: update sd and ed for v
