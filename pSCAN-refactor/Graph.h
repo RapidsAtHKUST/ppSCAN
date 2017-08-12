@@ -58,7 +58,7 @@ private:
     long all_cmp2 = 0;
     long intersection_times = 0;
     int portion = 0;
-    vector<int> distribution = vector<int>(900, 0);
+//    vector<int> distribution = vector<int>(900, 0);
 #endif
 private:
     // 1st optimization: cross-link

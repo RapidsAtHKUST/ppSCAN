@@ -180,7 +180,7 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int max_val = max(tmp0, tmp1);
     int min_val = min(tmp0, tmp1);
     int local_portion = min_val == 0 ? max_val : max_val / min_val;
-    ++distribution[local_portion];
+//    ++distribution[local_portion];
     portion = max(portion, local_portion);
 #endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;

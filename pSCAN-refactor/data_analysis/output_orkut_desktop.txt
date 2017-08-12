@@ -1,0 +1,51 @@
+// original desktop
+
+**** Graph Clustering (Release): ./data, 0.3, 5 ***
+	*** Finished loading graph!
+Total time without IO: 158654855
+
+// parallel desktop
+
+int size:4
+n:3072627, m:234370166
+Total input cost:1324 ms
+
+with google perf start
+1st: prune and cross link execution time:5215 ms
+2nd: core check time:22718 ms
+3rd: core clustering time:553 ms
+4th: non-core clustering time:598 ms
+
+with google perf end
+PROFILE: interrupts/evictions/bytes = 21603/38/16008
+Total time without IO:29086 ms
+Total output cost:297 ms
+Using local file build/pSCAN.
+Using local file pscanProfile.log.
+
+// sequential statistics desktop
+
+int size:4
+n:3072627, m:234370166
+Total input cost:1288 ms
+
+with google perf start
+1st: prune and cross link execution time:16318 ms
+2nd: core check time:124618 ms
+3rd: core clustering time:538 ms
+4th: non-core clustering time:623 ms
+
+prune0 definitely not reachable:8445671
+prune1 definitely reachable:18560
+intersection times:108720852
+cmp0:16230884108
+cmp1:11146323371
+equal cmp:1375991912
+max portion:2009
+
+with google perf end
+PROFILE: interrupts/evictions/bytes = 14180/12298/787792
+Total time without IO:142100 ms
+Total output cost:292 ms
+Using local file build/pSCAN.
+Using local file pscanProfile.log.

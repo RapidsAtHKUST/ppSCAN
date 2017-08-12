@@ -82,10 +82,26 @@ void PlaySetUnion() {
     cout << another << endl;
 }
 
+void PlaySort() {
+    vector<pair<int, int>> lines;
+    lines.emplace_back(2, 3);
+    lines.emplace_back(2, 4);
+    lines.emplace_back(1, 3);
+    lines.emplace_back(1, 2);
+    sort(lines.begin(), lines.end(), [](pair<int, int> &left, pair<int, int> &right) {
+        if (left.first == right.first) {
+            return left.second < right.second;
+        }
+        return left.first < right.first;
+    });
+    cout << lines << endl;
+}
+
 int main() {
-    PlaySwap();
-    PlayEpsaAndEpsb();
-    PlaySelfIncrement();
-    PlayUnique();
-    PlaySetUnion();
+//    PlaySwap();
+//    PlayEpsaAndEpsb();
+//    PlaySelfIncrement();
+//    PlayUnique();
+//    PlaySetUnion();
+    PlaySort();
 }
