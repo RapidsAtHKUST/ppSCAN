@@ -36,7 +36,8 @@ vector<pair<int, int>> GetEdgeList(string &input_file_path, int &max_ele) {
             int first, second;
             ss >> first >> second;
             assert(first < INT32_MAX and second < INT32_MAX);
-            max_ele = max(max_ele, second);
+            if (second > max_ele)
+                max_ele = second;
             lines.emplace_back(first, second);
         }
     }
@@ -61,17 +62,10 @@ bool IsAlreadyCSROrder(vector<pair<int, int>> &lines) {
                 cout << "cur line:" << line_count << "\n";
                 return false;
             }
-
-            prev_dst_val = dst;
         } else {
-//            if (src < cur_src_vertex) {
-//                cout << "src < cur_src_vertex, src:" << src << ", cur_src_vertex:" << cur_src_vertex << "\n";
-//                cout << "cur line:" << line_count << "\n";
-//                return false;
-//            }
             cur_src_vertex = src;
-            prev_dst_val = dst;
         }
+        prev_dst_val = dst;
         line_count++;
     }
     return true;
@@ -99,24 +93,19 @@ void WriteToOutputFiles(string &deg_output_file, string &adj_output_file, vector
         matrix[dst].emplace_back(src);
     }
 
-    cout << "begin out" << endl;
+    cout << "begin write" << endl;
     int int_size = sizeof(int);
     deg_ofs.write(reinterpret_cast<const char *>(&int_size), 4);
     deg_ofs.write(reinterpret_cast<const char *>(&vertex_num), 4);
     deg_ofs.write(reinterpret_cast<const char *>(&edge_num), 4);
     deg_ofs.write(reinterpret_cast<const char *>(&degree_arr.front()), degree_arr.size() * 4);
 
+    cout << "finish degree write..." << endl;
     ofstream adj_ofs(adj_output_file, ios::binary);
     cout << matrix.back() << endl;
-    vector<int> flat_matrix;
-    flat_matrix.reserve(edge_num);
     for (auto &adj_arr: matrix) {
-        for (auto ele:adj_arr) {
-            flat_matrix.emplace_back(ele);
-        }
+        adj_ofs.write(reinterpret_cast<const char *>(&adj_arr.front()), adj_arr.size() * 4);
     }
-    cout << "ready write..." << endl;
-    adj_ofs.write(reinterpret_cast<const char *>(&flat_matrix.front()), flat_matrix.size() * 4);
     cout << "finish write.." << endl;
 }
 

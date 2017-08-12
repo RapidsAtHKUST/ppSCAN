@@ -49,3 +49,15 @@ Total time without IO:142100 ms
 Total output cost:292 ms
 Using local file build/pSCAN.
 Using local file pscanProfile.log.
+
+// gpu-23 parallel
+
+int size:4
+n:3072627, m:234370166
+Total input cost:10173 ms
+1st: prune and cross link execution time:1756 ms
+2nd: core check time:7057 ms
+3rd: core clustering time:747 ms
+4th: non-core clustering time:680 ms
+Total time without IO:10243 ms
+Total output cost:1348 ms
