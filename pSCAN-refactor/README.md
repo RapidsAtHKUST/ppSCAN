@@ -6,6 +6,8 @@ pSCAN: Fast and Exact Structural Graph Clustering
 
 g++ should support c++11, e.g, g++ 4.8+
 
+cmake should be 3.6+, allowing for modern cmake
+
 ```zsh
 mkdir -p build
 cd build
@@ -15,7 +17,14 @@ make
 
 # Dataset 
 
+already
+
 * https://snap.stanford.edu/data/com-LiveJournal.html
+* https://snap.stanford.edu/data/com-Orkut.html
+* https://snap.stanford.edu/data/com-Friendster.html 
+
+not yet
+
 * http://law.di.unimi.it/webdata/uk-2002/
 * http://law.di.unimi.it/webdata/twitter-2010/
 
