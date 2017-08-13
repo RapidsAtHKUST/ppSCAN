@@ -56,19 +56,19 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 
 void Graph::Prune() {
 #ifdef STATISTICS
-    for (auto i = 0; i < n; i++) {
-        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+    for (auto u = 0; u < n; u++) {
+        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
             auto v = out_edges[j];
-            if (i <= v) {
-                int a = degree[i], b = degree[v];
-                if (a > b) { swap(a, b); };
-                if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+            if (u <= v) {
+                int deg_a = degree[u], b = degree[v];
+                if (deg_a > b) { swap(deg_a, b); };
+                if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
                     // can be pruned
                     ++prune0;
                     min_cn[j] = NOT_DIRECT_REACHABLE;
                 } else {
                     // can be pruned, when c <= 2
-                    int c = ComputeCnLowerBound(a, b);
+                    int c = ComputeCnLowerBound(deg_a, b);
                     if (c <= 2) {
                         ++prune1;
                         min_cn[j] = DIRECT_REACHABLE;
