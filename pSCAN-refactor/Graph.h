@@ -49,17 +49,6 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
-    // statistics for profiling
-#ifdef STATISTICS
-    long prune0 = 0;
-    long prune1 = 0;
-    long all_cmp0 = 0;
-    long all_cmp1 = 0;
-    long all_cmp2 = 0;
-    long intersection_times = 0;
-    int portion = 0;
-//    vector<int> distribution = vector<int>(900, 0);
-#endif
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index

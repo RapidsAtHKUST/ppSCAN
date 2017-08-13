@@ -67,16 +67,15 @@ void Graph::PruneAndCrossLink() {
             for (auto u = i_start; u < i_end; u++) {
                 for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
                     auto v = out_edges[edge_idx];
-                    //edge (u,v), correctness of sd/ed updates guaranteed by u<=v
                     if (u <= v) {
-                        int a = degree[u], b = degree[v];
-                        if (a > b) { swap(a, b); }
-                        if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+                        int deg_a = degree[u], deg_b = degree[v];
+                        if (deg_a > deg_b) { swap(deg_a, deg_b); }
+                        if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
                             // can be pruned
                             min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
                         } else {
                             // can be pruned, when c <= 2
-                            int c = ComputeCnLowerBound(a, b);
+                            int c = ComputeCnLowerBound(deg_a, deg_b);
                             min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
                         }
                     }
@@ -89,7 +88,7 @@ void Graph::PruneAndCrossLink() {
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
-    for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+    for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
@@ -179,8 +178,7 @@ void Graph::pSCAN() {
     auto prune_start = high_resolution_clock::now();
     PruneAndCrossLink();
     auto prune_end = high_resolution_clock::now();
-    cout << "1st: prune and cross link execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count()
-         << " ms\n";
+    cout << "1st: prune execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
 
     // 2nd: find all cores
     auto find_core_start = high_resolution_clock::now();
@@ -199,17 +197,10 @@ void Graph::pSCAN() {
             }, my_start, my_end);
         }
     }
-    {
-        ThreadPool pool(thread_num);
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                auto candidates = vector<int>();
-                for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
-            }, my_start, my_end);
-        }
-    }
+    auto first_bsp_end = high_resolution_clock::now();
+    cout << "2nd: check core first-phase bsp time:"
+         << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
+
     vector<std::future<vector<int>>> future_vec;
     {
         ThreadPool pool(thread_num);
@@ -219,25 +210,29 @@ void Graph::pSCAN() {
             int my_end = min(n, my_start + batch_size);
             future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
                 auto candidates = vector<int>();
-                for (auto i = i_start; i < i_end; i++) { if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }}
+                for (auto i = i_start; i < i_end; i++) {
+                    CheckCoreSecondBSP(i);
+                    if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+                }
                 return candidates;
             }, my_start, my_end));
         }
     }
-    auto find_core_end = high_resolution_clock::now();
-    cout << "2nd: core check time:" << duration_cast<milliseconds>(find_core_end - find_core_start).count() << " ms\n";
+    auto second_bsp_end = high_resolution_clock::now();
+    cout << "2nd: check core second-phase bsp time:"
+         << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
-// 3rd: cluster cores
+    // 3rd: cluster cores
     for (auto &future:future_vec) {
         auto candidates = future.get();
         for (auto candidate:candidates) { ClusterCore(candidate); }
     }
 
     auto end_core_cluster = high_resolution_clock::now();
-    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - find_core_end).count()
+    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()
          << " ms\n";
 
-// 4th: non-core clustering
+    // 4th: non-core clustering
     ClusterNonCores();
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()

@@ -24,17 +24,17 @@ int main(int argc, char *argv[]) {
         auto io_start = high_resolution_clock::now();
         auto *graph = new Graph(argv[1], argv[2], atoi(argv[3]));
         auto io_end = high_resolution_clock::now();
-        cout << "Total input cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n";
+        cout << "\nTotal input cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n";
 
         // compute
         auto start = high_resolution_clock::now();
 #ifdef WITHGPERFTOOLS
-        cout << "\nwith google perf start\n";
+        cout << "with google perf start------------\n";
         ProfilerStart("pscanProfile.log");
 #endif
         graph->pSCAN();
 #ifdef WITHGPERFTOOLS
-        cout << "\nwith google perf end\n";
+        cout << "with google perf end--------------\n";
         ProfilerStop();
 #endif
         auto end = high_resolution_clock::now();
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
         io_start = high_resolution_clock::now();
         if (argc >= 5 && strcmp(argv[4], "output") == 0) { graph->Output(argv[2], argv[3]); }
         io_end = high_resolution_clock::now();
-        cout << "Total output cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n";
+        cout << "Total output cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n\n";
     }
     return 0;
 }
