@@ -248,7 +248,7 @@ void Graph::pSCAN() {
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
-    
+
     for (auto candidate:candidates) { ClusterCore(candidate); }
 #else
     auto thread_num = std::thread::hardware_concurrency();
@@ -306,4 +306,11 @@ void Graph::pSCAN() {
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
          << " ms\n";
+
+#ifdef STATISTICS
+    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
+    cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
+         << "\nequal cmp:" << all_cmp2 << "\n";
+    cout << "max portion:" << portion << endl;
+#endif
 }
