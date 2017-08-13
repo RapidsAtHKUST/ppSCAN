@@ -35,7 +35,6 @@ private:
     vector<int> out_edges;
 
     // edge properties
-//    vector<ui> reverse_edge_idx; //the position of reverse_edge_idx edge in out_edges
     vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
 
     // vertex properties
@@ -49,6 +48,17 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
+
+    // statistics
+#ifdef STATISTICS
+    long prune0 = 0;
+    long prune1 = 0;
+    long all_cmp0 = 0;
+    long all_cmp1 = 0;
+    long all_cmp2 = 0;
+    long intersection_times = 0;
+    int portion = 0;
+#endif
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
@@ -57,7 +67,7 @@ private:
     // 2nd optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
-    void PruneAndCrossLink();
+    void Prune();
 
     // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);

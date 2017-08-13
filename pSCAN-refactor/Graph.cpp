@@ -54,7 +54,32 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
     return c;
 }
 
-void Graph::PruneAndCrossLink() {
+void Graph::Prune() {
+#ifdef STATISTICS
+    for (auto i = 0; i < n; i++) {
+        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+            auto v = out_edges[j];
+            if (i <= v) {
+                int a = degree[i], b = degree[v];
+                if (a > b) { swap(a, b); };
+                if (((long long) a) * eps_b2 < ((long long) b) * eps_a2) {
+                    // can be pruned
+                    ++prune0;
+                    min_cn[j] = NOT_DIRECT_REACHABLE;
+                } else {
+                    // can be pruned, when c <= 2
+                    int c = ComputeCnLowerBound(a, b);
+                    if (c <= 2) {
+                        ++prune1;
+                        min_cn[j] = DIRECT_REACHABLE;
+                    } else {
+                        min_cn[j] = c;
+                    }
+                }
+            }
+        }
+    }
+#else
     auto thread_num = std::thread::hardware_concurrency();
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
@@ -83,26 +108,51 @@ void Graph::PruneAndCrossLink() {
             }
         }, my_start, my_end);
     }
+#endif
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
+#ifdef STATISTICS
+    intersection_times++;
+    auto tmp0 = 0;
+    auto tmp1 = 0;
+#endif
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
+#ifdef STATISTICS
+            ++all_cmp0;
+            ++tmp0;
+#endif
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
             ++offset_nei_v;
+#ifdef STATISTICS
+            ++all_cmp1;
+            ++tmp1;
+#endif
         } else {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
+#ifdef STATISTICS
+            ++all_cmp2;
+            ++tmp0;
+            ++tmp1;
+#endif
         }
     }
+#ifdef STATISTICS
+    int max_val = max(tmp0, tmp1);
+    int min_val = min(tmp0, tmp1);
+    int local_portion = min_val == 0 ? max_val : max_val / min_val;
+    portion = max(portion, local_portion);
+#endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
@@ -176,12 +226,31 @@ void Graph::ClusterNonCores() {
 void Graph::pSCAN() {
     // 1st: pre-processing
     auto prune_start = high_resolution_clock::now();
-    PruneAndCrossLink();
+    Prune();
     auto prune_end = high_resolution_clock::now();
     cout << "1st: prune execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
 
     // 2nd: find all cores
     auto find_core_start = high_resolution_clock::now();
+#ifdef STATISTICS
+    vector<int> candidates;
+    for (auto i = 0; i < n; i++) {
+        CheckCoreFirstBSP(i);
+    }
+    auto first_bsp_end = high_resolution_clock::now();
+    cout << "2nd: check core first-phase bsp time:"
+         << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
+
+    for (auto i = 0; i < n; i++) {
+        CheckCoreSecondBSP(i);
+        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+    }
+    auto second_bsp_end = high_resolution_clock::now();
+    cout << "2nd: check core second-phase bsp time:"
+         << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
+    
+    for (auto candidate:candidates) { ClusterCore(candidate); }
+#else
     auto thread_num = std::thread::hardware_concurrency();
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
@@ -227,7 +296,7 @@ void Graph::pSCAN() {
         auto candidates = future.get();
         for (auto candidate:candidates) { ClusterCore(candidate); }
     }
-
+#endif
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()
          << " ms\n";
@@ -238,5 +307,3 @@ void Graph::pSCAN() {
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
          << " ms\n";
 }
-
-
