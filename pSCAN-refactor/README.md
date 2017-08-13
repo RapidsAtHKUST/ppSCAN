@@ -2,6 +2,15 @@
 
 pSCAN: Fast and Exact Structural Graph Clustering
 
+# Before Experiments
+
+clear page cache
+
+```zsh
+sudo -i
+echo 3 > /proc/sys/vm/drop_caches
+```
+
 # Compile
 
 g++ should support c++11, e.g, g++ 4.8+
