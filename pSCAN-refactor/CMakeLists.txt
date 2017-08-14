@@ -8,16 +8,16 @@ set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
 
 find_package(Threads REQUIRED)
 
-add_executable(other_play play/play.cpp)
+add_executable(other_play playground/play.cpp)
 
-add_executable(io_play play/graph_io.cpp)
+add_executable(io_play playground/graph_io.cpp)
 
 add_executable(converter converter/EdgeListToBinsConverter.cpp)
 target_compile_options(converter PRIVATE -O3 -g)
 #target_compile_definitions(converter PRIVATE WITHGPERFTOOLS=1)
 #target_link_libraries(converter profiler)
 
-add_executable(binary_file_checker play/check_binary_files.cpp InputOutput.cpp)
+add_executable(binary_file_checker playground/check_binary_files.cpp InputOutput.cpp)
 target_compile_options(binary_file_checker PRIVATE -O3 -g)
 target_compile_definitions(binary_file_checker PRIVATE WITHGPERFTOOLS=1)
 target_link_libraries(binary_file_checker profiler)
