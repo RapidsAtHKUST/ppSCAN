@@ -28,7 +28,7 @@ target_compile_definitions(pSCAN PRIVATE DEBUG=1 FOO=1 WITHGPERFTOOLS=1)
 #target_compile_definitions(pSCAN PRIVATE DEBUG=1 FOO=1)
 target_compile_options(pSCAN PRIVATE -O3 -g)
 target_link_libraries(pSCAN ${CMAKE_THREAD_LIBS_INIT})
-#target_link_libraries(pSCAN profiler)
+target_link_libraries(pSCAN profiler)
 
 
 

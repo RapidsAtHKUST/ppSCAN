@@ -303,3 +303,27 @@ Total input cost:9557 ms
 Total time without IO:11795 ms
 Total output cost:1346 ms
 ```
+
+## Dataset2: friendster
+
+### Desktop
+
+```zsh
+int size:4
+n:124836180, m:3612134270
+read degree file time:3368 ms
+read adjacency list file time:96129 ms
+check input graph file time:4825 ms
+
+Total input cost:124244 ms
+with google perf start------------
+1st: prune execution time:21597 ms
+2nd: check core first-phase bsp time:479283 ms
+2nd: check core second-phase bsp time:105028 ms
+3rd: core clustering time:1539 ms
+4th: non-core clustering time:35237 ms
+with google perf end--------------
+PROFILE: interrupts/evictions/bytes = 479436/42017/4041832
+Total time without IO:643497 ms
+Total output cost:2757 ms
+```
