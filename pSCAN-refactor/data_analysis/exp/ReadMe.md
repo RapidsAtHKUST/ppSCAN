@@ -308,6 +308,36 @@ Total output cost:1346 ms
 
 ### Desktop
 
+without clearing page-cache, sequential
+
+```zsh
+int size:4
+n:124836180, m:3612134270
+read degree file time:233 ms
+read adjacency list file time:20947 ms
+check input graph file time:4662 ms
+
+Total input cost:30099 ms
+with google perf start------------
+1st: prune execution time:83082 ms
+2nd: check core first-phase bsp time:2912217 ms
+2nd: check core second-phase bsp time:512762 ms
+3rd: core clustering time:1470 ms
+4th: non-core clustering time:3402 ms
+
+prune0 definitely not reachable:217839645
+prune1 definitely reachable:5427415
+intersection times:1582800075
+cmp0:344733547542
+cmp1:245393023242
+equal cmp:7835707712
+max portion:2745
+with google perf end--------------
+PROFILE: interrupts/evictions/bytes = 350648/298193/19081752
+Total time without IO:3512963 ms
+Total output cost:2114 ms
+```
+
 without clearing page-cache, parallel
 
 ```zsh
@@ -332,6 +362,36 @@ Total output cost:2757 ms
 
 ### Cluster: luocpu8
 
+without clearing page-cache, sequential
+
+```zsh
+int size:4                                                                                                                                                                                    
+n:124836180, m:3612134270                                                                                                                                                                     
+read degree file time:264 ms                                                                                                                                                                  
+read adjacency list file time:13269 ms                                                                                                                                                        
+check input graph file time:7265 ms                                                                                                                                                           
+                                                                                                                                                                                              
+Total input cost:30049 ms                                                                                                                                                                     
+with google perf start------------                                                                                                                                                            
+1st: prune execution time:113179 ms                                                                                                                                                           
+2nd: check core first-phase bsp time:4332802 ms                                                                                                                                               
+2nd: check core second-phase bsp time:530805 ms                                                                                                                                               
+3rd: core clustering time:2419 ms              
+4th: non-core clustering time:5549 ms          
+
+prune0 definitely not reachable:217839645      
+prune1 definitely reachable:5427415            
+intersection times:1582800075                  
+cmp0:344733547542                              
+cmp1:245393023242                              
+equal cmp:7835707712                           
+max portion:2745                               
+with google perf end--------------             
+PROFILE: interrupts/evictions/bytes = 498472/418180/26758648                                   
+Total time without IO:4984785 ms               
+Total output cost:3828 ms           
+```
+
 without clearing page-cache, parallel
 
 ```zsh
@@ -355,6 +415,33 @@ Total output cost:3655 ms
 ```
 
 ### Cluster: gpu-23
+
+without clearing page-cache, sequential
+
+```zsh
+int size:4
+n:124836180, m:3612134270
+read degree file time:925 ms
+read adjacency list file time:130188 ms
+check input graph file time:4324 ms
+
+Total input cost:162256 ms      
+1st: prune execution time:79398 ms
+2nd: check core first-phase bsp time:3406565 ms
+2nd: check core second-phase bsp time:459172 ms                                                                                                                 
+3rd: core clustering time:1790 ms
+4th: non-core clustering time:4058 ms
+
+prune0 definitely not reachable:217839645
+prune1 definitely reachable:5427415
+intersection times:1582800075
+cmp0:344733547542
+cmp1:245393023242
+equal cmp:7835707712
+max portion:2745
+Total time without IO:3950985 ms
+Total output cost:10898 ms
+```
 
 without clearing page-cache, parallel
 
