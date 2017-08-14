@@ -11,7 +11,7 @@ echo 3 > /proc/sys/vm/drop_caches
 Desktop
 
 hardware | detail
---- | ---
+--- | ---   
 disk read | 190MB/s
 memory | 32GB
 cpu | 8 logical threads, hyper-threading, 3.4GHz

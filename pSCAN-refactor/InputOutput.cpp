@@ -6,10 +6,15 @@
 
 #include <iostream>
 #include <algorithm>
+#include <chrono>
 
 InputOutput::InputOutput(const string &dir) : dir(dir) {}
 
+using namespace std::chrono;
+
 void InputOutput::ReadDegree() {
+    auto start = high_resolution_clock::now();
+
     ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
     int int_size;
     deg_file.read(reinterpret_cast<char *>(&int_size), 4);
@@ -21,9 +26,14 @@ void InputOutput::ReadDegree() {
 
     degree.resize(static_cast<unsigned long>(n));
     deg_file.read(reinterpret_cast<char *>(&degree.front()), sizeof(int) * n);
+
+    auto end = high_resolution_clock::now();
+    cout << "read degree file time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 }
 
 void InputOutput::ReadAdjacencyList() {
+    auto start = high_resolution_clock::now();
+
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
     offset_out_edges.resize(n + 1);
     out_edges.resize(m);
@@ -37,17 +47,28 @@ void InputOutput::ReadAdjacencyList() {
         // inclusive
         degree[i]++;
     }
+
+    auto end = high_resolution_clock::now();
+    cout << "read adjacency list file time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 }
 
 void InputOutput::CheckInputGraph() {
+    auto start = high_resolution_clock::now();
+
     for (auto i = 0; i < n; i++) {
         for (auto j = offset_out_edges[i]; j < offset_out_edges[i + 1]; j++) {
-            if (out_edges[j] == i) { cout << "Self loop\n"; }
+            if (out_edges[j] == i) {
+                cout << "Self loop\n";
+                exit(1);
+            }
             if (j > offset_out_edges[i] && out_edges[j] <= out_edges[j - 1]) {
                 cout << "Edges not sorted in increasing id order!\nThe program may not run properly!\n";
+                exit(1);
             }
         }
     }
+    auto end = high_resolution_clock::now();
+    cout << "check input graph file time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 }
 
 void InputOutput::ReadGraph() {
