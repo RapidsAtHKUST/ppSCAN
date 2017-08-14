@@ -44,15 +44,6 @@ void Graph::Output(const char *eps_s, const char *miu) {
 
 ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
     auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
-    if (offset_beg >= offset_end) {
-        for (auto i = 0; i < n; i++) {
-            if (out_edge_start[i] <= offset_beg && out_edge_start[i + 1] > offset_beg) {
-                cout << "i:" << i << out_edge_start[i] << "," << out_edge_start[i + 1] << endl;
-            }
-        }
-        cout << "err:" << offset_beg << " " << offset_end << " " << val << endl;
-        exit(1);
-    }
     if (array[mid] == val) { return mid; }
     return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }

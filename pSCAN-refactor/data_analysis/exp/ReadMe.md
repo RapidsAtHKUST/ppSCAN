@@ -308,6 +308,8 @@ Total output cost:1346 ms
 
 ### Desktop
 
+without clearing page-cache, parallel
+
 ```zsh
 int size:4
 n:124836180, m:3612134270
@@ -326,4 +328,49 @@ with google perf end--------------
 PROFILE: interrupts/evictions/bytes = 479436/42017/4041832
 Total time without IO:643497 ms
 Total output cost:2757 ms
+```
+
+### Cluster: luocpu8
+
+without clearing page-cache, parallel
+
+```zsh
+int size:4                                                                      
+n:124836180, m:3612134270                                                       
+read degree file time:272 ms                                                    
+read adjacency list file time:12872 ms                                          
+check input graph file time:7270 ms                                             
+                                                                                
+Total input cost:29458 ms                                                       
+with google perf start------------                                              
+1st: prune execution time:15418 ms                                              
+2nd: check core first-phase bsp time:405723 ms                                  
+2nd: check core second-phase bsp time:64124 ms                                  
+3rd: core clustering time:2510 ms                                               
+4th: non-core clustering time:6019 ms                                           
+with google perf end--------------                                              
+PROFILE: interrupts/evictions/bytes = 483439/379885/39541344                    
+Total time without IO:493800 ms                                                 
+Total output cost:3655 ms                                                       
+```
+
+### Cluster: gpu-23
+
+without clearing page-cache, parallel
+
+```zsh
+int size:4
+n:124836180, m:3612134270
+read degree file time:1003 ms
+read adjacency list file time:133417 ms
+check input graph file time:4377 ms
+
+Total input cost:194094 ms
+1st: prune execution time:5565 ms
+2nd: check core first-phase bsp time:154054 ms
+2nd: check core second-phase bsp time:31065 ms
+3rd: core clustering time:2010 ms
+4th: non-core clustering time:6660 ms
+Total time without IO:199357 ms
+Total output cost:10173 ms
 ```

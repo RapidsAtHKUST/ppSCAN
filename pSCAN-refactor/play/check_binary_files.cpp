@@ -1,6 +1,8 @@
 //
 // Created by yche on 8/13/17.
 //
+#include <cassert>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -8,13 +10,13 @@
 #include <chrono>
 
 #include "pretty_print.h"
+
 #include "../InputOutput.h"
 #include "../Graph.h"
 
 #ifdef WITHGPERFTOOLS
 
 #include <gperftools/profiler.h>
-#include <cassert>
 
 #endif
 
