@@ -1,21 +1,9 @@
-* set intersection
+# Data Analysis
 
-```zsh
-avg cmp times: 106.705256679
-cmp(<,>,=) portion: [0.2668310010742859, 0.6754213354937074, 0.05774766343200669] 
+## Folder Structure
 
-avg cmp times: 183.901244422
-cmp(<,>,=) portion: [0.6009386644743986, 0.3552078756466056, 0.04385345987899577] 
-
-cmp count: 4619824355 2680566655 ratio: 0.580231292148 
-
-cmp histogram: [21633443, 2263730, 1224051]
-cmp histogram(0:6, 6:10, 10:inf): [0.8611619800054329, 0.09011224930759744, 0.04872577068696971] 
-```
-
-* pruning
-
-```zsh
-prune0, prune1, evaluations: [0.11424673873678252, 0.03396929990601334, 0.8517839613572041]
-involved: 58984966 total: 69362378 ratio: 0.850388462748
-```
+folder | detail
+--- | ---
+[debug](debug) | some debug information
+[exp](exp) | some experimental results
+[previous](previous) | some early-stage experimental results
