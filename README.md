@@ -1,8 +1,12 @@
 # pScan Optimizing
 
-Project: pScan (Graph Clustering) Optimization
+**Project**: pScan (Graph Clustering) Optimization.
+
+**Target**: Exact, Efficient(Time/Space), Scalable(Parallel).
 
 ## My Work
+
+Please have a look at [pSCAN-refactor](pSCAN-refactor) and find some useful things for you. :smile:
 
 ### Understanding and Works
 
@@ -13,14 +17,15 @@ Project: pScan (Graph Clustering) Optimization
 * density function: `number of common neighbors` / `(sqrt(du * dv))`
 
 * pScan basic concepts:
-  * introduce `similar_degree`, `effective_degree` to help checking core, if a vertex is a core iff `sd <= number of reachable neighbors <=ed`, which can be used as a pruning rule,
-  * introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core
+  * :thumbsup: : introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core
+  * not super userful: introduce `similar_degree`, `effective_degree` to help checking core, if a vertex is a core iff `sd <= number of reachable neighbors <=ed`, which can be used as a pruning rule
 
-* runing:
-  * pre-processing, `PruneAndCrossLink`, prune not reachable `if (((long long) a) * eps_b2 < ((long long) b) * eps_a2)`, which is easy to deduced when the max of`number of common neighbors` is `min(du,dv)`, and utilize cross-link
-  * `common neighbor lower bound <=2`, must be similar, self and neighbor vertices
-  * compute common neighbor with early exit, via utilizing `sd` and `ed`
-  * other tricks to reduce the number of evaluations of reachability
+* pruning techniques:
+  * :thumbsup: : pre-processing, `PruneAndCrossLink`, prune not reachable `if (((long long) a) * eps_b2 < ((long long) b) * eps_a2)`, which is easy to deduced when the max of`number of common neighbors` is `min(du,dv)`, and utilize cross-link
+  * :thumbsup: : `common neighbor lower bound <=2`, must be similar, self and neighbor vertices, compute common neighbor with early exit, via utilizing `du` and `dv`
+  * not so useful: other tricks to reduce the number of evaluations of reachability, like `max-priority-queue`, `similar_degree`, `effective_degree`
+
+* detail: check the following table
 
 description | folder link
 --- | ---
