@@ -1,1 +1,0 @@
-c/n vertex_id cluster_id
