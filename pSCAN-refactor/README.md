@@ -48,20 +48,31 @@ make
 
 # Dataset
 
-already(from snap, represented in edge list, use [EdgeListToBinsConverter.cpp](converter/EdgeListToBinsConverter.cpp) to convert into two binary files,
-i.e., degree file and adjacent list file) 
+## real-world type 0: 
+
+from snap, represented in edge list, use [EdgeListToBinsConverter.cpp](converter/EdgeListToBinsConverter.cpp) to convert into two binary files,
+i.e., degree file and adjacent list file, need to sort src vertices 
 
 * https://snap.stanford.edu/data/com-LiveJournal.html
 * https://snap.stanford.edu/data/com-Orkut.html
 * https://snap.stanford.edu/data/com-Friendster.html
 
-not yet()
+## real-world type 1:
+
+from law.di.unimi.it, represented in BVGraph, two files `xxx.graph`, `xxx.properties`), 
+need to 1st: remove self-loop (i,i), 2nd: unique (i,j), (j,i) duplicates
+
+please check: https://github.com/GraphProcessor/WebGraph-1
+
+how to use original site: http://law.di.unimi.it/tutorial.php
 
 * http://law.di.unimi.it/webdata/webbase-2001/
 * http://law.di.unimi.it/webdata/uk-2002/
 * http://law.di.unimi.it/webdata/twitter-2010/
 
-lfr synthetic, undirected and unweighted, `-k 15 -maxk 50 -mu 0.1 -minc 20 -maxc 50`, `-N 1million/10million/100million`
+## synthetic
+
+lfr synthetic, undirected and unweighted, `-k 15 -maxk 50 -mu 0.1 -minc 20 -maxc 50`, `-N 1million`/`10million`/`100million `
 
 * https://github.com/GraphProcessor/CommunityDetectionCodes/tree/master/Benchmark/2009-LFR-Benchmark/src_refactor_cpp
 

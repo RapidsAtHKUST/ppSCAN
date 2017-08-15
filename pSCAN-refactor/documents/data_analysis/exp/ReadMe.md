@@ -304,7 +304,7 @@ Total time without IO:11795 ms
 Total output cost:1346 ms
 ```
 
-## Dataset2: friendster
+## Dataset 2: friendster
 
 ### Desktop
 
