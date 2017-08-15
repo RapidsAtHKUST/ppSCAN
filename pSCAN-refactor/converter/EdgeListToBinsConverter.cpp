@@ -35,6 +35,11 @@ vector<pair<int, int>> GetEdgeList(string &input_file_path, int &max_ele) {
             ss << tmp_str;
             int first, second;
             ss >> first >> second;
+            // 1st case first == second: skip these self loop, (i,i)
+            // 2nd case first > second: unique (i,j), (j,i)
+            if (first >= second) {
+                continue;
+            }
             assert(first < INT32_MAX and second < INT32_MAX);
             if (second > max_ele)
                 max_ele = second;
