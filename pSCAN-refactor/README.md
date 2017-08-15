@@ -40,18 +40,30 @@ cmake .. -DCMAKE_CXX_COMPILER=g++
 make
 ```
 
+# Parameter
+
+* eps influence the computation workloads a lot
+
+* min_pts not influence the workloads
+
 # Dataset
 
-already
+already(from snap, represented in edge list, use [EdgeListToBinsConverter.cpp](converter/EdgeListToBinsConverter.cpp) to convert into two binary files,
+i.e., degree file and adjacent list file) 
 
 * https://snap.stanford.edu/data/com-LiveJournal.html
 * https://snap.stanford.edu/data/com-Orkut.html
 * https://snap.stanford.edu/data/com-Friendster.html
 
-not yet
+not yet()
 
+* http://law.di.unimi.it/webdata/webbase-2001/
 * http://law.di.unimi.it/webdata/uk-2002/
 * http://law.di.unimi.it/webdata/twitter-2010/
+
+lfr synthetic, undirected and unweighted, `-k 15 -maxk 50 -mu 0.1 -minc 20 -maxc 50`, `-N 1million/10million/100million`
+
+* https://github.com/GraphProcessor/CommunityDetectionCodes/tree/master/Benchmark/2009-LFR-Benchmark/src_refactor_cpp
 
 # Usage
 
