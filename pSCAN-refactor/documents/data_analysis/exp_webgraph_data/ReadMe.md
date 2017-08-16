@@ -231,7 +231,108 @@ Total output cost:65331 ms
 pscan
 
 ```zsh
+**** Graph Clustering (Release): ../dataset, 0.3, 5 *** 
+	*** Finished loading graph!
+Total time without IO: 18003817
+	*** Start write result into disk!
+```
 
+sequential
+
+```zsh
+int size:4
+n:18520343, m:301136554
+read degree file time:48 ms
+read adjacency list file time:865 ms
+check input graph file time:419 ms
+
+Total input cost:1716 ms
+with google perf start------------
+1st: prune execution time:1518 ms
+2nd: check core first-phase bsp time:24966 ms
+2nd: check core second-phase bsp time:2698 ms
+3rd: core clustering time:994 ms
+4th: non-core clustering time:566 ms
+
+prune0 definitely not reachable:67656923
+prune1 definitely reachable:4997008
+intersection times:77914346
+cmp0:588466397
+cmp1:8695675975
+equal cmp:2111915924
+max portion:7218
+with google perf end--------------
+PROFILE: interrupts/evictions/bytes = 3069/2776/178456
+Total time without IO:30745 ms
+Total output cost:1980 ms
+```
+
+parallel
+
+```zsh
+int size:4
+n:18520343, m:301136554
+read degree file time:51 ms
+read adjacency list file time:852 ms
+check input graph file time:419 ms
+
+Total input cost:1701 ms
+with google perf start------------
+1st: prune execution time:350 ms
+2nd: check core first-phase bsp time:5796 ms
+2nd: check core second-phase bsp time:511 ms
+3rd: core clustering time:946 ms
+4th: non-core clustering time:556 ms
+with google perf end--------------
+PROFILE: interrupts/evictions/bytes = 5193/642/69288
+Total time without IO:8164 ms
+Total output cost:1928 ms
 ```
 
 ### Cluster: gpu-23
+
+sequential
+
+```zsh
+int size:4
+n:18520343, m:301136554
+read degree file time:76 ms
+read adjacency list file time:10435 ms
+check input graph file time:703 ms
+
+Total input cost:11825 ms
+1st: prune execution time:1928 ms
+2nd: check core first-phase bsp time:28831 ms
+2nd: check core second-phase bsp time:3065 ms
+3rd: core clustering time:940 ms
+4th: non-core clustering time:632 ms
+
+prune0 definitely not reachable:67656923
+prune1 definitely reachable:4997008
+intersection times:77914346
+cmp0:588466397
+cmp1:8695675975
+equal cmp:2111915924
+max portion:7218
+Total time without IO:35398 ms
+Total output cost:11359 ms
+```
+
+parallel
+
+```zsh
+int size:4
+n:18520343, m:301136554
+read degree file time:185 ms
+read adjacency list file time:11473 ms
+check input graph file time:745 ms
+
+Total input cost:13019 ms
+1st: prune execution time:196 ms
+2nd: check core first-phase bsp time:2177 ms
+2nd: check core second-phase bsp time:205 ms
+3rd: core clustering time:1424 ms
+4th: non-core clustering time:702 ms
+Total time without IO:4706 ms
+Total output cost:11012 ms
+```

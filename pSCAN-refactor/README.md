@@ -2,6 +2,12 @@
 
 pSCAN: Fast and Exact Structural Graph Clustering
 
+# Parallel Version Challenges
+
+* load balance, especially twitter dataset
+
+* how to deal with workload increment in some datasets, from less pruning 
+
 # Before Experiments
 
 clear page cache    
