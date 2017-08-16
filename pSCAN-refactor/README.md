@@ -4,7 +4,7 @@ pSCAN: Fast and Exact Structural Graph Clustering
 
 # Parallel Version Challenges
 
-* load balance, especially twitter dataset
+* load balance, especially twitter dataset, solved via smaller tasks, without significant overheads
 
 * how to deal with workload increment in some datasets, from less pruning 
 

@@ -63,6 +63,28 @@ Total time without IO:1908585 ms
 Total output cost:503 ms
 ```
 
+parallel with smaller tasks in density eval
+
+```zsh
+int size:4
+n:41652230, m:1369000750
+read degree file time:97 ms
+read adjacency list file time:3044 ms
+check input graph file time:1737 ms
+
+Total input cost:6592 ms
+with google perf start------------
+1st: prune execution time:4322 ms
+2nd: check core first-phase bsp time:432875 ms
+2nd: check core second-phase bsp time:26933 ms
+3rd: core clustering time:415 ms
+4th: non-core clustering time:858 ms
+with google perf end--------------
+PROFILE: interrupts/evictions/bytes = 358331/35396/3410472
+Total time without IO:465406 ms
+Total output cost:613 ms
+```
+
 ### Cluster: gpu-23
 
 sequential
@@ -109,6 +131,25 @@ Total input cost:46358 ms
 4th: non-core clustering time:1141 ms
 Total time without IO:2005122 ms
 Total output cost:3239 ms
+```
+
+parallel with smaller tasks in density eval
+
+```zsh
+int size:4
+n:41652230, m:1369000750
+read degree file time:384 ms
+read adjacency list file time:44108 ms
+check input graph file time:2180 ms
+
+Total input cost:48724 ms
+1st: prune execution time:3314 ms
+2nd: check core first-phase bsp time:116536 ms
+2nd: check core second-phase bsp time:10997 ms
+3rd: core clustering time:634 ms
+4th: non-core clustering time:970 ms
+Total time without IO:132453 ms
+Total output cost:3090 ms
 ```
 
 ## Webbase

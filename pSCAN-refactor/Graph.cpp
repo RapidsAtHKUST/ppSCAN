@@ -252,7 +252,7 @@ void Graph::pSCAN() {
     for (auto candidate:candidates) { ClusterCore(candidate); }
 #else
     auto thread_num = std::thread::hardware_concurrency();
-    auto batch_num = 16u * thread_num;
+    auto batch_num = 1024 * 16u * thread_num;
     auto batch_size = n / batch_num;
 
     {
@@ -261,7 +261,6 @@ void Graph::pSCAN() {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
             pool.enqueue([this](int i_start, int i_end) {
-                auto candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
             }, my_start, my_end);
         }
