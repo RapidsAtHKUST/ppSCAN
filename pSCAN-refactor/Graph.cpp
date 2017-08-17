@@ -261,11 +261,12 @@ void Graph::pSCAN() {
     for (auto candidate:candidates) { ClusterCore(candidate); }
 #else
     auto thread_num = std::thread::hardware_concurrency();
-    auto batch_num = 1024 * 16u * thread_num;
-    auto batch_size = n / batch_num;
 
     {
         ThreadPool pool(thread_num);
+        auto batch_num = std::min(64 * 1024 * 16u * thread_num, 1u);
+        auto batch_size = n / batch_num;
+
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
@@ -282,6 +283,8 @@ void Graph::pSCAN() {
     {
         ThreadPool pool(thread_num);
 
+        auto batch_num = std::min(64 * 16u * thread_num, 1u);
+        auto batch_size = n / batch_num;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
