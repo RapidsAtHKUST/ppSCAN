@@ -6,6 +6,12 @@ pSCAN: Fast and Exact Structural Graph Clustering
 
 * load balance, especially twitter dataset, solved via smaller tasks, without significant overheads
 
+    * 1st bsp, it seems larger number of tasks better
+    
+    * 2nd bsp, `64 * 16u * thread_num` seems better in twitter
+    
+    * so how to effectively set `batch_num`: `auto batch_num = 1024 * 16u * thread_num` or set `auto batch_num = 64 * 16u * thread_num;`
+    
 * how to deal with workload increment in some datasets, from less pruning 
 
 # Before Experiments
