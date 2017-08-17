@@ -8,7 +8,11 @@
 
 #include "playground/pretty_print.h"
 
+#ifndef SERIAL
+
 #include "ThreadPool.h"
+
+#endif
 
 using namespace std::chrono;
 
@@ -55,7 +59,7 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 }
 
 void Graph::Prune() {
-#ifdef STATISTICS
+#ifdef SERIAL
     for (auto u = 0; u < n; u++) {
         for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
             auto v = out_edges[j];
@@ -64,13 +68,17 @@ void Graph::Prune() {
                 if (deg_a > b) { swap(deg_a, b); };
                 if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
                     // can be pruned
+#ifdef STATSTICS
                     ++prune0;
+#endif
                     min_cn[j] = NOT_DIRECT_REACHABLE;
                 } else {
                     // can be pruned, when c <= 2
                     int c = ComputeCnLowerBound(deg_a, b);
                     if (c <= 2) {
+#ifdef STATSTICS
                         ++prune1;
+#endif
                         min_cn[j] = DIRECT_REACHABLE;
                     } else {
                         min_cn[j] = c;
@@ -119,6 +127,7 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     auto tmp0 = 0;
     auto tmp1 = 0;
 #endif
+
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
@@ -232,7 +241,7 @@ void Graph::pSCAN() {
 
     // 2nd: find all cores
     auto find_core_start = high_resolution_clock::now();
-#ifdef STATISTICS
+#ifdef SERIAL
     vector<int> candidates;
     for (auto i = 0; i < n; i++) {
         CheckCoreFirstBSP(i);

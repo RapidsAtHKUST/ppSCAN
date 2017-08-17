@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef WITHGPERFTOOLS
     cout << "\nwith google perf start\n";
-    ProfilerStart("pscanProfile.log");
+    ProfilerStart("converterProfile.log");
 #endif
     auto lines = GetEdgeList(input_file_path, max_ele);
 

@@ -9,16 +9,16 @@
 #include <algorithm>
 #include <chrono>
 
-#include "pretty_print.h"
-
-#include "../InputOutput.h"
-#include "../Graph.h"
-
 #ifdef WITHGPERFTOOLS
 
 #include <gperftools/profiler.h>
 
 #endif
+
+#include "pretty_print.h"
+
+#include "../InputOutput.h"
+#include "../Graph.h"
 
 using namespace std;
 using ui=unsigned int;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
     auto start = high_resolution_clock::now();
 #ifdef WITHGPERFTOOLS
     cout << "with google perf start------------\n";
-    ProfilerStart("pscanProfile.log");
+    ProfilerStart("checkBinFilesProfile.log");
 #endif
     io_helper_ptr->ReadGraph();
 

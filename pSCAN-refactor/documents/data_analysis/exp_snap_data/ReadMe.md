@@ -134,6 +134,15 @@ Total output cost:3655 ms
 
 ### Cluster: gpu-23
 
+pscan
+
+```zsh
+**** Graph Clustering (Release): ../dataset, 0.3, 5 ***
+        *** Finished loading graph!
+Total time without IO: 3738351095
+        *** Start write result into disk!
+```
+
 without clearing page-cache, sequential
 
 ```zsh
@@ -202,6 +211,9 @@ Total output cost:9787 ms
 ## Orkut
 
 ### Desktop
+
+sequential, u=5, eps=0.1
+
 
 sequential
 

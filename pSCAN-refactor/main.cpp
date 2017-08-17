@@ -3,13 +3,13 @@
 #include <iostream>
 #include <chrono>
 
-#include "Graph.h"
-
 #ifdef WITHGPERFTOOLS
 
 #include <gperftools/profiler.h>
 
 #endif
+
+#include "Graph.h"
 
 void Usage() {
     cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold [4]density-threshold [5 optional]Output\n";
