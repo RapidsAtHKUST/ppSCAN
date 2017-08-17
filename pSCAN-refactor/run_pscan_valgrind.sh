@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-valgrind --tool=callgrind build/pSCAN ../dataset 0.3 5 output
+valgrind --tool=callgrind build/pSCANStatistics0 ../dataset 0.3 5 output
 

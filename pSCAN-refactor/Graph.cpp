@@ -68,7 +68,7 @@ void Graph::Prune() {
                 if (deg_a > b) { swap(deg_a, b); };
                 if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
                     // can be pruned
-#ifdef STATSTICS
+#ifdef STATISTICS
                     ++prune0;
 #endif
                     min_cn[j] = NOT_DIRECT_REACHABLE;
@@ -76,7 +76,7 @@ void Graph::Prune() {
                     // can be pruned, when c <= 2
                     int c = ComputeCnLowerBound(deg_a, b);
                     if (c <= 2) {
-#ifdef STATSTICS
+#ifdef STATISTICS
                         ++prune1;
 #endif
                         min_cn[j] = DIRECT_REACHABLE;

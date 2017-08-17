@@ -89,6 +89,15 @@ Total output cost:613 ms
 
 ### Cluster: gpu-23
 
+pscan
+
+```zsh
+**** Graph Clustering (Release): ../dataset/webgraph_twitter, 0.3, 5 ***
+        *** Finished loading graph!
+Total time without IO: 2486230766
+        *** Start write result into disk!
+```
+
 sequential
 
 ```zsh
@@ -221,6 +230,15 @@ Total output cost:16729 ms
 
 ### Cluster: gpu-23
 
+pscan
+
+```zsh
+**** Graph Clustering (Release): ../dataset, 0.3, 5 ***
+        *** Finished loading graph!
+Total time without IO: 64074486
+        *** Start write result into disk!
+```
+
 sequential
 
 ```zsh
@@ -333,6 +351,15 @@ Total output cost:1928 ms
 ```
 
 ### Cluster: gpu-23
+
+pscan
+
+```zsh
+**** Graph Clustering (Release): ../dataset, 0.3, 5 *** 
+        *** Finished loading graph!
+Total time without IO: 18427485
+        *** Start write result into disk!
+```
 
 sequential
 
