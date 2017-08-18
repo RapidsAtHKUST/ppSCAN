@@ -50,16 +50,20 @@ file | utility
 
 file | utility
 --- | ---
-[pretty_print.h](pSCAN-refactor/play/pretty_print.h) | third-party pretty print utilities
-[graph_io.cpp](pSCAN-refactor/play/graph_io.cpp) | play ground about i/o
-[play.cpp](pSCAN-refactor/play/play.cpp) | play ground others
+[pretty_print.h](pSCAN-refactor/playground/pretty_print.h) | third-party pretty print utilities
+[graph_io.cpp](pSCAN-refactor/playground/graph_io.cpp) | play ground about i/o
+[play.cpp](pSCAN-refactor/playground/play.cpp) | play ground others
+
+* experimental(parallel version with adjustable thread num)
+
+see [pSCAN-refactor/experimental](pSCAN-refactor/experimental).
 
 * deprecated
 
 file | utility
 --- | ---
-[MaxPriorityQueue.h](pSCAN-refactor/play/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](pSCAN-refactor/play/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
-[ThreadSafeDisjointSet.h](pSCAN-refactor/play/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
+[MaxPriorityQueue.h](pSCAN-refactor/playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](pSCAN-refactor/playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
+[ThreadSafeDisjointSet.h](pSCAN-refactor/playground/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
 
 ### Profiling
 
