@@ -47,7 +47,6 @@ target_link_libraries(pSCANStatistics0 profiler)
 set(EXP_FILES experimental/main_exp_parallel.cpp experimental/GraphParallelExp.cpp experimental/GraphParallelExp.h
         InputOutput.cpp InputOutput.h DisjointSet.cpp DisjointSet.h ThreadPool.h)
 add_executable(pSCANParallelExp0 ${EXP_FILES})
-target_compile_definitions(pSCANParallelExp0 PRIVATE WITHGPERFTOOLS=1)
 target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g)
 target_link_libraries(pSCANParallelExp0 ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(pSCANParallelExp0 profiler)
