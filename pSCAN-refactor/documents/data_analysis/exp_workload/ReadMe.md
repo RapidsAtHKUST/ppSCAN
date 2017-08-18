@@ -2,6 +2,20 @@
 
 All data are collected on gpu-23, cpu 2.3Ghz.
 
+## Lfr Benchmark
+
+pscan
+
+```zsh
+
+```
+
+pscan+
+
+```zsh
+
+```
+
 ## Snap - Dblp
 
 pscan
