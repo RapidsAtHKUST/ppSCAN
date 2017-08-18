@@ -12,6 +12,8 @@ pSCAN: Fast and Exact Structural Graph Clustering
     
     * so how to effectively set `batch_num`, while efficiently estimating task grain and pruning effects
     
+    * case study: webbase 40, 32, 24, 16
+    
 * how to deal with workload increment in some datasets, from less pruning 
 
     * interpret how will workload increment influence the running time
