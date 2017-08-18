@@ -1,4 +1,4 @@
-#include "Graph.h"
+#include "GraphParallelExp.h"
 
 #include <cstring>
 #include <cmath>
@@ -6,17 +6,13 @@
 #include <iostream>
 #include <algorithm>
 
-#include "playground/pretty_print.h"
+#include "../playground/pretty_print.h"
 
-#ifndef SERIAL
-
-#include "ThreadPool.h"
-
-#endif
+#include "../ThreadPool.h"
 
 using namespace std::chrono;
 
-Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
+GraphExp::GraphExp(const char *dir_string, const char *eps_s, int min_u, ui thread_num) {
     io_helper_ptr = yche::make_unique<InputOutput>(dir_string);
     io_helper_ptr->ReadGraph();
 
@@ -40,57 +36,29 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
+
+    thread_num_ = thread_num;
 }
 
-void Graph::Output(const char *eps_s, const char *miu) {
+void GraphExp::Output(const char *eps_s, const char *miu) {
     io_helper_ptr->Output(eps_s, miu, noncore_cluster, similar_degree, cluster_dict, disjoint_set_ptr->parent);
 }
 
-ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
+ui GraphExp::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
     auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
     if (array[mid] == val) { return mid; }
     return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
 
-int Graph::ComputeCnLowerBound(int du, int dv) {
+int GraphExp::ComputeCnLowerBound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) { ++c; }
     return c;
 }
 
-void Graph::Prune() {
-#ifdef SERIAL
-    for (auto u = 0; u < n; u++) {
-        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-            auto v = out_edges[j];
-            if (u <= v) {
-                int deg_a = degree[u], b = degree[v];
-                if (deg_a > b) { swap(deg_a, b); };
-                if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
-                    // can be pruned
-#ifdef STATISTICS
-                    ++prune0;
-#endif
-                    min_cn[j] = NOT_DIRECT_REACHABLE;
-                } else {
-                    // can be pruned, when c <= 2
-                    int c = ComputeCnLowerBound(deg_a, b);
-                    if (c <= 2) {
-#ifdef STATISTICS
-                        ++prune1;
-#endif
-                        min_cn[j] = DIRECT_REACHABLE;
-                    } else {
-                        min_cn[j] = c;
-                    }
-                }
-            }
-        }
-    }
-#else
-    auto thread_num = std::thread::hardware_concurrency();
+void GraphExp::Prune() {
     auto batch_size = 8192u;
-    ThreadPool pool(thread_num);
+    ThreadPool pool(thread_num_);
     for (auto v_i = 0; v_i < n; v_i += batch_size) {
         int my_start = v_i;
         int my_end = min(n, my_start + batch_size);
@@ -115,17 +83,11 @@ void Graph::Prune() {
             }
         }, my_start, my_end);
     }
-#endif
 }
 
-int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+int GraphExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
-#ifdef STATISTICS
-    intersection_times++;
-    auto tmp0 = 0;
-    auto tmp1 = 0;
-#endif
 
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
@@ -133,47 +95,29 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
-#ifdef STATISTICS
-            ++all_cmp0;
-            ++tmp0;
-#endif
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
             ++offset_nei_v;
-#ifdef STATISTICS
-            ++all_cmp1;
-            ++tmp1;
-#endif
         } else {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
-#ifdef STATISTICS
-            ++all_cmp2;
-            ++tmp0;
-            ++tmp1;
-#endif
         }
     }
-#ifdef STATISTICS
-    int max_val = max(tmp0, tmp1);
-    int min_val = min(tmp0, tmp1);
-    int local_portion = min_val == 0 ? max_val : max_val / min_val;
-    portion = max(portion, local_portion);
-#endif
+
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
-int Graph::EvalReachable(int u, ui edge_idx) {
+int GraphExp::EvalReachable(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
-bool Graph::IsDefiniteCoreVertex(int u) {
+bool GraphExp::IsDefiniteCoreVertex(int u) {
     return similar_degree[u] >= min_u;
 }
 
-void Graph::CheckCoreFirstBSP(int u) {
+void GraphExp::CheckCoreFirstBSP(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         if (min_cn[edge_idx] > 0 && u <= out_edges[edge_idx]) {
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
@@ -181,7 +125,7 @@ void Graph::CheckCoreFirstBSP(int u) {
     }
 }
 
-void Graph::CheckCoreSecondBSP(int u) {
+void GraphExp::CheckCoreSecondBSP(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u > v) {
@@ -193,7 +137,7 @@ void Graph::CheckCoreSecondBSP(int u) {
     }
 }
 
-void Graph::ClusterCore(int u) {
+void GraphExp::ClusterCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         if (min_cn[j] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[j])) {
             disjoint_set_ptr->Union(u, out_edges[j]);
@@ -201,7 +145,7 @@ void Graph::ClusterCore(int u) {
     }
 }
 
-void Graph::MarkClusterMinEleAsId() {
+void GraphExp::MarkClusterMinEleAsId() {
     cluster_dict = vector<int>(n);
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
@@ -214,7 +158,7 @@ void Graph::MarkClusterMinEleAsId() {
     }
 }
 
-void Graph::ClusterNonCores() {
+void GraphExp::ClusterNonCores() {
     noncore_cluster = vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
@@ -231,7 +175,7 @@ void Graph::ClusterNonCores() {
     }
 }
 
-void Graph::pSCAN() {
+void GraphExp::pSCAN() {
     // 1st: pre-processing
     auto prune_start = high_resolution_clock::now();
     Prune();
@@ -240,29 +184,8 @@ void Graph::pSCAN() {
 
     // 2nd: find all cores
     auto find_core_start = high_resolution_clock::now();
-#ifdef SERIAL
-    vector<int> candidates;
-    for (auto i = 0; i < n; i++) {
-        CheckCoreFirstBSP(i);
-    }
-    auto first_bsp_end = high_resolution_clock::now();
-    cout << "2nd: check core first-phase bsp time:"
-         << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
-
-    for (auto i = 0; i < n; i++) {
-        CheckCoreSecondBSP(i);
-        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
-    }
-    auto second_bsp_end = high_resolution_clock::now();
-    cout << "2nd: check core second-phase bsp time:"
-         << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
-
-    for (auto candidate:candidates) { ClusterCore(candidate); }
-#else
-    auto thread_num = std::thread::hardware_concurrency();
-
     {
-        ThreadPool pool(thread_num);
+        ThreadPool pool(thread_num_);
 
         auto batch_size = 64u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
@@ -279,7 +202,7 @@ void Graph::pSCAN() {
 
     vector<std::future<vector<int>>> future_vec;
     {
-        ThreadPool pool(thread_num);
+        ThreadPool pool(thread_num_);
 
         auto batch_size = 1024u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
@@ -304,7 +227,6 @@ void Graph::pSCAN() {
         auto candidates = future.get();
         for (auto candidate:candidates) { ClusterCore(candidate); }
     }
-#endif
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()
          << " ms\n";
@@ -314,11 +236,4 @@ void Graph::pSCAN() {
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
          << " ms\n";
-
-#ifdef STATISTICS
-    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
-    cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
-         << "\nequal cmp:" << all_cmp2 << "\n";
-    cout << "max portion:" << portion << endl;
-#endif
 }
