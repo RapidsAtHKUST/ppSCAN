@@ -4,16 +4,18 @@ pSCAN: Fast and Exact Structural Graph Clustering
 
 # Parallel Version Challenges
 
-* load balance, especially twitter dataset, solved via smaller tasks, without significant overheads
+* load balance, especially twitter dataset
 
-    * 1st bsp, it seems larger number of tasks better
+    * 1st bsp, `batch size` important
     
-    * 2nd bsp, `64 * 16u * thread_num` seems better in twitter
+    * 2nd bsp, `batch size` important
     
-    * so how to effectively set `batch_num`: `auto batch_num = 1024 * 16u * thread_num` or set `auto batch_num = 64 * 16u * thread_num;`
+    * so how to effectively set `batch_num`, while efficiently estimating task grain and pruning effects
     
 * how to deal with workload increment in some datasets, from less pruning 
 
+    * interpret how will workload increment influence the running time
+    
 # Before Experiments
 
 clear page cache    
@@ -112,7 +114,7 @@ lfr synthetic, undirected and unweighted, `-k 15 -maxk 50 -mu 0.1 -minc 20 -maxc
 # Usage
 
 ```zsh
-build/pSCAN ../dataset 0.3 5 output
+build/pSCANSerial ../dataset 0.3 5 output
 ```
 
 # Citation
