@@ -11,6 +11,7 @@ if __name__ == '__main__':
     parameter_min_pts_lst = [5]
     thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
 
+    # data_set_lst = ['small_snap_dblp']
     # parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     # parameter_min_pts_lst = [2, 5, 10, 15]
     # thread_num_lst = [40]
@@ -31,7 +32,7 @@ if __name__ == '__main__':
                     # statistics output dir and file
                     data_set_name = data_set_path.split(os.sep)[-1]
                     statistics_dir = os.sep.join(
-                        map(str, ['.', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
+                        map(str, ['.', 'scalability', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
                     os.system('mkdir -p ' + statistics_dir)
                     statistics_file_path = statistics_dir + os.sep + '-'.join(
                         map(str, ['output', data_set_name, eps, min_pts, thread_num])) + '.txt'
