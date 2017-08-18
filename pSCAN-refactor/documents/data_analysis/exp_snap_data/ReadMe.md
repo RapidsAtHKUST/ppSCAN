@@ -485,3 +485,53 @@ Total time without IO:3999 ms
 Total output cost:2334 ms
 ```
 
+## Dblp
+
+### Cluster: gpu23
+
+sequential
+
+```zsh
+```zsh
+int size:4
+n:425957, m:2099732
+read degree file time:3 ms
+read adjacency list file time:96 ms
+check input graph file time:13 ms
+
+Total input cost:127 ms
+1st: prune execution time:68 ms
+2nd: check core first-phase bsp time:325 ms
+2nd: check core second-phase bsp time:117 ms
+3rd: core clustering time:46 ms
+4th: non-core clustering time:38 ms
+
+prune0 definitely not reachable:0
+prune1 definitely reachable:0
+intersection times:773778
+cmp0:10965872
+cmp1:4267180
+equal cmp:2890571
+max portion:163
+Total time without IO:596 ms
+Total output cost:277 ms
+```
+
+parallel
+
+```zsh
+int size:4
+n:425957, m:2099732
+read degree file time:3 ms
+read adjacency list file time:96 ms
+check input graph file time:13 ms
+
+Total input cost:126 ms
+1st: prune execution time:9 ms
+2nd: check core first-phase bsp time:108 ms
+2nd: check core second-phase bsp time:8 ms
+3rd: core clustering time:46 ms
+4th: non-core clustering time:37 ms
+Total time without IO:208 ms
+Total output cost:295 ms
+```
