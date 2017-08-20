@@ -2,6 +2,7 @@ import os
 import time
 
 if __name__ == '__main__':
+    # data_set_lst = ['small_snap_dblp']
     data_set_lst = ['small_snap_dblp',
                     'snap_livejournal', 'snap_orkut', 'snap_pokec',
                     'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
@@ -46,32 +47,38 @@ if __name__ == '__main__':
                         ifs.write(my_splitter + my_splitter + '\n')
 
 
+                # check md5, line count and byte count
+                def check_result():
+                    res_file_name = '-'.join(map(str, ['result', eps, min_pts])) + '.txt'
+                    res_file_path = data_set_path + os.sep + res_file_name
+                    os.system(' '.join(['md5sum', res_file_path, '>>', statistics_file_path]))
+                    os.system(' '.join(['wc -l', res_file_path, '>>', statistics_file_path]))
+                    os.system(' '.join(['du -b', res_file_path, '>>', statistics_file_path]))
+
+
                 # pscan statistics, pscan+ statistics, pscan, pscan+
                 params_lst = map(str, ['../pSCAN-refactor/build/pSCANStatistics0', data_set_path,
                                        eps, min_pts, 'output', '>>', statistics_file_path])
                 os.system(' '.join(params_lst))
+                check_result()
                 write_split()
 
                 params_lst = map(str, ['../pSCAN-statistics/build/pSCANOptSerialStat', data_set_path,
                                        eps, min_pts, 'output', '>>', statistics_file_path])
                 os.system(' '.join(params_lst))
+                check_result()
                 write_split()
 
                 params_lst = map(str, ['../pSCAN-refactor/build/pSCANSerial', data_set_path,
                                        eps, min_pts, 'output', '>>', statistics_file_path])
                 os.system(' '.join(params_lst))
+                check_result()
                 write_split()
 
                 params_lst = map(str, ['../pSCAN/pscan', data_set_path,
                                        eps, min_pts, 'output', '>>', statistics_file_path])
                 os.system(' '.join(params_lst))
-
-                # 3rd: check md5, line count and byte count
-                res_file_name = '-'.join(map(str, ['result', eps, min_pts])) + '.txt'
-                res_file_path = data_set_path + os.sep + res_file_name
-                os.system(' '.join(['md5sum', res_file_path, '>>', statistics_file_path]))
-                os.system(' '.join(['wc -l', res_file_path, '>>', statistics_file_path]))
-                os.system(' '.join(['du -b', res_file_path, '>>', statistics_file_path]))
+                check_result()
 
                 with open(statistics_file_path, 'a+') as ifs:
                     ifs.write(my_splitter + time.ctime() + my_splitter)

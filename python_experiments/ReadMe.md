@@ -2,11 +2,21 @@
 ## Scalability
 ### Plan
 
-runtime part, add state-of-art pscan runtime as a horizontal line
+runtime part, add state-of-art pscan runtime as a horizontal line to show parallel algorithm's contribution.
 
 ### Problem
 
 * need to interpret the performance degradation in webbase.
+
+![webbase-overview](figures/webgraph_webbase - eps:0.3 - min_pts:5-overview.png)
+
+![webbase-speedup](figures/webgraph_webbase - eps:0.3 - min_pts:5-runtime-speedup.png)
+
+* need to analyze why lfr benchmark incurs more cost in union-find disjoint-set operation
+
+![lfr-10million-avg15-overview](figures/lfr_10million_avgdeg15 - eps:0.3 - min_pts:5-overview.png)
+
+![lfr-10million-avg15-speedup](figures/lfr_10million_avgdeg15 - eps:0.3 - min_pts:5-runtime-speedup.png)
 
 * need to interpret the speedup difference among different input graphs.
 
