@@ -85,9 +85,9 @@ def display_overview(statistics_dic, title_append_txt=''):
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('time (ms)', fontdict=font)
 
-    os.system('mkdir -p /figures')
-    plt.savefig('./figures' + os.sep + title_append_txt + '-' + 'overview.png', bbox_inches='tight', pad_inches=0,
-                transparent=True)
+    os.system('mkdir -p ./figures')
+    plt.savefig('./figures' + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png', bbox_inches='tight',
+                pad_inches=0, transparent=True)
     plt.show()
 
 
@@ -144,9 +144,9 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     plt.ylabel('speedup', fontdict=font)
 
     # show the whole runtime/speedup figure
-    os.system('mkdir -p /figures')
-    plt.savefig('./figures' + os.sep + title_append_txt + '-' + 'runtime-speedup.png', bbox_inches='tight',
-                pad_inches=0, transparent=True)
+    os.system('mkdir -p ./figures')
+    plt.savefig('./figures' + os.sep + title_append_txt.replace(' ', '') + '-' + 'runtime-speedup.png',
+                bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
 
