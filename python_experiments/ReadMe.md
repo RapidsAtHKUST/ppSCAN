@@ -4,6 +4,12 @@
 
 runtime part, add state-of-art pscan runtime as a horizontal line
 
+### Problem
+
+* need to interpret the performance degradation in webbase.
+
+* need to interpret the speedup difference among different input graphs.
+
 ### Deprecated
 
 [scalability_figure.py](scalability_figure.py)

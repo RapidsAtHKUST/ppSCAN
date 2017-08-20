@@ -115,19 +115,37 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     shape_color_lst = ['bo', 'g^', 'r*', 'ch', 'ys', 'mx']
     shape_color_dict = dict(zip(tag_list, shape_color_lst))
 
+    # 1st: draw runtime
     prev_partial_func = plt.plot
     for tag, time_lst in tag_time_lst_lst:
         # partially bind parameters
         prev_partial_func = partial(prev_partial_func, thread_lst, time_lst, shape_color_dict[tag])
+    plt.subplot(211)
     prev_partial_func()
 
-    # draw figures
-    plt.legend(filtered_tag_list)
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
-    plt.title('Total and hotspot time cost\n' +
+    plt.title('Total and hotspot time cost/speedup\n' +
               title_append_txt if title_append_txt != '' else 'Total and hotspot time cost\n', fontdict=font)
-    plt.xlabel('thread num', fontdict=font)
+    plt.legend(filtered_tag_list)
     plt.ylabel('time (ms)', fontdict=font)
+
+    # 2nd: draw speedup
+    tag_speedup_lst = map(lambda tag_time_lst_pair: (
+        tag_time_lst_pair[0], map(lambda ele: max(tag_time_lst_pair[1]) / float(ele), tag_time_lst_pair[1])),
+                          tag_time_lst_lst)
+    print tag_time_lst_lst
+    prev_partial_func = plt.plot
+    for tag, speedup_lst in tag_speedup_lst:
+        # partially bind parameters
+        prev_partial_func = partial(prev_partial_func, thread_lst, speedup_lst, shape_color_dict[tag])
+    plt.subplot(212)
+    prev_partial_func()
+
+    font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
+    plt.xlabel('thread num', fontdict=font)
+    plt.ylabel('speedup', fontdict=font)
+
+    # show the whole runtime/speedup figure
     plt.show()
 
 
