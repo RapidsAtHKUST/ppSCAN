@@ -1,4 +1,9 @@
 # Experiments
+## Case Study 0 
+
+see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
+ on 9 graphs.
+
 ## Scalability
 ### Plan
 
