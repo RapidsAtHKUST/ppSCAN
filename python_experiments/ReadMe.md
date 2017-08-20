@@ -23,7 +23,31 @@ overview | speedup
 --- | ---
 ![lfr-10million-avg15-overview](figures/lfr_10million_avgdeg15-eps:0.3-min_pts:5-overview.png) | ![lfr-10million-avg15-speedup](figures/lfr_10million_avgdeg15-eps:0.3-min_pts:5-runtime-speedup.png)
 
+* need to elaborate on why it is not worthwhile to parallelize clustering phase(core clustering and non-core clustering), mention io cost
+
+e.g, lfr-10million-avg15 synthetic graph, i/o cost is much bigger than 3rd/4th serial part
+
+```zsh
+int size:4
+n:10000001, m:152826874
+read degree file time:40 ms
+read adjacency list file time:5120 ms
+check input graph file time:298 ms
+
+Total input cost:5938 ms
+1st: prune execution time:194 ms
+2nd: check core first-phase bsp time:1181 ms
+2nd: check core second-phase bsp time:623 ms
+3rd: core clustering time:5292 ms
+4th: non-core clustering time:1289 ms
+Total time without IO:8580 ms
+Total output cost:10649 ms
+```
+
+* need to elaborate on comparison difference and union-find operation difference, implement more about statistics, give detailed information for workloads
+
 * need to interpret the speedup difference among different input graphs, add some statistics about union-find operations
+
 
 ### Deprecated
 
