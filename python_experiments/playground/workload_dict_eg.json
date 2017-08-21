@@ -1,0 +1,15 @@
+{
+  'cmp1, pscan+': 4267180,
+  'prune1 definitely reachable': 203486,
+  'prune0 definitely not reachable': 72602,
+  'equal cmp, pscan+': 2890571,
+  'num of edges': 2099732,
+  'Total time without IO, pscan': 264,
+  'equal cmp, pscan': 1872596,
+  'intersection times, pscan': 648554,
+  'cmp0, pscan': 3240962,
+  'cmp1, pscan': 10910275,
+  'Total time without IO, pscan+': 248,
+  'cmp0, pscan+': 10965872,
+  'intersection times, pscan+': 773778
+}
