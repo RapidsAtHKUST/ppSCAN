@@ -3,11 +3,6 @@ import sys
 import os
 from functools import partial
 
-
-def parse_line(line):
-    return int(line.split(':')[-1][:-len(' ms\n') + 1])
-
-
 # total time tag, and five separate time tag: first three parallel, last two serial
 total_time_tag = 'Total time without IO'
 prune_time_tag = '1st: prune execution time'
@@ -15,6 +10,10 @@ first_bsp_time_tag = '2nd: check core first-phase bsp time'
 second_bsp_time_tag = '2nd: check core second-phase bsp time'
 core_cluster_time_tag = '3rd: core clustering time'
 non_core_cluster_time_tag = '4th: non-core clustering time'
+
+
+def parse_line(line):
+    return int(line.split(':')[-1][:-len(' ms\n') + 1])
 
 
 # should guarantee the format of the file, no empty body
@@ -167,5 +166,5 @@ if __name__ == '__main__':
         # 1st: overall time cost
         display_overview(time_info_dict, append_txt)
 
-        # 2nd: runtime for filtered tags
+        # 2nd: runtime/speedup for filtered tags
         display_filtered_tags(time_info_dict, append_txt)
