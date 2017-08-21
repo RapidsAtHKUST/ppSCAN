@@ -16,6 +16,8 @@ runtime_tag = 'Total time without IO'
 pscan_tag = ', pscan'
 pscan_plus_tag = ', pscan+'
 
+global_lst = []
+
 
 def pretty_print(my_dict):
     header_1st_line = ' | '.join(
@@ -36,6 +38,10 @@ def pretty_print(my_dict):
             row_lst.append(my_dict[tag])
         row_lst.append(str(float(my_dict[runtime_tag + algo_tag]) / 1000) + 's')
         table_lines.append(' | '.join(map(str, row_lst)))
+
+        global_lst.append(decimal.Decimal(sum(map(lambda tag: my_dict[tag], complete_tag_lst)) / (
+            float(my_dict[intersect_tag + algo_tag]))).quantize(decimal.Decimal('0.000')))
+
     print '\n'.join(table_lines), '\n\n'
 
 
@@ -45,3 +51,17 @@ if __name__ == '__main__':
         for my_dict in my_dict_lst:
             # print my_dict
             pretty_print(my_dict)
+
+    tmp_lst = map(str, global_lst)
+    print tmp_lst
+
+    pscan_lst = []
+    pscan_plus_lst = []
+    for i in xrange(0, len(global_lst)):
+        if i % 2 == 0:
+            pscan_lst.append(tmp_lst[i])
+        else:
+            pscan_plus_lst.append(tmp_lst[i])
+
+    print ' | '.join(pscan_lst)
+    print ' | '.join(pscan_plus_lst)
