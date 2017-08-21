@@ -56,7 +56,7 @@ if __name__ == '__main__':
                     '10million_avgdeg15_maxdeg50_Cdefault']
     eps = 0.3
     min_pts = 5
-    root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod2'
+    root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod'
     for data_set in data_set_lst:
         file_path = os.sep.join([root_dir_path, data_set, 'eps-' + str(eps), 'min_pts-' + str(min_pts),
                                  '-'.join(['output', data_set, str(eps), str(min_pts)]) + '.txt'])
