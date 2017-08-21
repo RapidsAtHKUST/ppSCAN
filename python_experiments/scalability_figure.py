@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 from functools import partial
+import workload_figure
 
 # total time tag, and five separate time tag: first three parallel, last two serial
 total_time_tag = 'Total time without IO'
@@ -10,6 +11,8 @@ first_bsp_time_tag = '2nd: check core first-phase bsp time'
 second_bsp_time_tag = '2nd: check core second-phase bsp time'
 core_cluster_time_tag = '3rd: core clustering time'
 non_core_cluster_time_tag = '4th: non-core clustering time'
+
+pscan_runtime_tag = 'serial pscan runtime'
 
 
 def parse_line(line):
@@ -41,19 +44,25 @@ def parse_lines(lines):
 def get_statistics(dataset, eps, min_pts, root_folder='.'):
     info_dict = dict()
     dir_path = os.sep.join([root_folder, 'scalability', dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
+    pscan_time = workload_figure.get_statistics(data_set, eps, min_pts, root_folder + os.sep + 'worklaod')[
+        workload_figure.runtime_tag + workload_figure.pscan_tag]
+    pscan_plus_runtime = workload_figure.get_statistics(data_set, eps, min_pts, root_folder + os.sep + 'worklaod')[
+        workload_figure.runtime_tag + workload_figure.pscan_plus_tag]
+
     for root, dirs, files in os.walk(dir_path):
         for file in files:
             with open(dir_path + os.sep + file) as ifs:
                 lines = ifs.readlines()
                 thread_num = int(file.split('-')[-1][:-(len('.txt'))])
                 info_dict[thread_num] = parse_lines(lines)
+                info_dict[thread_num][pscan_runtime_tag] = pscan_time
     return info_dict
 
 
 # display 0: overall time cost in five phases
 def display_overview(statistics_dic, title_append_txt=''):
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
-                non_core_cluster_time_tag, total_time_tag]
+                non_core_cluster_time_tag, total_time_tag, pscan_runtime_tag]
 
     def post_process():
         sorted_info_lst = sorted(statistics_dic.items(), key=lambda pair: pair[0])
@@ -68,7 +77,7 @@ def display_overview(statistics_dic, title_append_txt=''):
 
     # draw after get data, with partial binding technique
     thread_lst, time_lst_lst = post_process()
-    shape_color_lst = ['bo', 'g^', 'r*', 'ch', 'ys', 'mx']
+    shape_color_lst = ['bo', 'g^', 'r*', 'ch', 'ys', 'mx', 'k--']
     prev_partial_func = plt.plot
     cur_shape_color_idx = 0
     for time_lst in time_lst_lst:

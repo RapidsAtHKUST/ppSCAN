@@ -24,7 +24,12 @@ def filter_lines_by_tag(tag, lines):
                filter(lambda line: tag in line, lines))
 
 
-def get_statistics(lines):
+def get_statistics(dataset, eps, min_pts, root_dir_path='.'):
+    file_path = os.sep.join([root_dir_path, dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts),
+                             '-'.join(['output', dataset, str(eps), str(min_pts)]) + '.txt'])
+    with open(file_path) as ifs:
+        lines = ifs.readlines()
+
     tag_lst = [prune0_tag, prune1_tag, intersect_tag, cmp0_tag, cmp1_tag, cmp_equ_tag]
     statistics_lst_dict = dict(map(lambda tag: (tag, filter_lines_by_tag(tag, lines)), tag_lst))
     # runtime unit: ms
@@ -58,9 +63,5 @@ if __name__ == '__main__':
     min_pts = 5
     root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod'
     for data_set in data_set_lst:
-        file_path = os.sep.join([root_dir_path, data_set, 'eps-' + str(eps), 'min_pts-' + str(min_pts),
-                                 '-'.join(['output', data_set, str(eps), str(min_pts)]) + '.txt'])
-        with open(file_path) as ifs:
-            lines = ifs.readlines()
-            ret_dict = get_statistics(lines)
-            print ret_dict
+        ret_dict = get_statistics(data_set, eps, min_pts, root_dir_path)
+        print ret_dict
