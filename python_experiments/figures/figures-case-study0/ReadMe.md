@@ -48,10 +48,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.01s | 0.071s | 0.008s | 0.045s | 0.037s | 0.173s | 3.671
 40 | 0.01s | 0.108s | 0.007s | 0.045s | 0.037s | 0.209s | 3.038
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 2099732 | 72602 | 203486 | 648554 | 3240962 | 10910275 | 1872596 | 0.264s
-pscan+ | 2099732 | 72602 | 203486 | 773778 | 10965872 | 4267180 | 2890571 | 0.248s 
+pscan | 1049866 | 0.0692 | 0.1938 | 0.6177 | 3240962 | 10910275 | 1872596 | 0.264s
+pscan+ | 1049866 | 0.0692 | 0.1938 | 0.7370 | 10965872 | 4267180 | 2890571 | 0.248s 
 
 ## Medium: Pokec
 
@@ -74,10 +74,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.05s | 0.591s | 0.114s | 0.052s | 0.069s | 0.878s | 10.257
 40 | 0.06s | 0.599s | 0.132s | 0.064s | 0.074s | 0.931s | 9.673
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 30282866 | 926575 | 270649 | 12900700 | 283087397 | 596798365 | 34622506 | 8.954s
-pscan+ | 30282866 | 926575 | 270649 | 13944209 | 518686746 | 388412047 | 36101066 | 7.607s 
+pscan | 15141433 | 0.0612 | 0.0179 | 0.8520 | 283087397 | 596798365 | 34622506 | 8.954s
+pscan+ | 15141433 | 0.0612 | 0.0179 | 0.9209 | 518686746 | 388412047 | 36101066 | 7.607s 
 
 ## Medium: LiveJournal
 
@@ -100,10 +100,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.107s | 1.299s | 0.232s | 0.654s | 0.408s | 2.702s | 8.783
 40 | 0.111s | 1.221s | 0.15s | 0.431s | 0.371s | 2.285s | 10.386
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 69362378 | 3369420 | 1001839 | 25120657 | 715186245 | 1810587638 | 154770513 | 22.901s
-pscan+ | 69362378 | 3369420 | 1001839 | 30309930 | 1776486141 | 994831588 | 297801180 | 21.264s 
+pscan | 34681189 | 0.0972 | 0.0289 | 0.7243 | 715186245 | 1810587638 | 154770513 | 22.901s
+pscan+ | 34681189 | 0.0972 | 0.0289 | 0.8740 | 1776486141 | 994831588 | 297801180 | 21.264s 
 
 ## Medium: Orkut
 
@@ -126,10 +126,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.362s | 8.509s | 0.813s | 0.587s | 0.594s | 10.869s | 16.856
 40 | 0.317s | 7.231s | 0.927s | 0.652s | 0.627s | 9.756s | 18.779
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 234370166 | 8445671 | 18560 | 96851867 | 8115508516 | 17562443634 | 1033761851 | 181.675s
-pscan+ | 234370166 | 8445671 | 18560 | 108720852 | 16230884108 | 11146323371 | 1375991912 | 176.496s 
+pscan | 117185083 | 0.0721 | 0.0002 | 0.8265 | 8115508516 | 17562443634 | 1033761851 | 181.675s
+pscan+ | 117185083 | 0.0721 | 0.0002 | 0.9278 | 16230884108 | 11146323371 | 1375991912 | 176.496s 
 
 ## Medium: Uk
 
@@ -152,10 +152,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.206s | 1.9s | 0.253s | 0.972s | 0.633s | 3.967s | 8.565
 40 | 0.194s | 1.791s | 0.249s | 1.009s | 0.634s | 3.879s | 8.759
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 301136554 | 67656923 | 4997008 | 36719739 | 232732652 | 3562856847 | 315608563 | 22.578s
-pscan+ | 301136554 | 67656923 | 4997008 | 77914346 | 588466397 | 8695675975 | 2111915924 | 37.69s 
+pscan | 150568277 | 0.4493 | 0.0332 | 0.2439 | 232732652 | 3562856847 | 315608563 | 22.578s
+pscan+ | 150568277 | 0.4493 | 0.0332 | 0.5175 | 588466397 | 8695675975 | 2111915924 | 37.69s 
 
 ## Large: Webbase
 
@@ -178,9 +178,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.743s | 5.394s | 0.928s | 3.944s | 2.742s | 13.753s | 6.718
 40 | 0.724s | 17.167s | 1.508s | 4.324s | 3.128s | 26.854s | 3.440
 
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 1050026736 | 203886616 | 46119741 | 150869130 | 1020798101 | 7772394167 | 847450383 | 76.548s
-pscan+ | 1050026736 | 203886616 | 46119741 | 275007011 | 2061408067 | 15685059958 | 6698684510 | 98.155s 
+pscan | 525013368 | 0.3883 | 0.0878 | 0.2874 | 1020798101 | 7772394167 | 847450383 | 76.548s
+pscan+ | 525013368 | 0.3883 | 0.0878 | 0.5238 | 2061408067 | 15685059958 | 6698684510 | 98.155s 
 
 ## Large: Twitter
 
@@ -203,10 +204,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 1.604s | 129.201s | 8.592s | 0.813s | 1.017s | 141.229s | 20.109
 40 | 1.649s | 118.153s | 7.845s | 0.56s | 1.219s | 129.427s | 21.943
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 1369000750 | 346551512 | 4856528 | 306051972 | 143132655618 | 391170393366 | 29341665477 | 2984.417s
-pscan+ | 1369000750 | 346551512 | 4856528 | 333092335 | 305687955207 | 270084254384 | 40209354722 | 2982.175s 
+pscan | 684500375 | 0.5063 | 0.0071 | 0.4471 | 143132655618 | 391170393366 | 29341665477 | 2984.417s
+pscan+ | 684500375 | 0.5063 | 0.0071 | 0.4866 | 305687955207 | 270084254384 | 40209354722 | 2982.175s 
 
 ## Large: Fridenster
 
@@ -229,10 +230,10 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 5.172s | 154.929s | 26.779s | 1.883s | 4.134s | 192.901s | 20.258
 40 | 4.617s | 132.803s | 24.353s | 1.707s | 5.382s | 168.866s | 23.141
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 3612134270 | 217839645 | 5427415 | 1547097583 | 189028022634 | 399383776139 | 7711211516 | 4699.255s
-pscan+ | 3612134270 | 217839645 | 5427415 | 1582800075 | 344733547542 | 245393023242 | 7835707712 | 4050.094s 
+pscan | 1806067135 | 0.1206 | 0.0030 | 0.8566 | 189028022634 | 399383776139 | 7711211516 | 4699.255s
+pscan+ | 1806067135 | 0.1206 | 0.0030 | 0.8764 | 344733547542 | 245393023242 | 7835707712 | 4050.094s 
 
 ## LFR: 10million-avgdeg15-maxdeg50
 
@@ -255,7 +256,7 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 0.267s | 1.452s | 0.548s | 5.233s | 1.312s | 8.815s | 5.398
 40 | 0.228s | 1.162s | 0.573s | 5.218s | 1.281s | 8.464s | 5.622
 
-algorithm | num of edges | prune0 | prune1 | intersection times | cmp0 | cmp1 | equal cmp | Total time without IO
+algo | egde num | prune0 | prune1 | eval | cmp0 | cmp1 | equ cmp | total time
 --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 152826874 | 0 | 0 | 39674475 | 159121647 | 644629816 | 107880042 | 29.845s
-pscan+ | 152826874 | 0 | 0 | 76413437 | 247555261 | 1283030908 | 318549472 | 34.313s 
+pscan | 76413437 | 0.0000 | 0.0000 | 0.5192 | 159121647 | 644629816 | 107880042 | 29.845s
+pscan+ | 76413437 | 0.0000 | 0.0000 | 1.0000 | 247555261 | 1283030908 | 318549472 | 34.313s
