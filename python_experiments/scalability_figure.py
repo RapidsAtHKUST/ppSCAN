@@ -77,7 +77,7 @@ def display_overview(statistics_dic, title_append_txt=''):
 
     # draw after get data, with partial binding technique
     thread_lst, time_lst_lst = post_process()
-    shape_color_lst = ['bo', 'g^', 'r*', 'ch', 'ys', 'mx', 'k--']
+    shape_color_lst = ['bo', 'g^', 'r*', 'c<', 'y>', 'mx', 'k--']
     prev_partial_func = plt.plot
     cur_shape_color_idx = 0
     for time_lst in time_lst_lst:
@@ -119,7 +119,7 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     thread_lst, tag_time_lst_lst = post_process()
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
                 non_core_cluster_time_tag, total_time_tag]
-    shape_color_lst = ['bo', 'g^', 'r*', 'ch', 'ys', 'mx']
+    shape_color_lst = ['bo', 'g^', 'r*', 'c<', 'y>', 'mx']
     shape_color_dict = dict(zip(tag_list, shape_color_lst))
 
     # 1st: draw runtime
