@@ -1,5 +1,5 @@
 # Experiments
-## Case Study 0 
+## Case Study 0
 
 see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
  on 9 graphs.
@@ -22,6 +22,35 @@ overview | speedup
 overview | speedup
 --- | ---
 ![lfr-10million-avg15-overview](figures/lfr_10million_avgdeg15-eps:0.3-min_pts:5-overview.png) | ![lfr-10million-avg15-speedup](figures/lfr_10million_avgdeg15-eps:0.3-min_pts:5-runtime-speedup.png)
+
+reason: zero-pruning in both prune0 and prune1
+
+```
+int size:4
+n:10000001, m:152826874
+read degree file time:210 ms
+read adjacency list file time:6301 ms
+check input graph file time:305 ms
+
+Total input cost:7336 ms
+with google perf start------------
+1st: prune execution time:2250 ms
+2nd: check core first-phase bsp time:22887 ms
+2nd: check core second-phase bsp time:6086 ms
+3rd: core clustering time:5106 ms
+4th: non-core clustering time:1288 ms
+
+prune0 definitely not reachable:0
+prune1 definitely reachable:0
+intersection times:76413437
+cmp0:247555261
+cmp1:1283030908
+equal cmp:318549472
+max portion:47
+with google perf end--------------
+Total time without IO:37632 ms
+Total output cost:9880 ms
+```
 
 * need to elaborate on why it is not worthwhile to parallelize clustering phase(core clustering and non-core clustering), mention io cost
 
