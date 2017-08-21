@@ -102,8 +102,8 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
         time_info_lst = map(lambda pair: pair[1], sorted_info_lst)
 
         tag_time_lst_lst = map(lambda tag: (tag, map(lambda my_dict: my_dict[tag], time_info_lst)), filtered_tag_list)
-        print 'thread list:', thread_lst
-        print 'tag time info list:', tag_time_lst_lst
+        # print 'thread list:', thread_lst
+        # print 'tag time info list:', tag_time_lst_lst
         return thread_lst, tag_time_lst_lst
 
     # init parameters
@@ -131,7 +131,7 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     tag_speedup_lst = map(lambda tag_time_lst_pair: (
         tag_time_lst_pair[0], map(lambda ele: max(tag_time_lst_pair[1]) / float(ele), tag_time_lst_pair[1])),
                           tag_time_lst_lst)
-    print tag_time_lst_lst
+    # print tag_time_lst_lst
     prev_partial_func = plt.plot
     for tag, speedup_lst in tag_speedup_lst:
         # partially bind parameters
@@ -152,10 +152,10 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
 
 if __name__ == '__main__':
     data_set_lst = ['small_snap_dblp',
-                    'snap_livejournal', 'snap_orkut', 'snap_pokec',
-                    '10million_avgdeg15_maxdeg50_Cdefault',
+                    'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster']
+                    'webgraph_twitter', 'snap_friendster',
+                    '10million_avgdeg15_maxdeg50_Cdefault']
 
     for data_set in data_set_lst:
         time_info_dict = get_statistics(data_set, 0.3, 5,
