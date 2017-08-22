@@ -6,9 +6,11 @@
 
 ## My Work
 
-Please have a look at [pSCAN-refactor](pSCAN-refactor) and find some useful things for you. :smile:
+Please have a look at [pSCAN-refactor](pSCAN-refactor) and find some useful things(source codes and documents) for you. :smile:
 
-### Understanding and Works
+Experiments in detail are [here](python_experiments).
+
+### Pscan Overview
 
 * pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on **unweighted, undirected not dynamic** graph.
 
@@ -33,7 +35,7 @@ pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
 python scripts during study | [python](python)
 simd study codes | [simd_study](simd_study)
 
-### Package Organization
+### Package Organization(pSCAN-refactor)
 
 pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
 
