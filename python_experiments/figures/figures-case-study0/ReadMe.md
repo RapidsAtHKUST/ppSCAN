@@ -2,31 +2,6 @@
 
 parameter setting: `eps:0.3`, `min_pts:5`
 
-* real-world
-
-graph type | name
---- | ---
-small | dblp
-medium |  pokec, livejournal, orkut, uk
-large | webbase, twitter, friendster
-
-name | n | m 
---- | --- | ---
-dblp        | 425,957       | 2,099,732
-pokec       | 1,632,804     | 30,282,866
-livejournal | 4,036,538     | 69,362,378
-orkut       | 3,072,627     | 234,370,166
-uk          | 18,520,343    | 301,136,554
-webbase     | 118,142,143   | 1,050,026,736
-twitter     | 41,652,230    | 1,369,000,750
-friendster  | 124,836,180   | 3,612,134,270
-
-* synthetic
-
-name | n | m
---- | --- | --- 
-lfr-avg15-max50 | 10,000,001  | 152,826,874 
-
 ## Small: Dblp
 
 name | n | m 
@@ -35,7 +10,7 @@ dblp        | 425,957       | 2,099,732
 
 overview | speedup
 --- | ---
-![dblp-overview](../small_snap_dblp-eps:0.3-min_pts:5-overview.png) | ![dblp-speedup](../small_snap_dblp-eps:0.3-min_pts:5-runtime-speedup.png)
+![dblp-overview](../scalability/small_snap_dblp-eps:0.3-min_pts:5-overview.png) | ![dblp-speedup](../scalability/small_snap_dblp-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -61,7 +36,7 @@ pokec       | 1,632,804     | 30,282,866
 
 overview | speedup
 --- | ---
-![pokec-overview](../snap_pokec-eps:0.3-min_pts:5-overview.png) | ![pokec-speedup](../snap_pokec-eps:0.3-min_pts:5-runtime-speedup.png)
+![pokec-overview](../scalability/snap_pokec-eps:0.3-min_pts:5-overview.png) | ![pokec-speedup](../scalability/snap_pokec-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -87,7 +62,7 @@ livejournal | 4,036,538     | 69,362,378
 
 overview | speedup
 --- | ---
-![livejournal-overview](../snap_livejournal-eps:0.3-min_pts:5-overview.png) | ![livejournal-speedup](../snap_livejournal-eps:0.3-min_pts:5-runtime-speedup.png)
+![livejournal-overview](../scalability/snap_livejournal-eps:0.3-min_pts:5-overview.png) | ![livejournal-speedup](../scalability/snap_livejournal-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -113,7 +88,7 @@ orkut       | 3,072,627     | 234,370,166
 
 overview | speedup
 --- | ---
-![orkut-overview](../snap_orkut-eps:0.3-min_pts:5-overview.png) | ![orkut-speedup](../snap_orkut-eps:0.3-min_pts:5-runtime-speedup.png)
+![orkut-overview](../scalability/snap_orkut-eps:0.3-min_pts:5-overview.png) | ![orkut-speedup](../scalability/snap_orkut-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -139,7 +114,7 @@ uk          | 18,520,343    | 301,136,554
 
 overview | speedup
 --- | ---
-![uk-overview](../webgraph_uk-eps:0.3-min_pts:5-overview.png) | ![uk-speedup](../webgraph_uk-eps:0.3-min_pts:5-runtime-speedup.png)
+![uk-overview](../scalability/webgraph_uk-eps:0.3-min_pts:5-overview.png) | ![uk-speedup](../scalability/webgraph_uk-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -165,7 +140,7 @@ webbase     | 118,142,143   | 1,050,026,736
 
 overview | speedup
 --- | ---
-![webbase-overview](../webgraph_webbase-eps:0.3-min_pts:5-overview.png) | ![webbase-speedup](../webgraph_webbase-eps:0.3-min_pts:5-runtime-speedup.png)
+![webbase-overview](../scalability/webgraph_webbase-eps:0.3-min_pts:5-overview.png) | ![webbase-speedup](../scalability/webgraph_webbase-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -191,7 +166,7 @@ twitter     | 41,652,230    | 1,369,000,750
 
 overview | speedup
 --- | ---
-![twitter-overview](../webgraph_twitter-eps:0.3-min_pts:5-overview.png) | ![twitter-speedup](../webgraph_twitter-eps:0.3-min_pts:5-runtime-speedup.png)
+![twitter-overview](../scalability/webgraph_twitter-eps:0.3-min_pts:5-overview.png) | ![twitter-speedup](../scalability/webgraph_twitter-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -217,7 +192,7 @@ friendster  | 124,836,180   | 3,612,134,270
 
 overview | speedup
 --- | ---
-![fridenster-overview](../snap_friendster-eps:0.3-min_pts:5-overview.png) | ![friendster-speedup](../snap_friendster-eps:0.3-min_pts:5-runtime-speedup.png)
+![fridenster-overview](../scalability/snap_friendster-eps:0.3-min_pts:5-overview.png) | ![friendster-speedup](../scalability/snap_friendster-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
@@ -243,7 +218,7 @@ lfr-avg15-max50 | 10,000,001  | 152,826,874
 
 overview | speedup
 --- | ---
-![lfr10million-avgdeg15-maxdeg50-overview](../lfr_10million_avgdeg15-eps:0.3-min_pts:5-overview.png) | ![lfr10million-avgdeg15-maxdeg50-speedup](../lfr_10million_avgdeg15-eps:0.3-min_pts:5-runtime-speedup.png)
+![lfr10million-avgdeg15-maxdeg50-overview](../scalability/lfr_10million_avgdeg15-eps:0.3-min_pts:5-overview.png) | ![lfr10million-avgdeg15-maxdeg50-speedup](../scalability/lfr_10million_avgdeg15-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---

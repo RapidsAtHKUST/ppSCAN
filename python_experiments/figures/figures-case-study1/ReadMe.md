@@ -1,6 +1,5 @@
 ## Small: Dblp
 
-
 workload | runtime
 --- | ---
 ![dblp-workload](../workload/small_snap_dblp-min_pts:5-workload.png) | ![dblp-runtime](../workload/small_snap_dblp-min_pts:5-runtime.png)
