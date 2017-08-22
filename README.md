@@ -25,7 +25,9 @@ Experiments in detail are [here](python_experiments).
 * pruning techniques:
   * :thumbsup: : pre-processing, `PruneAndCrossLink`, prune not reachable `if (((long long) a) * eps_b2 < ((long long) b) * eps_a2)`, which is easy to deduced when the max of`number of common neighbors` is `min(du,dv)`, and utilize cross-link
   * :thumbsup: : `common neighbor lower bound <=2`, must be similar, self and neighbor vertices, compute common neighbor with early exit, via utilizing `du` and `dv`
-  * not so useful: other tricks to reduce the number of evaluations of reachability, like `max-priority-queue`, `similar_degree`, `effective_degree`
+  * not super useful: other tricks to reduce the number of evaluations of reachability, like `max-priority-queue`, `similar_degree`, `effective_degree`
+
+* **set-intersection** is the bottleneck in the current pScan design.
 
 * detail: check the following table
 
@@ -35,7 +37,7 @@ pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
 python scripts during study | [python](python)
 simd study codes | [simd_study](simd_study)
 
-### Package Organization(pSCAN-refactor)
+### Package Organization, [pSCAN-refactor](pSCAN-refactor)
 
 pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
 
@@ -67,11 +69,10 @@ file | utility
 [MaxPriorityQueue.h](pSCAN-refactor/playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](pSCAN-refactor/playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
 [ThreadSafeDisjointSet.h](pSCAN-refactor/playground/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
 
-### Profiling
+* profiling scrips
 
 see [run_pscan_gperftools.sh](pSCAN-refactor/run_pscan_gperftools.sh), [run_pscan_perf.sh](pSCAN-refactor/run_pscan_perf.sh), [run_pscan_valgrind.sh](pSCAN-refactor/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
 
-**set-intersection** is the bottleneck in the current pScan design.
 
 ## Related Projects
 
@@ -82,7 +83,7 @@ spatial dbscan another | [markus.goetz-hpdbscan](related_projects/markus.goetz-h
 parameter-free scan | [gSkeletonClu](related_projects/gSkeletonClu)
 pSCAN original codes | [pSCAN](related_projects/pSCAN)
 
-## Submodules Init
+* Submodules Init
 
 ```
 git submodule init
