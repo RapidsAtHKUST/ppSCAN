@@ -1,8 +1,16 @@
 # Experiments
-## Case Study 0
+## Case Study 
 
-see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
+* scalability: see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
  on 9 graphs.
+
+* workload/serial-runtime: see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
+
+## Workload
+
+### Observation
+
+* pscan's prunning is powerful in non social networks with `eps:0.1` and `eps:0.2` 
 
 ## Scalability
 

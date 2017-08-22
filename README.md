@@ -8,7 +8,7 @@
 
 Please have a look at [pSCAN-refactor](pSCAN-refactor) and find some useful things(source codes and documents) for you. :smile:
 
-Experiments in detail are [here](python_experiments).
+Experiments in detail are [here](python_experiments). [scalability-exp](python_experiments/figures/figures-case-study0), [workload-exp](python_experiments/figures/figures-case-study1).
 
 ### Pscan Overview
 
