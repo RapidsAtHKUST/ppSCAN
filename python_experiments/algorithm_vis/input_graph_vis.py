@@ -17,7 +17,7 @@ def vis_input(graph):
             edge_color='grey', node_color='white')
 
     plt.axis('off')
-    plt.savefig('./demo_graph.png', bbox_inches='tight', pad_inches=0, transparent=True)
+    plt.savefig('./demo_input_graph.png', bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
 
@@ -27,10 +27,9 @@ def to_csr_graph(graph):
     :type graph: nx.Graph
     """
     # 1st: deg_lst
-    deg_lst = range(max(graph.nodes()) + 1)
+    deg_lst = [0] * (max(graph.nodes()) + 1)
     for node in graph.nodes():
         deg_lst[node] = nx.degree(graph, node)
-    deg_lst = map(lambda node: nx.degree(graph, node), graph.nodes())
     assert 2 * graph.number_of_edges() == sum(deg_lst)
 
     # 2nd: offset_lst
@@ -83,22 +82,23 @@ class PScan:
     def is_definitely_not_reachable(self, u, v):
         du = self.inc_degree_lst[u]
         dv = self.inc_degree_lst[v]
-        return True if min(du, dv) < max(du, dv) * self.eps else False
+        return True if min(du, dv) < max(du, dv) * (self.eps ** 2) else False
 
     def compute_cn_lower_bound(self, u, v):
-        return int(math.ceil(math.sqrt(deg_lst[u] * deg_lst[v]) * self.eps))
+        return int(math.ceil(math.sqrt(self.inc_degree_lst[u] * self.inc_degree_lst[v]) * self.eps))
 
     # 1st: prune
     def prune(self):
         for i in xrange(self.n):
             for j in xrange(offset_lst[i], offset_lst[i + 1]):
-                if i < j:
-                    if self.is_definitely_not_reachable(i, dst_v_lst[j]):
+                v = self.dst_v_lst[j]
+                if i < v:
+                    if self.is_definitely_not_reachable(i, v):
                         self.prune0 += 1
                         self.min_cn_lst[j] = PScan.not_direct_reachable
                     else:
-                        tmp = self.compute_cn_lower_bound(i, dst_v_lst[j])
-                        if self.min_cn_lst[j] <= 2:
+                        tmp = self.compute_cn_lower_bound(i, v)
+                        if tmp <= 2:
                             self.prune1 += 1
                             self.min_cn_lst[j] = PScan.direct_reachable
                         else:
@@ -108,13 +108,13 @@ class PScan:
         v = dst_v_lst[edge_idx]
         cn = 2
 
-        du = deg_lst[u] + 1
-        dv = deg_lst[v] + 1
-        offset_nei_u = dst_v_lst[u]
-        offset_nei_v = dst_v_lst[v]
+        du = self.inc_degree_lst[u] + 1
+        dv = self.inc_degree_lst[v] + 1
+        offset_nei_u = offset_lst[u]
+        offset_nei_v = offset_lst[v]
         min_cn_num = self.min_cn_lst[edge_idx]
 
-        while offset_nei_u < dst_v_lst[u + 1] and offset_nei_v < dst_v_lst[v + 1] \
+        while offset_nei_u < offset_lst[u + 1] and offset_nei_v < offset_lst[v + 1] \
                 and cn < min_cn_num <= du and dv >= min_cn_num:
             if self.dst_v_lst[offset_nei_u] < self.dst_v_lst[offset_nei_v]:
                 du -= 1
@@ -129,7 +129,6 @@ class PScan:
                 offset_nei_v += 1
                 offset_nei_u += 1
                 self.cmp_equ += 1
-
         return PScan.direct_reachable if cn >= min_cn_num else PScan.not_direct_reachable
 
     # 2nd: check core 1st bsp computation
@@ -198,7 +197,7 @@ class PScan:
     def run_algorithm(self):
         # 1st: prune
         self.prune()
-        print 'min_cn_lst:', self.min_cn_lst
+        print 'min_cn_lst after prune:\t\t', self.min_cn_lst
 
         # 2nd: check core
         for i in xrange(self.n):
@@ -209,6 +208,7 @@ class PScan:
             self.check_core_2nd_bsp(i)
             if self.is_definite_core_vertex(i):
                 candidates.append(i)
+        print 'min_cn_lst after check core:\t\t', self.min_cn_lst
 
         # 3rd: cluster cores
         print 'cores:', candidates
@@ -226,6 +226,7 @@ class PScan:
 
 if __name__ == '__main__':
     graph = nx.read_edgelist('demo_input_graph.txt', nodetype=int)
+    vis_input(graph)
     to_csr_graph(graph)
     offset_lst, dst_v_lst, deg_lst = to_csr_graph(graph)
     print 'offset_lst:', offset_lst, '\ndst_v_lst:', dst_v_lst, '\ndeg_lst:', deg_lst
