@@ -69,7 +69,7 @@ min_cn to satisfy direct reachable | `> 0`, e.g, `3`
 
 * input
 
-![demo_input_graph.png](demo_input_graph.png)
+![demo_input_graph.png](./demo_input_graph.png)
 
 ```python
 min_cn_lst=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -77,7 +77,7 @@ min_cn_lst=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 * after pruning
 
-![after_pruning_graph.png](after_pruning_graph.png)
+![after_pruning_graph.png](./after_pruning_graph.png)
 
 ```python
 min_cn_lst=[-1, 0, 3, 3, 3, 0, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 3, 0, 3, 3, 4, 0, 3, 3, 0, 0, 3, 0, 0, 0, -2, -2, 0, 0]
@@ -85,7 +85,7 @@ min_cn_lst=[-1, 0, 3, 3, 3, 0, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 3, 0, 3, 3, 4, 0, 3
 
 * after check core 1st bsp
 
-![after_check_core_1st_bsp_graph.png](after_check_core_1st_bsp_graph.png)
+![after_check_core_1st_bsp_graph.png](./after_check_core_1st_bsp_graph.png)
 
 ```python
 min_cn_lst=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -94,7 +94,7 @@ min_cn_lst=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, 
 
 * after check core 2nd bsp
 
-![after_check_core_2nd_bsp_graph.png](after_check_core_2nd_bsp_graph.png)
+![after_check_core_2nd_bsp_graph.png](./after_check_core_2nd_bsp_graph.png)
 
 ```python
 min_cn_lst=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1,
