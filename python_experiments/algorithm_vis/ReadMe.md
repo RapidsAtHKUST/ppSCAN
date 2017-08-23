@@ -19,7 +19,7 @@ pscan_algo = PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3)
 
 file: [demo_input_graph.txt](demo_input_graph.txt)
 
-![demo input graph](demo_input_graph.png)
+![demo input graph](./pure_demo_input_graph.png)
 
 csr representation
 
@@ -67,7 +67,7 @@ direct_reachable | `-1`
 not_sure | `0 `
 min_cn to satisfy direct reachable | `> 0`, e.g, `3`
 
-* input
+* input with initialized edge property `min_cn`
 
 ![demo_input_graph.png](./demo_input_graph.png)
 

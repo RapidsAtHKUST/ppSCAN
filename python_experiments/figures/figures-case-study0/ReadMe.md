@@ -1,4 +1,4 @@
-# Case Study
+# Scalability Case Study
 
 parameter setting: `eps:0.3`, `min_pts:5`
 

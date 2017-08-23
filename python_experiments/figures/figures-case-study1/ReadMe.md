@@ -1,3 +1,7 @@
+# Workload Case Study
+
+parameter setting: `min_pts:5`, varying `eps`
+
 ## Small: Dblp
 
 workload | runtime

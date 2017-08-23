@@ -1,20 +1,21 @@
 # Experiments
-## Case Study 
 
-* scalability: see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
+* algorithm introduction and visualization: see [algorithm_vis](algorithm_vis), with a toy case [demo_input_graph.txt](algorithm_vis/demo_input_graph.txt)
+
+* dataset description: see [dataset_description](dataset_description/ReadMe.md)
+
+* scalability experiment: see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
  on 9 graphs.
 
-* workload/serial-runtime: see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
+* workload/serial-runtime experiment: see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
 
-## Workload
+## Observation
 
-### Observation
+### Workload
 
 * pscan's prunning is powerful in non social networks with `eps:0.1` and `eps:0.2` 
 
-## Scalability
-
-### Observation
+### Scalability
 
 * pscan's prunning(via sd/ed) is more powerful in non social network graphs and lfr benchmark graphs, from [figures/figures-case-study0](figures/figures-case-study0), 
 however at most twice evaluation of density from our experiments is affordable, since evaluation phase, i.e, check-core 1st phase bsp has a good scalability 
@@ -39,15 +40,48 @@ pscan+ | 23.422 | 67.641 | 101.258 | 264.468 | 146.264 | **88.889** | 1849.282 |
 
 * real-world graph more parameters: use more small real-world datasets to do work-load experiments, with different `eps [0,1, 0.9]` and `min_pts [2, 5, 15, 20]`
 
-### Problem
+## Problem
 
-* need to interpret the performance degradation in webbase.
+* urgent: need to interpret the performance degradation in webbase.
+
+* must: need to elaborate on why it is not worthwhile to parallelize clustering phase(core clustering and non-core clustering), mention io cost
+
+* must: need to interpret the speedup difference among different input graphs
+
+* small problem: need to elaborate on comparison difference and union-find operation difference, implement more about statistics, give detailed information for workloads
+
+* small problem: need to analyze why lfr benchmark incurs more cost in union-find disjoint-set operation
+
+## Problem Elaboration
+
+### Webbase Performance Degradation
 
 overview | speedup
 --- | ---
 ![webbase-overview](figures/scalability/webgraph_webbase-eps:0.3-min_pts:5-overview.png) | ![webbase-speedup](figures/scalability/webgraph_webbase-eps:0.3-min_pts:5-runtime-speedup.png)
 
-* need to analyze why lfr benchmark incurs more cost in union-find disjoint-set operation
+### Not Worthwhile Parallelize Union-Find
+
+e.g, lfr-10million-avg15 synthetic graph, i/o cost is much bigger than 3rd/4th serial part
+
+```zsh
+int size:4
+n:10000001, m:152826874
+read degree file time:40 ms
+read adjacency list file time:5120 ms
+check input graph file time:298 ms
+
+Total input cost:5938 ms
+1st: prune execution time:194 ms
+2nd: check core first-phase bsp time:1181 ms
+2nd: check core second-phase bsp time:623 ms
+3rd: core clustering time:5292 ms
+4th: non-core clustering time:1289 ms
+Total time without IO:8580 ms
+Total output cost:10649 ms
+```
+
+### LFR Benchmark More Workload in Union-Find
 
 overview | speedup
 --- | ---
@@ -82,29 +116,10 @@ Total time without IO:37632 ms
 Total output cost:9880 ms
 ```
 
-* need to elaborate on why it is not worthwhile to parallelize clustering phase(core clustering and non-core clustering), mention io cost
+## Scripts
 
-e.g, lfr-10million-avg15 synthetic graph, i/o cost is much bigger than 3rd/4th serial part
-
-```zsh
-int size:4
-n:10000001, m:152826874
-read degree file time:40 ms
-read adjacency list file time:5120 ms
-check input graph file time:298 ms
-
-Total input cost:5938 ms
-1st: prune execution time:194 ms
-2nd: check core first-phase bsp time:1181 ms
-2nd: check core second-phase bsp time:623 ms
-3rd: core clustering time:5292 ms
-4th: non-core clustering time:1289 ms
-Total time without IO:8580 ms
-Total output cost:10649 ms
-```
-
-* need to elaborate on comparison difference and union-find operation difference, implement more about statistics, give detailed information for workloads
-
-* need to interpret the speedup difference among different input graphs, add some statistics about union-find operations
-
-
+category | scripts
+--- | ---
+scalability | [scalability_experiment.py](scalability_experiment.py), [scalability_figure.py](scalability_figure.py), [generate_markdown0.py](playground/generate_markdown0.py)
+workload | [workload_experiment.py](workload_experiment.py), [workload_figure.py](workload_figure.py), [generate_markdown1.py](playground/generate_markdown1.py), [generate_markdown2.py](playground/generate_markdown2.py)
+algorithm demo | [pscan_algo.py](algorithm_vis/pscan_algo.py), [pscan_algo_vis.py](algorithm_vis/pscan_algo_vis.py)

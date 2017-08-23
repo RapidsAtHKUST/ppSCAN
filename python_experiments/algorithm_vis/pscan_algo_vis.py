@@ -39,11 +39,25 @@ def vis_input(graph, min_cn, similar_deg_lst, min_pts, graph_name):
     plt.show()
 
 
+def vis_input_only(graph):
+    # draw background graph
+    pos = nx.circular_layout(graph)
+    nx.draw_networkx_nodes(graph, with_labels=True, pos=pos, font_size=12, node_size=380, alpha=1.0, width=4,
+                           node_color='black')
+    nx.draw_networkx(graph, with_labels=True, pos=pos, font_size=12, node_size=350, alpha=1.0, width=4,
+                     edge_color='grey', node_color='white')
+    plt.axis('off')
+    plt.savefig('./' + 'pure_demo_input_graph' + '.png', bbox_inches='tight', pad_inches=0, transparent=True)
+    plt.show()
+
+
 if __name__ == '__main__':
     graph = nx.read_edgelist('demo_input_graph.txt', nodetype=int)
 
     offset_lst, dst_v_lst, deg_lst = to_csr_graph(graph)
     print 'csr representation:\noffset_lst=', offset_lst, '\ndst_v_lst=', dst_v_lst, '\ndeg_lst=', deg_lst, '\n'
+
+    vis_input_only(graph)
 
     # demo input graph
     min_cn = [0 for _ in xrange(len(dst_v_lst))]

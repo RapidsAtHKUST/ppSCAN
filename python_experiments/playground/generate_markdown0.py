@@ -1,5 +1,6 @@
 import decimal
 
+
 def pretty_print(thread_lst, time_lst):
     print
     header_1st_line = ' | '.join(
@@ -12,9 +13,11 @@ def pretty_print(thread_lst, time_lst):
         for phase_lst in time_lst:
             row_lst.append(str(float(phase_lst[i]) / 1000) + 's')
         total_lst = time_lst[-1]
-        row_lst.append(decimal.Decimal.from_float(total_lst[0] / float(total_lst[i])).quantize(decimal.Decimal('0.000'))  )
+        row_lst.append(
+            decimal.Decimal.from_float(total_lst[0] / float(total_lst[i])).quantize(decimal.Decimal('0.000')))
         table_lines.append(' | '.join(map(str, row_lst)))
     print '\n'.join(table_lines)
+
 
 if __name__ == '__main__':
     with open('scalability_vis_middle_res.txt') as ifs:
