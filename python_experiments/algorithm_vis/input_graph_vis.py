@@ -75,9 +75,12 @@ class PScan:
         self.prune0 = 0  # definitely not reachable
         self.prune1 = 0  # definitely reachable
 
+        self.intersect = 0
         self.cmp0 = 0
         self.cmp1 = 0
         self.cmp_equ = 0
+
+        self.result_lines = []
 
     def is_definitely_not_reachable(self, u, v):
         du = self.inc_degree_lst[u]
@@ -105,6 +108,7 @@ class PScan:
                             self.min_cn_lst[j] = tmp
 
     def eval_density(self, u, edge_idx):
+        self.intersect += 1
         v = dst_v_lst[edge_idx]
         cn = 2
 
@@ -189,10 +193,14 @@ class PScan:
     def output_result(self):
         for i in xrange(self.n):
             if self.is_definite_core_vertex(i):
-                print 'c ', i, ' ', self.cluster_dict[self.disjoint_set.find_root(i)]
+                line = ' '.join(map(str, ['c', i, self.cluster_dict[self.disjoint_set.find_root(i)]]))
+                self.result_lines.append(line)
+                print line
 
         for cluster_id, non_core_v in sorted(set(self.non_core_cluster)):
-            print 'n ', non_core_v, ' ', cluster_id
+            line = ' '.join(map(str, ['n', non_core_v, cluster_id]))
+            self.result_lines.append(line)
+            print line
 
     def run_algorithm(self):
         # 1st: prune
@@ -220,14 +228,18 @@ class PScan:
 
         # finally, output result
         print '\n', '\t'.join(['core/non-core', 'vertex id', 'cluster id(min core vertex id in this cluster)']), '\n'
-        print 'c/n vertex_id cluster_id'
+        self.result_lines.append('c/n vertex_id cluster_id')
         self.output_result()
 
 
 if __name__ == '__main__':
     graph = nx.read_edgelist('demo_input_graph.txt', nodetype=int)
-    vis_input(graph)
+    # vis_input(graph)
     to_csr_graph(graph)
     offset_lst, dst_v_lst, deg_lst = to_csr_graph(graph)
     print 'offset_lst:', offset_lst, '\ndst_v_lst:', dst_v_lst, '\ndeg_lst:', deg_lst
-    PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3).run_algorithm()
+    pscan_algo = PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3)
+    pscan_algo.run_algorithm()
+    print '<br/>'.join(pscan_algo.result_lines)
+    print 'statistics:', pscan_algo.prune0, pscan_algo.prune1, pscan_algo.intersect, len(pscan_algo.dst_v_lst) / 2
+    print 'statistics:', pscan_algo.intersect, pscan_algo.cmp0, pscan_algo.cmp1, pscan_algo.cmp_equ
