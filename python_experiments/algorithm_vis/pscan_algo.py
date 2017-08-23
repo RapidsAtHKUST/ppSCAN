@@ -68,6 +68,8 @@ class PScan:
         # 2.2 statistics for check core 2nd bsp: binary search
         self.binary_search_call = 0
 
+        # 3 statistics for disjoint set
+
         self.result_lines = []
 
     def is_definitely_not_reachable(self, u, v):
@@ -164,8 +166,6 @@ class PScan:
                 x = self.disjoint_set.find_root(i)
                 if i < self.cluster_dict[x]:
                     self.cluster_dict[x] = i
-        # print 'disjoint set root dict:', self.cluster_dict
-        pass
 
     # 4th: cluster non-cores
     def cluster_non_core(self):
@@ -191,31 +191,41 @@ class PScan:
             print line
 
     def run_algorithm(self):
+        print ', '.join(['not_direct_reachable = -2', 'direct_reachable = -1', 'not_sure = 0',
+                        '>0 means min_cn to satisfy direct reachable']), '\n'
+
         # 1st: prune
         self.prune()
-        print 'min_cn_lst after prune:\t\t', self.min_cn_lst
+        print '1. after prune, min_cn_lst:', self.min_cn_lst
 
         # 2nd: check core
         for i in xrange(self.n):
             self.check_core_1st_bsp(i)
         candidates = []
+        print '2.1 after check core 1st bsp, min_cn_lst :', self.min_cn_lst
+
         for i in xrange(self.n):
             # print 'check core', i, 'neighbors:', self.dst_v_lst[self.offset_lst[i]:self.offset_lst[i + 1]]
             self.check_core_2nd_bsp(i)
             if self.is_definite_core_vertex(i):
                 candidates.append(i)
-        print 'min_cn_lst after check core:\t\t', self.min_cn_lst
+        print '2.2 after check core 2nd bsp, min_cn_lst:', self.min_cn_lst
+        print '2.2 after check core 2nd bsp, similar_degree_lst:', self.similar_degree_lst
+        print '2.2 after check core 2nd bsp, cores:', candidates
 
         # 3rd: cluster cores
-        print 'cores:', candidates
         for candidate in candidates:
             self.cluster_core(candidate)
+        print '3. after cluster core, disjoint set - parent dict:', dict(zip(range(self.n), self.disjoint_set.parent))
 
         # 4th: cluster non-core
         self.cluster_non_core()
+        print '4. after cluster non-core mark cluster id, cluster(represented by root vertex), min ele id:', dict(
+            filter(lambda pair: pair[1] != self.n, zip(range(self.n), self.cluster_dict)))
 
         # finally, output result
-        print '\n', '\t'.join(['core/non-core', 'vertex id', 'cluster id(min core vertex id in this cluster)']), '\n'
+        print '\nfinal result in format:', ' '.join(
+            ['core/non-core', 'vertex id', 'cluster id(min core vertex id in this cluster)'])
         self.result_lines.append('c/n vertex_id cluster_id')
         print 'c/n vertex_id cluster_id'
         self.output_result()
@@ -224,6 +234,8 @@ class PScan:
 if __name__ == '__main__':
     graph = nx.read_edgelist('demo_input_graph.txt', nodetype=int)
     offset_lst, dst_v_lst, deg_lst = to_csr_graph(graph)
+
+    print 'csr representation:\noffset_lst=', offset_lst, '\ndst_v_lst=', dst_v_lst, '\ndeg_lst=', deg_lst, '\n'
 
     pscan_algo = PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3)
     pscan_algo.run_algorithm()

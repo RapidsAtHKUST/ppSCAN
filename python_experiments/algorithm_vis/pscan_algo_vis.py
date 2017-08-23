@@ -84,6 +84,8 @@ class PScan:
         # 2.2 statistics for check core 2nd bsp: binary search
         self.binary_search_call = 0
 
+        # 3 statistics for disjoint set
+
         self.result_lines = []
 
     def is_definitely_not_reachable(self, u, v):
@@ -180,8 +182,6 @@ class PScan:
                 x = self.disjoint_set.find_root(i)
                 if i < self.cluster_dict[x]:
                     self.cluster_dict[x] = i
-        # print 'disjoint set root dict:', self.cluster_dict
-        pass
 
     # 4th: cluster non-cores
     def cluster_non_core(self):
@@ -233,6 +233,7 @@ class PScan:
         # finally, output result
         print '\n', '\t'.join(['core/non-core', 'vertex id', 'cluster id(min core vertex id in this cluster)']), '\n'
         self.result_lines.append('c/n vertex_id cluster_id')
+        print 'c/n vertex_id cluster_id'
         self.output_result()
 
 

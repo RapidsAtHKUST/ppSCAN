@@ -13,7 +13,46 @@ modify this line to use different `eps` and `min_pts`
 ```python
 pscan_algo = PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3)
 ```
-## Algorithm Visualization
+## Algorithm Example
+
+* input file: [demo_input_graph.txt](demo_input_graph.txt)
+
+![demo input graph](demo_input_graph.png)
+
+csr representation
+
+```python
+offset_lst = [0, 1, 5, 8, 11, 15, 17, 21, 24, 27, 32, 33, 34]
+dst_v_lst = [1, 0, 2, 3, 4, 1, 3, 4, 1, 2, 4, 1, 2, 3, 5, 4, 6, 
+5, 7, 8, 9, 6, 8, 9, 6, 7, 9, 6, 7, 8, 10, 11, 9, 9]
+deg_lst = [1, 4, 3, 3, 4, 2, 4, 3, 3, 5, 1, 1]
+```
+
+* output sample
+
+```zsh
+not_direct_reachable = -2, direct_reachable = -1, not_sure = 0, >0 means min_cn to satisfy direct reachable 
+
+1. after prune, min_cn_lst: [-1, 0, 3, 3, 3, 0, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 3, 0, 3, 3, 4, 0, 3, 3, 0, 0, 3, 0, 0, 0, -2, -2, 0, 0]
+2.1 after check core 1st bsp, min_cn_lst : [-1, 0, -1, -1, -1, 0, -1, -1, 0, 0, -1, 0, 0, 0, -2, 0, -2, 0, -1, -1, -1, 0, -1, -1, 0, 0, -1, 0, 0, 0, -2, -2, 0, 0]
+2.2 after check core 2nd bsp, min_cn_lst: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2]
+2.2 after check core 2nd bsp, similar_degree_lst: [1, 4, 3, 3, 3, 0, 3, 3, 3, 3, 0, 0]
+2.2 after check core 2nd bsp, cores: [1, 2, 3, 4, 6, 7, 8, 9]
+3. after cluster core, disjoint set - parent dict: {0: 0, 1: 1, 2: 1, 3: 1, 4: 1, 5: 5, 6: 6, 7: 6, 8: 6, 9: 6, 10: 10, 11: 11}
+4. after cluster non-core mark cluster id, cluster(represented by root vertex), min ele id: {1: 1, 6: 6}
+
+final result in format: core/non-core vertex id cluster id(min core vertex id in this cluster)
+c/n vertex_id cluster_id
+c 1 1
+c 2 1
+c 3 1
+c 4 1
+c 6 6
+c 7 6
+c 8 6
+c 9 6
+n 0 1
+```
 
 ## Algorithm Components
 
@@ -155,8 +194,6 @@ def mark_cluster_min_ele_as_id(self):
             x = self.disjoint_set.find_root(i)
             if i < self.cluster_dict[x]:
                 self.cluster_dict[x] = i
-    # print 'disjoint set root dict:', self.cluster_dict
-    pass
 
 
 # 4th: cluster non-cores
