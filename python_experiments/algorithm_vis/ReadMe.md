@@ -58,7 +58,64 @@ n 0 1
 
 ## Algorithm Status Visual Aids
 
+edge property meaning
 
+meaning | value
+--- | ---
+not_direct_reachable | `-2`
+direct_reachable | `-1`
+not_sure | `0 `
+min_cn to satisfy direct reachable | `> 0`, e.g, `3`
+
+* input
+
+![demo_input_graph.png](demo_input_graph.png)
+
+```python
+min_cn_lst=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+```
+
+* after pruning
+
+![after_pruning_graph.png](after_pruning_graph.png)
+
+```python
+min_cn_lst=[-1, 0, 3, 3, 3, 0, 3, 3, 0, 0, 3, 0, 0, 0, 3, 0, 3, 0, 3, 3, 4, 0, 3, 3, 0, 0, 3, 0, 0, 0, -2, -2, 0, 0]
+```
+
+* after check core 1st bsp
+
+![after_check_core_1st_bsp_graph.png](after_check_core_1st_bsp_graph.png)
+
+```python
+min_cn_lst=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1,
+              -1, -1, -1, -1, -2, -2, -2, -2]
+```
+
+* after check core 2nd bsp
+
+![after_check_core_2nd_bsp_graph.png](after_check_core_2nd_bsp_graph.png)
+
+```python
+min_cn_lst=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1,
+              -1, -1, -1, -1, -2, -2, -2, -2]
+similar_degree_lst = [1, 4, 3, 3, 3, 0, 3, 3, 3, 3, 0, 0]              
+```
+
+* cluster core
+
+connected component:
+
+```zsh
+[1, 2, 3, 4]
+[6, 7, 8, 9]
+```
+
+* cluster non-core
+
+```zsh
+0 belongs to cluster [1, 2, 3, 4], represented by 1
+```
 
 ## Algorithm Components in Detail
 
