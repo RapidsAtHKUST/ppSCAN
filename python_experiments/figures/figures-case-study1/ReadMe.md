@@ -119,6 +119,20 @@ pscan+/pscan runtime | 2.2760 | 1.3215 | 1.1168 | 1.1224 | 1.1582 | 1.2213 | 1.2
 
 ## Large: Fridenster
 
+workload | runtime
+--- | ---
+![friendster-workload](../workload/snap_friendster-min_pts:5-workload.png) | ![friendster-runtime](../workload/snap_friendster-min_pts:5-runtime.png)
+
+tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
+--- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+prune0 definitely not reachable | 0.0072 | 0.0471 | 0.1206 | 0.2231 | 0.3458 | 0.4812 | 0.6192 | 0.7544 | 0.8818
+prune1 definitely reachable | 0.0243 | 0.0068 | 0.0030 | 0.0016 | 0.0010 | 0.0004 | 0.0002 | 0.0001 | 0.0000
+pscan eval number | 0.7487 | 0.9163 | 0.8566 | 0.7546 | 0.6329 | 0.4989 | 0.3619 | 0.2277 | 0.1017
+pscan+ eval number | 0.9686 | 0.9461 | 0.8764 | 0.7753 | 0.6532 | 0.5184 | 0.3805 | 0.2455 | 0.1182
+serial pscan runtime | 4959.7340 | 4673.8800 | 3726.3020 | 2801.6070 | 2019.3340 | 1382.4930 | 881.8610 | 509.7330 | 245.7020
+serial pscan+ runtime | 5842.4790 | 4857.3320 | 3862.6940 | 2971.0850 | 2203.1410 | 1593.2370 | 1120.5860 | 813.1940 | 622.2720
+pscan+/pscan eval | 1.2937 | 1.0326 | 1.0231 | 1.0274 | 1.0322 | 1.0391 | 1.0515 | 1.0779 | 1.1621
+pscan+/pscan runtime | 1.1780 | 1.0393 | 1.0366 | 1.0605 | 1.0910 | 1.1524 | 1.2707 | 1.5953 | 2.5326
 
 ## LFR: 10million-avgdeg15-maxdeg50
 
