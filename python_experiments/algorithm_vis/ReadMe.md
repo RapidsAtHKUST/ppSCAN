@@ -13,9 +13,11 @@ modify this line to use different `eps` and `min_pts`
 ```python
 pscan_algo = PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3)
 ```
-## Algorithm Example
+## Algorithm I/O Example
 
-* input file: [demo_input_graph.txt](demo_input_graph.txt)
+* input 
+
+file: [demo_input_graph.txt](demo_input_graph.txt)
 
 ![demo input graph](demo_input_graph.png)
 
@@ -28,7 +30,7 @@ dst_v_lst = [1, 0, 2, 3, 4, 1, 3, 4, 1, 2, 4, 1, 2, 3, 5, 4, 6,
 deg_lst = [1, 4, 3, 3, 4, 2, 4, 3, 3, 5, 1, 1]
 ```
 
-* output sample
+* output 
 
 ```zsh
 not_direct_reachable = -2, direct_reachable = -1, not_sure = 0, >0 means min_cn to satisfy direct reachable 
@@ -54,7 +56,11 @@ c 9 6
 n 0 1
 ```
 
-## Algorithm Components
+## Algorithm Status Visual Aids
+
+
+
+## Algorithm Components in Detail
 
 ### 1. Prune
 
