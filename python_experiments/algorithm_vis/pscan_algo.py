@@ -1,24 +1,8 @@
 import math
 import networkx as nx
-import matplotlib.pyplot as plt
 from itertools import chain
 
 from disjoint_set import DisjointSet
-
-
-def vis_input(graph):
-    """
-    :type graph: nx.Graph
-    """
-    pos = nx.circular_layout(graph)
-    nx.draw(graph, with_labels=True, pos=pos, font_size=16, node_size=700, alpha=1, width=4,
-            node_color='black')
-    nx.draw(graph, with_labels=True, pos=pos, font_size=16, node_size=600, alpha=1, width=4,
-            edge_color='grey', node_color='white')
-
-    plt.axis('off')
-    plt.savefig('./demo_input_graph.png', bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
 
 
 # pre-processing, neighbors should be sorted
@@ -71,14 +55,18 @@ class PScan:
         self.cluster_dict = [self.n] * self.n
         self.non_core_cluster = []
 
-        # statistics
+        # 1. statistics for prune
         self.prune0 = 0  # definitely not reachable
         self.prune1 = 0  # definitely reachable
 
+        # 2.1 statistics for check core 1st bsp: set intersection with early stop
         self.intersect = 0
         self.cmp0 = 0
         self.cmp1 = 0
         self.cmp_equ = 0
+
+        # 2.2 statistics for check core 2nd bsp: binary search
+        self.binary_search_call = 0
 
         self.result_lines = []
 
@@ -141,13 +129,13 @@ class PScan:
             if self.min_cn_lst[edge_idx] > 0 and u <= self.dst_v_lst[edge_idx]:
                 self.min_cn_lst[edge_idx] = self.eval_density(u, edge_idx)
 
-    @staticmethod
-    def binary_search(array, offset_beg, offset_end, val):
+    def binary_search(self, array, offset_beg, offset_end, val):
+        self.binary_search_call += 1
         mid = (offset_beg + offset_end) / 2
         if array[mid] == val:
             return mid
-        return PScan.binary_search(array, offset_beg, mid, val) if val < array[mid] \
-            else PScan.binary_search(array, mid + 1, offset_end, val)
+        return self.binary_search(array, offset_beg, mid, val) if val < array[mid] \
+            else self.binary_search(array, mid + 1, offset_end, val)
 
     # 2nd: check core 2nd bsp computation
     def check_core_2nd_bsp(self, u):
@@ -155,7 +143,7 @@ class PScan:
             v = self.dst_v_lst[edge_idx]
             if u > v:
                 self.min_cn_lst[edge_idx] = self.min_cn_lst[
-                    PScan.binary_search(self.dst_v_lst, self.offset_lst[v], self.offset_lst[v + 1], u)]
+                    self.binary_search(self.dst_v_lst, self.offset_lst[v], self.offset_lst[v + 1], u)]
             if self.min_cn_lst[edge_idx] == PScan.direct_reachable:
                 self.similar_degree_lst[u] += 1
 
@@ -229,17 +217,13 @@ class PScan:
         # finally, output result
         print '\n', '\t'.join(['core/non-core', 'vertex id', 'cluster id(min core vertex id in this cluster)']), '\n'
         self.result_lines.append('c/n vertex_id cluster_id')
+        print 'c/n vertex_id cluster_id'
         self.output_result()
 
 
 if __name__ == '__main__':
     graph = nx.read_edgelist('demo_input_graph.txt', nodetype=int)
-    # vis_input(graph)
-    to_csr_graph(graph)
     offset_lst, dst_v_lst, deg_lst = to_csr_graph(graph)
-    print 'offset_lst:', offset_lst, '\ndst_v_lst:', dst_v_lst, '\ndeg_lst:', deg_lst
+
     pscan_algo = PScan(offset_lst, dst_v_lst, deg_lst, eps=0.6, min_pts=3)
     pscan_algo.run_algorithm()
-    print '<br/>'.join(pscan_algo.result_lines)
-    print 'statistics:', pscan_algo.prune0, pscan_algo.prune1, pscan_algo.intersect, len(pscan_algo.dst_v_lst) / 2
-    print 'statistics:', pscan_algo.intersect, pscan_algo.cmp0, pscan_algo.cmp1, pscan_algo.cmp_equ
