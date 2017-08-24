@@ -35,7 +35,7 @@ computation and io portion
 
 with 40 full logical threads | with best thread num
 --- | ---
-![portion with full logical threads](../scalability_overview/eps:0.3-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition](../scalability_overview/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
+![portion with full logical threads](../scalability_overview/eps:0.3-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition](../scalability_overview/eps:0.3-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
 
 with 40 full logical threads | with best thread num
 --- | ---
