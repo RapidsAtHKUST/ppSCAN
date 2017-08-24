@@ -114,6 +114,7 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
 
     #  draw speedup
     plt.xlabel('real-world data set', fontdict=font)
+    plt.ylim([-0.3, 5.0])
     plt.xticks(range(1, len(data_set_name_lst) + 1), data_set_name_lst, rotation=20)
     plt.ylabel('portion', fontdict=font)
     plt.legend(['total comp time', 'parallel part time', 'serial part time', 'input time', 'output time'])
