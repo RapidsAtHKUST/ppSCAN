@@ -2,6 +2,20 @@
 
 parameter setting: `min_pts:5`, varying `eps`
 
+green triangle: pscan+ eval number
+
+read square: pscan eval number
+
+## Observations
+
+* eps from `0.3` to `0.8`, `pscan+/pscan runtime` is within 2, in all experimental datasets
+
+* eps `0.1`, `0.2`, except webbase, uk, twitter, `pscan+/pscan runtime` is within 2
+
+* eps `0.9`, workload is not heavy at all, due to the effect of pruning 0, definitely not reachable
+
+* in all except lfr graph, from eps `0.2` to larger, workload and runtime decreases, lfr from eps `0.5` to larger,
+
 ## Small: Dblp
 
 workload | runtime
