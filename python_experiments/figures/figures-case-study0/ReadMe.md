@@ -29,6 +29,27 @@ pscan+ | 23.422 | 67.641 | 101.258 | 264.468 | 146.264 | **88.889** | 1849.282 |
 
 * parallel prune speedup scales well vertically
 
+## Speedup Overview
+
+with 40 full logical threads | with best thread num
+--- | ---
+![with full logical threads](../scalability_overview/eps:0.3-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num](../scalability_overview/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
+
+```zsh
+best performance thread_num_lst: [16, 32, 40, 40, 40, 32, 40, 40]
+```
+
+dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
+--- | --- | --- | --- | --- | ---
+dblp | 2,099,732 | 0.555s | **2.656** | **4.173** | 16
+pokec | 30,282,866 | 8.597s | 9.234 | 9.792 | 32
+livejournal | 69,362,378 | 21.846s | 9.561 | 9.561 | 40
+orkut | 234,370,166 | 164.248s | 16.836 | 16.836 | 40
+uk | 301,136,554 | 18.498s | **4.769** | 4.769 | 40
+webbase | 1,050,026,736 | 63.705s | **2.372** | **4.632** | 32
+twitter | 1,369,000,750 | 2487.317s | 19.218 | 19.218 | 40
+friendster | 3,612,134,270 | 3726.302s | 22.067 | 22.067 | 40
+
 ## Small: Dblp
 
 name | n | m 
