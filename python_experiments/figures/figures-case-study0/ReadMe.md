@@ -31,6 +31,12 @@ pscan+ | 23.422 | 67.641 | 101.258 | 264.468 | 146.264 | **88.889** | 1849.282 |
 
 ## Speedup Overview
 
+computation and io portion
+
+with 40 full logical threads | with best thread num
+--- | ---
+![portion with full logical threads](../scalability_overview/eps:0.3-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition](../scalability_overview/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads](../scalability_overview/eps:0.3-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num](../scalability_overview/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
