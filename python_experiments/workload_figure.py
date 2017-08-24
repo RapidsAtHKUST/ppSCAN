@@ -115,7 +115,7 @@ def display_workload_runtime(eps_lst, display_lst, title_append_txt=''):
               if title_append_txt != '' else 'Workload portion', fontdict=font)
     plt.xlabel('eps', fontdict=font)
     plt.ylabel('portion', fontdict=font)
-
+    plt.ylim([-0.1, 1.1])
     os.system('mkdir -p ./figures/workload')
     plt.savefig('./figures/workload' + os.sep + title_append_txt.replace(' ', '') + '-' + 'workload.png',
                 bbox_inches='tight', pad_inches=0, transparent=True)
