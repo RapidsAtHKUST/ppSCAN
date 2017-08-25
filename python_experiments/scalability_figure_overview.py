@@ -97,7 +97,7 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
     # init parameters
     filtered_lst = recal_for_bar_char([portion_lst_lst[3], portion_lst_lst[4], portion_lst_lst[1], portion_lst_lst[2]])
 
-    shape_color_lst = ['g', 'c', 'y', 'r']
+    shape_color_lst = ['y', 'r', 'g', 'c']
     hatch_lst = ['\\\\\\', '////', '----', '||||']
 
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
@@ -107,12 +107,10 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
 
     cur_shape_color_idx = 0
     for portion_lst in filtered_lst:
-        # partially bind parameters
         plt.bar(range(1, len(data_set_name_lst) + 1), portion_lst, color=shape_color_lst[cur_shape_color_idx],
                 hatch=hatch_lst[cur_shape_color_idx])
         cur_shape_color_idx += 1
 
-    # draw speedup
     plt.xlabel('real-world data set', fontdict=font)
     plt.ylim([0.0, 10.0])
     plt.xticks(range(1, len(data_set_name_lst) + 1), data_set_name_lst, rotation=20)

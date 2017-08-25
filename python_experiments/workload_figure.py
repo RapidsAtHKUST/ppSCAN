@@ -153,7 +153,7 @@ def display_runtime(eps_lst, display_lst, title_append_txt=''):
     plt.show()
 
 
-if __name__ == '__main__':
+def case_study0():
     # case study 0
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
@@ -164,9 +164,15 @@ if __name__ == '__main__':
     min_pts = 5
     root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod'
     case_study_fix_eps_min_pts(data_set_lst, eps, min_pts, root_dir_path)
-
-    # case study 1
     print
+
+
+def case_study1():
+    # case study 1
+    eps = 0.3
+    min_pts = 5
+    root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod'
+
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
@@ -179,3 +185,8 @@ if __name__ == '__main__':
         append_txt = ' - '.join([data_set, 'min_pts:' + str(min_pts)])
         display_workload_runtime(parameter_eps_lst, display_lst, title_append_txt=append_txt)
         display_runtime(parameter_eps_lst, display_lst, title_append_txt=append_txt)
+
+
+if __name__ == '__main__':
+    case_study0()
+    case_study1()
