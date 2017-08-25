@@ -46,8 +46,6 @@ def get_statistics(dataset, eps, min_pts, root_folder='.'):
     dir_path = os.sep.join([root_folder, 'scalability', dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
     pscan_time = workload_figure.get_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
         workload_figure.runtime_tag + workload_figure.pscan_tag]
-    pscan_plus_runtime = workload_figure.get_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
-        workload_figure.runtime_tag + workload_figure.pscan_plus_tag]
 
     for root, dirs, files in os.walk(dir_path):
         for file in files:
@@ -62,7 +60,7 @@ def get_statistics(dataset, eps, min_pts, root_folder='.'):
 # display 0: overall time cost in five phases
 def display_overview(statistics_dic, title_append_txt=''):
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
-                non_core_cluster_time_tag, total_time_tag, pscan_runtime_tag]
+                non_core_cluster_time_tag, pscan_runtime_tag]
 
     def post_process():
         sorted_info_lst = sorted(statistics_dic.items(), key=lambda pair: pair[0])
@@ -77,15 +75,12 @@ def display_overview(statistics_dic, title_append_txt=''):
 
     # draw after get data, with partial binding technique
     thread_lst, time_lst_lst = post_process()
-    shape_color_lst = ['bo', 'g^', 'r*', 'c<', 'y>', 'mx', 'k--']
-    prev_partial_func = plt.plot
+    shape_color_lst = ['b', 'g', 'r', 'c', 'y', 'm', 'k--']
     cur_shape_color_idx = 0
-    for time_lst in time_lst_lst:
-        # partially bind parameters
-        prev_partial_func = partial(prev_partial_func, thread_lst, map(lambda integer: float(integer) / 1000, time_lst),
-                                    shape_color_lst[cur_shape_color_idx])
+    for time_lst in time_lst_lst[:-1]:
+        plt.bar(thread_lst, map(lambda integer: float(integer) / 1000, time_lst), width=0.9,
+                color=shape_color_lst[cur_shape_color_idx])
         cur_shape_color_idx += 1
-    prev_partial_func()
 
     plt.legend(tag_list)
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
@@ -96,8 +91,7 @@ def display_overview(statistics_dic, title_append_txt=''):
 
     os.system('mkdir -p ./figures/scalability')
     plt.savefig('./figures/scalability' + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png',
-                bbox_inches='tight',
-                pad_inches=0, transparent=True)
+                bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
 
@@ -112,15 +106,13 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
         time_info_lst = map(lambda pair: pair[1], sorted_info_lst)
 
         tag_time_lst_lst = map(lambda tag: (tag, map(lambda my_dict: my_dict[tag], time_info_lst)), filtered_tag_list)
-        # print 'thread list:', thread_lst
-        # print 'tag time info list:', tag_time_lst_lst
         return thread_lst, tag_time_lst_lst
 
     # init parameters
     thread_lst, tag_time_lst_lst = post_process()
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
                 non_core_cluster_time_tag, total_time_tag]
-    shape_color_lst = ['bo', 'g^', 'r*', 'c<', 'y>', 'mx']
+    shape_color_lst = ['bo-', 'g^-', 'rs-', 'c<-', 'y>-', 'mx-']
     shape_color_dict = dict(zip(tag_list, shape_color_lst))
 
     # 1st: draw runtime
@@ -129,6 +121,8 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
         # partially bind parameters
         prev_partial_func = partial(prev_partial_func, thread_lst, map(lambda time: float(time) / 1000, time_lst),
                                     shape_color_dict[tag])
+        # prev_partial_func = partial(prev_partial_func, thread_lst, map(lambda time: float(time) / 1000, time_lst),
+        #                             shape_color_dict2[tag])
     plt.subplot(211)
     prev_partial_func()
 

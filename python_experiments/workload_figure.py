@@ -95,7 +95,7 @@ def display_workload_runtime(eps_lst, display_lst, title_append_txt=''):
                 display_prune0_tag, display_prune1_tag]
 
     # draw after get data, with partial binding technique
-    shape_color_lst = ['g^', 'rs', 'c<', 'y>', 'mx', 'k--']
+    shape_color_lst = ['g^-', 'rs-', 'c<-', 'y>-', 'mx-', 'k--']
     prev_partial_func = plt.plot
     cur_shape_color_idx = 0
 
@@ -126,7 +126,7 @@ def display_runtime(eps_lst, display_lst, title_append_txt=''):
     tag_list = [display_pscan_plus_runtime_tag, display_pscan_runtime_tag]
 
     # draw after get data, with partial binding technique
-    shape_color_lst = ['mx', 'k--']
+    shape_color_lst = ['mx-', 'k--']
     prev_partial_func = plt.plot
     cur_shape_color_idx = 0
 

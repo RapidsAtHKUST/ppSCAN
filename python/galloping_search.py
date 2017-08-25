@@ -15,12 +15,12 @@ def binary_search2(array, beg, end, val):
     # beg <= mid < end
     mid = (beg + end) / 2
     if array[mid] == val:
-        return mid
+        return True, mid
     elif array[mid] < val:
-        return mid if mid + 1 == end else binary_search2(array, mid + 1, end, val)
+        return (False, mid) if mid + 1 == end else binary_search2(array, mid + 1, end, val)
     else:
         if mid == beg:
-            return beg
+            return False, beg
         return binary_search2(array, beg, mid, val)
 
 
