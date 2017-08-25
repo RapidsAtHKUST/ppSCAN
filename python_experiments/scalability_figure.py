@@ -57,6 +57,13 @@ def get_statistics(dataset, eps, min_pts, root_folder='.'):
     return info_dict
 
 
+def recal_for_bar_char(filtered_lst):
+    for idx in xrange(len(filtered_lst)):
+        for idx2 in xrange(idx + 1, len(filtered_lst)):
+            filtered_lst[idx] = map(lambda pair: sum(pair), zip(filtered_lst[idx], filtered_lst[idx2]))
+    return filtered_lst
+
+
 # display 0: overall time cost in five phases
 def display_overview(statistics_dic, title_append_txt=''):
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
@@ -75,15 +82,21 @@ def display_overview(statistics_dic, title_append_txt=''):
 
     # draw after get data, with partial binding technique
     thread_lst, time_lst_lst = post_process()
-    shape_color_lst = ['b', 'g', 'r', 'c', 'y', 'm', 'k--']
-    hatch_lst = ['', '\\\\', '----', '||||', '////']
+
+    # bar charts
+    shape_color_lst = ['b', 'g', 'r', 'c', 'y', 'm']
+    hatch_lst = ['', '\\\\\\', '////', '----', '||||']
     cur_shape_color_idx = 0
-    for time_lst in time_lst_lst[:-1]:
-        plt.bar(thread_lst, map(lambda integer: float(integer) / 1000, time_lst), width=0.9,
+
+    filtered_lst = recal_for_bar_char(time_lst_lst[:-1])
+    plt.plot(thread_lst, map(lambda integer: float(integer) / 1000, time_lst_lst[-1]), 'k--')
+    for time_lst in filtered_lst:
+        plt.bar(thread_lst, map(lambda integer: float(integer) / 1000, time_lst),
                 color=shape_color_lst[cur_shape_color_idx], hatch=hatch_lst[cur_shape_color_idx])
         cur_shape_color_idx += 1
 
-    plt.legend(tag_list)
+    plt.legend([tag_list[-1]] + tag_list[:-1])
+
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
     plt.title('Time cost overview\n' + title_append_txt if title_append_txt != '' else 'Time cost overview',
               fontdict=font)

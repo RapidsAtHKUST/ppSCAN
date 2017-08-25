@@ -10,24 +10,22 @@ def format_str(float_num):
 def display_speedup(edge_num_portion_lst, pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst,
                     data_set_name_lst, title_append_txt=''):
     # init parameters
-    shape_color_lst = ['k--', 'mx']
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
     plt.title(
         'Computation speedup over different datasets\n' + title_append_txt if title_append_txt != ''
         else 'Computation speedup over different datasets', fontdict=font)
 
     #  draw speedup
-    pscan_speedup = [1 for _ in xrange(len(edge_num_portion_lst))]
     psca_plus_speedup = map(lambda pair: pair[0] / pair[1],
                             zip(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst))
-    plt.plot(edge_num_portion_lst, pscan_speedup, shape_color_lst[0])
-    plt.plot(edge_num_portion_lst, psca_plus_speedup, shape_color_lst[1])
+    plt.bar(edge_num_portion_lst, psca_plus_speedup, color='m')
 
     plt.xlabel('real-world data set', fontdict=font)
     plt.xticks(edge_num_portion_lst, data_set_name_lst, rotation=20)
     plt.ylabel('speedup', fontdict=font)
-    plt.legend(['pscan serial', 'pscan+ parallel'])
+    plt.legend(['parallel pscan+ speedup over serial pscan'])
 
+    plt.ylim([0.0, 25.0])
     plt.savefig('./figures/scalability_overview' + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'runtime-speedup.png', bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
@@ -97,36 +95,36 @@ def to_portion_lst(info_lst, input_time_lst, output_time_lst):
 
 def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt=''):
     # init parameters
-    shape_color_lst = ['mx', 'g^', 'bv', 'k+', 'ko']
+    filtered_lst = recal_for_bar_char([portion_lst_lst[3], portion_lst_lst[4], portion_lst_lst[1], portion_lst_lst[2]])
+
+    shape_color_lst = ['g', 'c', 'y', 'r']
+    hatch_lst = ['\\\\\\', '////', '----', '||||']
+
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
     plt.title(
         'Computation and I/O portition over different datasets\n' + title_append_txt if title_append_txt != ''
         else 'Computation and I/O portition over different datasets', fontdict=font)
 
-    prev_partial_func = plt.plot
     cur_shape_color_idx = 0
-    for portion_lst in portion_lst_lst:
+    for portion_lst in filtered_lst:
         # partially bind parameters
-        prev_partial_func = partial(prev_partial_func, range(1, len(data_set_name_lst) + 1), portion_lst,
-                                    shape_color_lst[cur_shape_color_idx])
+        plt.bar(range(1, len(data_set_name_lst) + 1), portion_lst, color=shape_color_lst[cur_shape_color_idx],
+                hatch=hatch_lst[cur_shape_color_idx])
         cur_shape_color_idx += 1
-    prev_partial_func()
 
-    #  draw speedup
+    # draw speedup
     plt.xlabel('real-world data set', fontdict=font)
-    plt.ylim([-0.3, 5.0])
+    plt.ylim([0.0, 10.0])
     plt.xticks(range(1, len(data_set_name_lst) + 1), data_set_name_lst, rotation=20)
     plt.ylabel('portion', fontdict=font)
-    plt.legend(['total comp time', 'parallel part time', 'serial part time', 'input time', 'output time'])
+    plt.legend(['input time', 'output time', 'parallel part time', 'serial part time'])
 
     plt.savefig('./figures/scalability_overview' + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'comp-io-portion.png', bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
 
-if __name__ == '__main__':
-    # illustrate_speedup()
-
+def illustrate_comp_io_portion():
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
@@ -168,3 +166,8 @@ if __name__ == '__main__':
     append_txt = ' - '.join(['eps:0.3', 'min_pts:5', 'with best logical thread num'])
     zipped_lst = to_portion_lst(best_info_lst, input_time_lst, output_time_lst)
     display_comp_io_portion(zipped_lst, map(lambda my_str: my_str.split('_')[-1], data_set_lst), append_txt)
+
+
+if __name__ == '__main__':
+    illustrate_speedup()
+    illustrate_comp_io_portion()
