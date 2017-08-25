@@ -76,10 +76,11 @@ def display_overview(statistics_dic, title_append_txt=''):
     # draw after get data, with partial binding technique
     thread_lst, time_lst_lst = post_process()
     shape_color_lst = ['b', 'g', 'r', 'c', 'y', 'm', 'k--']
+    hatch_lst = ['', '\\\\', '----', '||||', '////']
     cur_shape_color_idx = 0
     for time_lst in time_lst_lst[:-1]:
         plt.bar(thread_lst, map(lambda integer: float(integer) / 1000, time_lst), width=0.9,
-                color=shape_color_lst[cur_shape_color_idx])
+                color=shape_color_lst[cur_shape_color_idx], hatch=hatch_lst[cur_shape_color_idx])
         cur_shape_color_idx += 1
 
     plt.legend(tag_list)
