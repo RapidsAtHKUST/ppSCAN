@@ -127,8 +127,10 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     auto tmp1 = 0;
 #endif
 
+    auto offset_nei_u_end = out_edge_start[u + 1];
+    auto offset_nei_v_end = out_edge_start[v + 1];
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
+         offset_nei_u < offset_nei_u_end && offset_nei_v < offset_nei_v_end &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;

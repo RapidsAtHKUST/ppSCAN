@@ -49,6 +49,12 @@ orkut | 32->40, check core 2nd phase bsp slower
 
 * pokec, livejournal, orkut: maybe the same, we are required to assign tasks based on real work load, considering pruning, different degree of vertices, different degree of dst vertices
 
+### Trade-off Problem
+
+* Task too large: load imbalance, cache locality issue
+
+* Task too small: system call overheads, queue access concurrency issue, memory cost for more function objects(maybe okay)
+
 ## Speedup Overview
 
 computation and io portion
