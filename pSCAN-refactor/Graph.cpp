@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <numeric>
 
 #include "playground/pretty_print.h"
 
@@ -264,17 +265,41 @@ void Graph::pSCAN() {
     auto thread_num = std::thread::hardware_concurrency();
 
     {
-        ThreadPool pool(thread_num);
+//        ThreadPool pool(thread_num);
 
-        auto batch_size = 64u;
+        auto batch_size = 1u;
+        workload_lst.reserve(n);
+        auto max = 0ul;
+        auto max_u = -1;
+        auto total = 0ul;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-            }, my_start, my_end);
+            auto tmp_sum = 0ul;
+            for (auto v_idx = my_start; v_idx < my_end; v_idx++) {
+                auto cmp0 = degree[v_idx] - 1;
+                for (auto edge_idx = out_edge_start[v_idx]; edge_idx < out_edge_start[v_idx + 1]; edge_idx++) {
+                    auto dst_idx = out_edges[edge_idx];
+                    if (v_idx < dst_idx && min_cn[edge_idx] > 0) {
+                        tmp_sum += cmp0 + degree[dst_idx];
+                    }
+                }
+            }
+            if (tmp_sum > max) {
+                max = tmp_sum;
+                max_u = v_i;
+            }
+            workload_lst.emplace_back(tmp_sum);
+            total += tmp_sum;
+//            pool.enqueue([this](int i_start, int i_end) {
+//                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+//            }, my_start, my_end);
         }
+        cout << max << endl;
+        cout << degree[max_u] << endl;
+        cout << total << endl;
     }
+    return;
     auto first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";

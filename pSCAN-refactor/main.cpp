@@ -41,10 +41,10 @@ int main(int argc, char *argv[]) {
         cout << "Total time without IO:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
         // Output
-        io_start = high_resolution_clock::now();
-        if (argc >= 5 && strcmp(argv[4], "output") == 0) { graph->Output(argv[2], argv[3]); }
-        io_end = high_resolution_clock::now();
-        cout << "Total output cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n\n";
+//        io_start = high_resolution_clock::now();
+//        if (argc >= 5 && strcmp(argv[4], "output") == 0) { graph->Output(argv[2], argv[3]); }
+//        io_end = high_resolution_clock::now();
+//        cout << "Total output cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n\n";
     }
     return 0;
 }
