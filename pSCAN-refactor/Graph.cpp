@@ -265,41 +265,56 @@ void Graph::pSCAN() {
     auto thread_num = std::thread::hardware_concurrency();
 
     {
-//        ThreadPool pool(thread_num);
+        auto task_count = 0u;
+        ThreadPool pool(thread_num);
 
-        auto batch_size = 1u;
-        workload_lst.reserve(n);
-        auto max = 0ul;
-        auto max_u = -1;
-        auto total = 0ul;
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
-            auto tmp_sum = 0ul;
-            for (auto v_idx = my_start; v_idx < my_end; v_idx++) {
-                auto cmp0 = degree[v_idx] - 1;
-                for (auto edge_idx = out_edge_start[v_idx]; edge_idx < out_edge_start[v_idx + 1]; edge_idx++) {
+        // 50,000,000
+        if (min_cn.size() > 50000000) {
+            // medium, large datasets
+            // > 1000,000,000 large datsets, `min_cn.size() / n < 20`: non-social-network
+            auto threshold_sum =
+                    min_cn.size() < 1000000000 ? 1024 * 16 : (min_cn.size() / n < 20 ? 64 * 1024 : 1024 * 32);
+
+            auto prev_start = 0;
+            int cur_end;
+            for (auto v_i = 0; v_i < n; ++v_i) {
+                cur_end = v_i + 1;
+
+                auto tmp_sum = 0u;
+                auto cmp0 = degree[v_i];
+                for (auto edge_idx = out_edge_start[v_i]; edge_idx < out_edge_start[v_i + 1]; edge_idx++) {
                     auto dst_idx = out_edges[edge_idx];
-                    if (v_idx < dst_idx && min_cn[edge_idx] > 0) {
+                    if (v_i < dst_idx && min_cn[edge_idx] > 0) {
                         tmp_sum += cmp0 + degree[dst_idx];
                     }
                 }
+
+                if (tmp_sum > threshold_sum) {
+                    pool.enqueue([this](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+                    }, prev_start, cur_end);
+
+                    prev_start = cur_end;
+                    ++task_count;
+                }
             }
-            if (tmp_sum > max) {
-                max = tmp_sum;
-                max_u = v_i;
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+            }, prev_start, cur_end);
+            cout << "total task count:" << task_count << endl;
+        } else {
+            // small datasets
+            auto batch_size = 256u;
+            for (auto v_i = 0; v_i < n; v_i += batch_size) {
+                int my_start = v_i;
+                int my_end = min(n, my_start + batch_size);
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+                }, my_start, my_end);
             }
-            workload_lst.emplace_back(tmp_sum);
-            total += tmp_sum;
-//            pool.enqueue([this](int i_start, int i_end) {
-//                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-//            }, my_start, my_end);
         }
-        cout << max << endl;
-        cout << degree[max_u] << endl;
-        cout << total << endl;
     }
-    return;
+
     auto first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
