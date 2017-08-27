@@ -7,6 +7,8 @@
 * scalability experiment: see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
  on 9 graphs.
 
+* scalability robust scheduling experiment: see [figures/figures-case-study2-robust](figures/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
+
 * workload/serial-runtime experiment: see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
 
 ## Observation

@@ -20,7 +20,8 @@ def pretty_print(thread_lst, time_lst):
 
 
 if __name__ == '__main__':
-    with open('scalability_vis_middle_res.txt') as ifs:
+    file_name = 'scalability_robust_vis_res.txt'
+    with open(file_name) as ifs:
         lines = ifs.readlines()
         thread_lst_lst = map(lambda my_str: eval(my_str.split(':')[-1]),
                              filter(lambda line: 'thread list:' in line, lines))

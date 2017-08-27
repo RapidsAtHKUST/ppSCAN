@@ -32,7 +32,7 @@ if __name__ == '__main__':
                     # statistics output dir and file
                     data_set_name = data_set_path.split(os.sep)[-1]
                     statistics_dir = os.sep.join(
-                        map(str, ['.', 'scalability', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
+                        map(str, ['.', 'scalability_robust', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
                     os.system('mkdir -p ' + statistics_dir)
                     statistics_file_path = statistics_dir + os.sep + '-'.join(
                         map(str, ['output', data_set_name, eps, min_pts, thread_num])) + '.txt'

@@ -43,7 +43,7 @@ def parse_lines(lines):
 
 def get_statistics(dataset, eps, min_pts, root_folder='.'):
     info_dict = dict()
-    dir_path = os.sep.join([root_folder, 'scalability', dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
+    dir_path = os.sep.join([root_folder, 'scalability_robust', dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
     pscan_time = workload_figure.get_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
         workload_figure.runtime_tag + workload_figure.pscan_tag]
 
@@ -77,7 +77,10 @@ def display_overview(statistics_dic, title_append_txt=''):
 
         time_lst_lst = map(lambda tag: map(lambda my_dict: my_dict[tag], time_info_lst), tag_list)
         print 'thread list:', thread_lst
-        print 'time info list:', time_lst_lst
+        new_lst = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
+                   non_core_cluster_time_tag, total_time_tag]
+
+        print 'time info list:', map(lambda tag: map(lambda my_dict: my_dict[tag], time_info_lst), new_lst)
         return thread_lst, time_lst_lst
 
     # draw after get data, with partial binding technique
@@ -103,8 +106,8 @@ def display_overview(statistics_dic, title_append_txt=''):
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('time (s)', fontdict=font)
 
-    os.system('mkdir -p ./figures/scalability')
-    plt.savefig('./figures/scalability' + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png',
+    os.system('mkdir -p ./figures/' + figure_folder)
+    plt.savefig('./figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png',
                 bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
@@ -163,9 +166,10 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     plt.ylabel('speedup', fontdict=font)
     plt.ylim([0, 27.0])
     # show the whole runtime/speedup figure
-    os.system('mkdir -p ./figures/scalability')
-    plt.savefig('./figures/scalability' + os.sep + title_append_txt.replace(' ', '') + '-' + 'runtime-speedup.png',
-                bbox_inches='tight', pad_inches=0, transparent=True)
+    os.system('mkdir -p ./figures/' + figure_folder)
+    plt.savefig(
+        './figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'runtime-speedup.png',
+        bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
 
@@ -173,9 +177,10 @@ if __name__ == '__main__':
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster',
+                    'webgraph_twitter',
                     '10million_avgdeg15_maxdeg50_Cdefault']
 
+    figure_folder = 'scalability_robust'
     for data_set in data_set_lst:
         time_info_dict = get_statistics(data_set, 0.3, 5,
                                         root_folder='/mnt/mount-gpu/d2/yche/projects/python_experiments')
