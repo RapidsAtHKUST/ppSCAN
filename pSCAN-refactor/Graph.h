@@ -40,6 +40,7 @@ private:
     // vertex properties
     vector<int> degree;
     vector<int> similar_degree;
+    vector<int> workload_lst;
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
