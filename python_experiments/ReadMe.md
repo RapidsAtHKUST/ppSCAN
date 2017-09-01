@@ -1,15 +1,19 @@
 # Experiments
 
-* algorithm introduction and visualization: see [algorithm_vis](algorithm_vis), with a toy case [demo_input_graph.txt](algorithm_vis/demo_input_graph.txt)
+category | detail
+--- | ---
+algorithm introduction and visualization | see [algorithm_vis](algorithm_vis), with a toy case [demo_input_graph.txt](algorithm_vis/demo_input_graph.txt)
+dataset description | see [dataset_description](dataset_description/ReadMe.md)
+scalability experiment | see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`.
+scalability robust scheduling experiment | see [figures/figures-case-study2-robust](figures/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
+workload/serial-runtime experiment | see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
 
-* dataset description: see [dataset_description](dataset_description/ReadMe.md)
+## Todo
 
-* scalability experiment: see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`
- on 9 graphs.
-
-* scalability robust scheduling experiment: see [figures/figures-case-study2-robust](figures/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
-
-* workload/serial-runtime experiment: see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
+* profile to summarize performance related issues
+* scalability experiments with different eps, from 0.1 to 0.9
+* implement complex logic(keep all pscan ideas) parallel version
+* compare to anySCAN and SCAN++, too 
 
 ## Observation
 

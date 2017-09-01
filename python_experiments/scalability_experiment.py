@@ -65,5 +65,5 @@ def scalability_exp():
 
 if __name__ == '__main__':
     # run 10 times and fetch the best result, to avoid machine status changes
-    for i in xrange(10):
+    for i in xrange(3):
         scalability_exp()

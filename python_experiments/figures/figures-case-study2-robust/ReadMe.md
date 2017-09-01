@@ -173,6 +173,8 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 32 | 1.71s | 130.77s | 8.241s | 0.81s | 1.014s | 142.547s | 20.782
 40 | 2.056s | 117.446s | 7.985s | 0.9s | 1.245s | 129.635s | 22.852
 
+## Large: Fridenster
+
 name | n | m 
 --- | --- | ---
 friendster  | 124,836,180   | 3,612,134,270
@@ -194,13 +196,13 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 
 ## LFR: 10million-avgdeg15-maxdeg50
 
-overview | speedup
---- | ---
-![lfr10million-avgdeg15-maxdeg50-overview](../scalability_robust/lfr_10million_avgdeg15-eps:0.3-min_pts:5-overview.png) | ![lfr10million-avgdeg15-maxdeg50-speedup](../scalability_robust/lfr_10million_avgdeg15-eps:0.3-min_pts:5-runtime-speedup.png)
-
 name | n | m
 --- | --- | --- 
 lfr-avg15-max50 | 10,000,001  | 152,826,874 
+
+overview | speedup
+--- | ---
+![lfr10million-avgdeg15-maxdeg50-overview](../scalability_robust/lfr_10million_avgdeg15-eps:0.3-min_pts:5-overview.png) | ![lfr10million-avgdeg15-maxdeg50-speedup](../scalability_robust/lfr_10million_avgdeg15-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
