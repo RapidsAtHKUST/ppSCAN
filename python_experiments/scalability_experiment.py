@@ -1,13 +1,14 @@
 import os
 import time
 
-if __name__ == '__main__':
+
+def scalability_exp():
     data_set_lst = ['small_snap_dblp',
                     'snap_livejournal', 'snap_orkut', 'snap_pokec',
                     'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
                     'webgraph_uk', 'webgraph_webbase',
                     'webgraph_twitter', 'snap_friendster']
-    parameter_eps_lst = [0.3]
+    parameter_eps_lst = [0.3, 0.2, 0.1]
     parameter_min_pts_lst = [5]
     thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
 
@@ -32,7 +33,8 @@ if __name__ == '__main__':
                     # statistics output dir and file
                     data_set_name = data_set_path.split(os.sep)[-1]
                     statistics_dir = os.sep.join(
-                        map(str, ['.', 'scalability_robust', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
+                        map(str,
+                            ['.', 'scalability_robust', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
                     os.system('mkdir -p ' + statistics_dir)
                     statistics_file_path = statistics_dir + os.sep + '-'.join(
                         map(str, ['output', data_set_name, eps, min_pts, thread_num])) + '.txt'
@@ -59,3 +61,9 @@ if __name__ == '__main__':
                         ifs.write(my_splitter + time.ctime() + my_splitter)
                         ifs.write('\n\n\n\n')
                     print 'finish:', '-'.join(map(str, [data_set_path, eps, min_pts, thread_num]))
+
+
+if __name__ == '__main__':
+    # run 10 times and fetch the best result, to avoid machine status changes
+    for i in xrange(10):
+        scalability_exp()

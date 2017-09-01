@@ -1,3 +1,30 @@
+## Speedup Overview
+
+computation and io portion
+
+with 40 full logical threads | with best thread num
+--- | ---
+![portion with full logical threads](../scalability_overview_robust/eps:0.3-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition](../scalability_overview_robust/eps:0.3-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
+with 40 full logical threads | with best thread num
+--- | ---
+![with full logical threads](../scalability_overview_robust/eps:0.3-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num](../scalability_overview_robust/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
+
+```zsh
+best performance thread_num_lst: [16, 32, 40, 40, 40, 32, 40, 40]
+```
+
+dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
+--- | --- | --- | --- | --- | ---
+dblp | 2,099,732 | 0.555s | 4.549 | 4.549 | 16
+pokec | 30,282,866 | 8.597s | 10.043 | 10.043 | 32
+livejournal | 69,362,378 | 21.846s | 8.367 | 8.759 | 40
+orkut | 234,370,166 | 164.248s | 16.340 | 16.340 | 40
+uk | 301,136,554 | 18.498s | 4.173 | 4.487 | 40
+webbase | 1,050,026,736 | 63.705s | 5.093 | 4.510 | 32
+twitter | 1,369,000,750 | 2487.317s | 19.187 | 19.187 | 40
+friendster | 3,612,134,270 | 3726.302s | 21.729 | 21.729 | 40
+
 ## Small: Dblp
 
 name | n | m 
@@ -145,6 +172,25 @@ thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cl
 24 | 2.494s | 168.6s | 11.007s | 0.819s | 1.115s | 184.037s | 16.097
 32 | 1.71s | 130.77s | 8.241s | 0.81s | 1.014s | 142.547s | 20.782
 40 | 2.056s | 117.446s | 7.985s | 0.9s | 1.245s | 129.635s | 22.852
+
+name | n | m 
+--- | --- | ---
+friendster  | 124,836,180   | 3,612,134,270
+
+overview | speedup
+--- | ---
+![fridenster-overview](../scalability_robust/snap_friendster-eps:0.3-min_pts:5-overview.png) | ![friendster-speedup](../scalability_robust/snap_friendster-eps:0.3-min_pts:5-runtime-speedup.png)
+
+thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
+--- | --- | --- | --- | --- | --- | --- | ---
+1 | 129.931s | 3602.674s | 676.785s | 2.655s | 4.076s | 4416.148s | 1.000
+2 | 52.277s | 1748.684s | 272.627s | 2.281s | 4.102s | 2079.982s | 2.123
+4 | 28.604s | 901.12s | 153.828s | 2.304s | 4.056s | 1089.915s | 4.052
+8 | 14.981s | 489.896s | 83.917s | 2.25s | 4.081s | 595.126s | 7.421
+16 | 8.928s | 265.88s | 51.357s | 2.285s | 4.414s | 332.866s | 13.267
+24 | 7.065s | 197.572s | 28.773s | 1.887s | 4.472s | 239.771s | 18.418
+32 | 6.021s | 152.678s | 27.147s | 2.151s | 4.24s | 192.24s | 22.972
+40 | 4.967s | 133.181s | 27.079s | 1.902s | 4.361s | 171.492s | 25.751
 
 ## LFR: 10million-avgdeg15-maxdeg50
 

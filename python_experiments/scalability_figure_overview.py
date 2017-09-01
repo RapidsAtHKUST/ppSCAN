@@ -26,21 +26,20 @@ def display_speedup(edge_num_portion_lst, pscan_serial_runtime_lst, pscan_plus_p
     plt.legend(['parallel pscan+ speedup over serial pscan'])
 
     plt.ylim([0.0, 25.0])
-    plt.savefig('./figures/scalability_overview' + os.sep + title_append_txt.replace(' ', '')
+    plt.savefig('./figures/' + overview_figure_folder + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'runtime-speedup.png', bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
 
-def illustrate_speedup():
+def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst, pscan_plus_best_parallel_runtime_lst):
     data_set_name_lst = ['dblp', 'pokec', 'livejournal', 'orkut', 'uk', 'webbase', 'twitter', 'friendster']
     edge_num_lst = ['2,099,732', '30,282,866', '69,362,378', '234,370,166', '301,136,554', '1,050,026,736',
                     '1,369,000,750', '3,612,134,270']
 
     # 1st: display speedup
-    pscan_serial_runtime_lst = [0.5550, 8.5970, 21.8460, 164.2480, 18.4980, 63.7050, 2487.3170, 3726.3020]
-    pscan_plus_parallel_runtime_lst = [0.209, 0.931, 2.285, 9.756, 3.879, 26.854, 129.427, 168.866]
+    # pscan_serial_runtime_lst = [0.5550, 8.5970, 21.8460, 164.2480, 18.4980, 63.7050, 2487.3170, 3726.3020]
+    # pscan_plus_parallel_runtime_lst = [0.209, 0.931, 2.285, 9.756, 3.879, 26.854, 129.427, 168.866]
 
-    os.system('mkdir -p ./figures/scalability_overview')
 
     append_txt = ' - '.join(['eps:0.3', 'min_pts:5', 'with all logical cores'])
 
@@ -50,7 +49,7 @@ def illustrate_speedup():
     append_txt = ' - '.join(['eps:0.3', 'min_pts:5', 'with best logical thread num'])
 
     # 2nd: data for generate markdown
-    pscan_plus_best_parallel_runtime_lst = [0.133, 0.878, 2.285, 9.756, 3.879, 13.753, 129.427, 168.866]
+    # pscan_plus_best_parallel_runtime_lst = [0.133, 0.878, 2.285, 9.756, 3.879, 13.753, 129.427, 168.866]
     display_speedup(range(1, 9), pscan_serial_runtime_lst, pscan_plus_best_parallel_runtime_lst,
                     data_set_name_lst, append_txt)
     speedup_full_lst = map(lambda pair: format_str(pair[0] / pair[1]) + "",
@@ -117,7 +116,7 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
     plt.ylabel('portion', fontdict=font)
     plt.legend(['input time', 'output time', 'parallel part time', 'serial part time'])
 
-    plt.savefig('./figures/scalability_overview' + os.sep + title_append_txt.replace(' ', '')
+    plt.savefig('./figures/' + overview_figure_folder + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'comp-io-portion.png', bbox_inches='tight', pad_inches=0, transparent=True)
     plt.show()
 
@@ -167,5 +166,20 @@ def illustrate_comp_io_portion():
 
 
 if __name__ == '__main__':
-    illustrate_speedup()
+    overview_figure_folder = 'scalability_overview_robust'
+    os.system('mkdir -p ./figures/' + overview_figure_folder)
+
     illustrate_comp_io_portion()
+    serial_time_lst = [0.5550, 8.5970, 21.8460, 164.2480, 18.4980, 63.7050, 2487.3170, 3726.3020]
+
+    # case study 0
+    # illustrate_speedup(
+    #     pscan_serial_runtime_lst=serial_time_lst,
+    #     pscan_plus_parallel_runtime_lst=[0.209, 0.931, 2.285, 9.756, 3.879, 26.854, 129.427, 168.866],
+    #     pscan_plus_best_parallel_runtime_lst=[0.133, 0.878, 2.285, 9.756, 3.879, 13.753, 129.427, 168.866])
+
+    # case study 2
+    illustrate_speedup(
+        pscan_serial_runtime_lst=serial_time_lst,
+        pscan_plus_parallel_runtime_lst=[0.122, 0.856, 2.611, 10.052, 4.433, 12.508, 129.635, 171.492],
+        pscan_plus_best_parallel_runtime_lst=[0.122, 0.856, 2.494, 10.052, 4.123, 14.125, 129.635, 171.492])
