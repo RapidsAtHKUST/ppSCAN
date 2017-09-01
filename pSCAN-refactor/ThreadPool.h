@@ -73,8 +73,9 @@ auto ThreadPool::enqueue(F &&f, Args &&... args) -> std::future<typename std::re
         if (stop) { throw std::runtime_error("enqueue on stopped ThreadPool"); }
 
         tasks.emplace([task]() { (*task)(); });
-        condition.notify_one(); // yche update: scoped within lock to avoid dead lock
     }
+    condition.notify_one();
+
     return res;
 }
 
@@ -83,8 +84,8 @@ ThreadPool::~ThreadPool() {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
         stop = true;
-        condition.notify_all(); // yche update: scoped within lock to avoid dead lock
     }
+    condition.notify_all();
 
     for (auto &worker: workers) { worker.join(); }
 }
