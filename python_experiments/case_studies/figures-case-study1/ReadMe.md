@@ -20,7 +20,7 @@ read square: pscan eval number
 
 workload | runtime
 --- | ---
-![dblp-workload](../workload/small_snap_dblp-min_pts:5-workload.png) | ![dblp-runtime](../workload/small_snap_dblp-min_pts:5-runtime.png)
+![dblp-workload](../../figures/workload/small_snap_dblp-min_pts:5-workload.png) | ![dblp-runtime](../../figures/workload/small_snap_dblp-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -37,7 +37,7 @@ pscan+/pscan runtime | 1.3208 | 1.0873 | 1.0126 | 1.0387 | 1.1111 | 1.1879 | 1.4
 
 workload | runtime
 --- | ---
-![pokec-workload](../workload/snap_pokec-min_pts:5-workload.png) | ![pokec-runtime](../workload/snap_pokec-min_pts:5-runtime.png)
+![pokec-workload](../../figures/workload/snap_pokec-min_pts:5-workload.png) | ![pokec-runtime](../../figures/workload/snap_pokec-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -54,7 +54,7 @@ pscan+/pscan runtime | 1.3700 | 0.9479 | 0.9757 | 1.0218 | 1.0023 | 1.0951 | 1.1
 
 workload | runtime
 --- | ---
-![livejournal-workload](../workload/snap_livejournal-min_pts:5-workload.png) | ![livejournal-runtime](../workload/snap_livejournal-min_pts:5-runtime.png)
+![livejournal-workload](../../figures/workload/snap_livejournal-min_pts:5-workload.png) | ![livejournal-runtime](../../figures/workload/snap_livejournal-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -71,7 +71,7 @@ pscan+/pscan runtime | 1.4828 | 1.0490 | 0.9903 | 0.9828 | 1.0193 | 1.0663 | 1.1
 
 workload | runtime
 --- | ---
-![orkut-workload](../workload/snap_orkut-min_pts:5-workload.png) | ![orkut-runtime](../workload/snap_orkut-min_pts:5-runtime.png)
+![orkut-workload](../../figures/workload/snap_orkut-min_pts:5-workload.png) | ![orkut-runtime](../../figures/workload/snap_orkut-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -88,7 +88,7 @@ pscan+/pscan runtime | 1.5684 | 1.1519 | 1.0462 | 0.9955 | 0.9630 | 0.9769 | 0.9
 
 workload | runtime
 --- | ---
-![uk-workload](../workload/webgraph_uk-min_pts:5-workload.png) | ![uk-runtime](../workload/webgraph_uk-min_pts:5-runtime.png)
+![uk-workload](../../figures/workload/webgraph_uk-min_pts:5-workload.png) | ![uk-runtime](../../figures/workload/webgraph_uk-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -105,7 +105,7 @@ pscan+/pscan runtime | 3.0495 | 2.3429 | 1.6889 | 1.4897 | 1.4779 | 1.5328 | 1.7
 
 workload | runtime
 --- | ---
-![webbase-workload](../workload/webgraph_webbase-min_pts:5-workload.png) | ![webbase-runtime](../workload/webgraph_webbase-min_pts:5-runtime.png)
+![webbase-workload](../../figures/workload/webgraph_webbase-min_pts:5-workload.png) | ![webbase-runtime](../../figures/workload/webgraph_webbase-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -122,7 +122,7 @@ pscan+/pscan runtime | 2.2159 | 1.5496 | 1.3351 | 1.3275 | 1.4231 | 1.5554 | 1.7
 
 workload | runtime
 --- | ---
-![twitter-workload](../workload/webgraph_twitter-min_pts:5-workload.png) | ![twiiter-runtime](../workload/webgraph_twitter-min_pts:5-runtime.png)
+![twitter-workload](../../figures/workload/webgraph_twitter-min_pts:5-workload.png) | ![twiiter-runtime](../../figures/workload/webgraph_twitter-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -139,7 +139,7 @@ pscan+/pscan runtime | 2.2760 | 1.3215 | 1.1168 | 1.1224 | 1.1582 | 1.2213 | 1.2
 
 workload | runtime
 --- | ---
-![friendster-workload](../workload/snap_friendster-min_pts:5-workload.png) | ![friendster-runtime](../workload/snap_friendster-min_pts:5-runtime.png)
+![friendster-workload](../../figures/workload/snap_friendster-min_pts:5-workload.png) | ![friendster-runtime](../../figures/workload/snap_friendster-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---
@@ -156,7 +156,7 @@ pscan+/pscan runtime | 1.1780 | 1.0393 | 1.0366 | 1.0605 | 1.0910 | 1.1524 | 1.2
 
 workload | runtime
 --- | ---
-![lfr10m-avg15-workload](../workload/10million_avgdeg15_maxdeg50_Cdefault-min_pts:5-workload.png) | ![lfr10m-avg15-runtime](../workload/10million_avgdeg15_maxdeg50_Cdefault-min_pts:5-runtime.png)
+![lfr10m-avg15-workload](../../figures/workload/10million_avgdeg15_maxdeg50_Cdefault-min_pts:5-workload.png) | ![lfr10m-avg15-runtime](../../figures/workload/10million_avgdeg15_maxdeg50_Cdefault-min_pts:5-runtime.png)
 
 tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
 --- | --- | --- | --- | --- | --- | --- | --- | --- | ---

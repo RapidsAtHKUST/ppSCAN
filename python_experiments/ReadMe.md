@@ -1,14 +1,14 @@
 # Experiments
 
-documents: [observation.md](doc/observation.md), [challenge.md](doc/challenge.md).
+documents: [observation.md](documents/observation.md), [challenge.md](documents/challenge.md).
 
 category | detail
 --- | ---
 algorithm introduction and visualization | see [algorithm_vis](algorithm_vis), with a toy case [demo_input_graph.txt](algorithm_vis/demo_input_graph.txt)
 dataset description | see [dataset_description](dataset_description/ReadMe.md)
-scalability experiment | see [figures/figures-case-study0](figures/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`.
-scalability robust scheduling experiment | see [figures/figures-case-study2-robust](figures/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
-workload/serial-runtime experiment | see [figures/figures-case-study1](figures/figures-case-study1), parameter setting: `min_pts:5`
+scalability experiment | see [figures/figures-case-study0](case_studies/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`.
+scalability robust scheduling experiment | see [figures/figures-case-study2-robust](case_studies/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
+workload/serial-runtime experiment | see [figures/figures-case-study1](case_studies/figures-case-study1), parameter setting: `min_pts:5`
 
 ## Todo
 
