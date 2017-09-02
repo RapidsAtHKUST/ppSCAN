@@ -11,12 +11,12 @@ with 40 full logical threads | with best thread num
 ![with full logical threads](../scalability_overview_robust/eps:0.3-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num](../scalability_overview_robust/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst: [40, 40, 32, 40, 32, 32, 40, 40]
+best performance thread_num_lst: [40, 40, 40, 40, 32, 24, 40, 40] 
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
 --- | --- | --- | --- | --- | ---
-dblp | 2,099,732 | 0.555s | 4.587 | 4.587 | 32
+dblp | 2,099,732 | 0.555s | 4.703 | 4.703 | 40
 pokec | 30,282,866 | 8.597s | 10.043 | 10.043 | 40
 livejournal | 69,362,378 | 21.846s | 9.433 | 9.433 | 40
 orkut | 234,370,166 | 164.248s | 16.992 | 16.992 | 40
@@ -37,14 +37,14 @@ overview | speedup
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 0.074s | 0.333s | 0.12s | 0.048s | 0.037s | 0.615s | 1.000
-2 | 0.035s | 0.16s | 0.061s | 0.059s | 0.046s | 0.364s | 1.690
-4 | 0.02s | 0.084s | 0.032s | 0.052s | 0.037s | 0.227s | 2.709
-8 | 0.011s | 0.046s | 0.017s | 0.048s | 0.037s | 0.162s | 3.796
-16 | 0.009s | 0.024s | 0.01s | 0.043s | 0.037s | 0.124s | 4.960
-24 | 0.01s | 0.021s | 0.009s | 0.055s | 0.044s | 0.142s | 4.331
-32 | 0.012s | 0.018s | 0.008s | 0.045s | 0.037s | 0.121s | 5.083
-40 | 0.01s | 0.018s | 0.008s | 0.045s | 0.037s | 0.121s | 5.083
+1 | 0.066s | 0.32s | 0.122s | 0.052s | 0.038s | 0.599s | 1.000
+2 | 0.035s | 0.16s | 0.061s | 0.059s | 0.046s | 0.364s | 1.646
+4 | 0.019s | 0.082s | 0.034s | 0.049s | 0.036s | 0.221s | 2.710
+8 | 0.011s | 0.046s | 0.017s | 0.048s | 0.037s | 0.162s | 3.698
+16 | 0.009s | 0.024s | 0.01s | 0.043s | 0.037s | 0.124s | 4.831
+24 | 0.012s | 0.023s | 0.009s | 0.045s | 0.037s | 0.128s | 4.680
+32 | 0.012s | 0.018s | 0.008s | 0.045s | 0.037s | 0.121s | 4.950
+40 | 0.009s | 0.017s | 0.009s | 0.045s | 0.037s | 0.118s | 5.076
 
 ## Medium: Pokec
 
