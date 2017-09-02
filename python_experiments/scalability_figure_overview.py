@@ -170,6 +170,6 @@ if __name__ == '__main__':
     # case study 2
     illustrate_speedup(
         pscan_serial_runtime_lst=serial_time_lst,
-        pscan_plus_parallel_runtime_lst=best_thread_time_lst,
-        pscan_plus_best_parallel_runtime_lst=full_core_time_lst,
+        pscan_plus_parallel_runtime_lst=full_core_time_lst,
+        pscan_plus_best_parallel_runtime_lst=best_thread_time_lst,
         best_thread_lst=thread_lst)
