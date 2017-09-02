@@ -31,42 +31,36 @@ def display_speedup(edge_num_portion_lst, pscan_serial_runtime_lst, pscan_plus_p
     plt.show()
 
 
-def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst, pscan_plus_best_parallel_runtime_lst):
+def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst, pscan_plus_best_parallel_runtime_lst,
+                       best_thread_lst):
     data_set_name_lst = ['dblp', 'pokec', 'livejournal', 'orkut', 'uk', 'webbase', 'twitter', 'friendster']
     edge_num_lst = ['2,099,732', '30,282,866', '69,362,378', '234,370,166', '301,136,554', '1,050,026,736',
                     '1,369,000,750', '3,612,134,270']
 
+    x_axis_range = range(1, len(best_thread_lst) + 1)
     # 1st: display speedup
-    # pscan_serial_runtime_lst = [0.5550, 8.5970, 21.8460, 164.2480, 18.4980, 63.7050, 2487.3170, 3726.3020]
-    # pscan_plus_parallel_runtime_lst = [0.209, 0.931, 2.285, 9.756, 3.879, 26.854, 129.427, 168.866]
-
-
     append_txt = ' - '.join(['eps:0.3', 'min_pts:5', 'with all logical cores'])
 
-    display_speedup(range(1, 9), pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst,
+    display_speedup(x_axis_range, pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst,
                     data_set_name_lst, append_txt)
 
     append_txt = ' - '.join(['eps:0.3', 'min_pts:5', 'with best logical thread num'])
 
     # 2nd: data for generate markdown
-    # pscan_plus_best_parallel_runtime_lst = [0.133, 0.878, 2.285, 9.756, 3.879, 13.753, 129.427, 168.866]
-    display_speedup(range(1, 9), pscan_serial_runtime_lst, pscan_plus_best_parallel_runtime_lst,
+    display_speedup(x_axis_range, pscan_serial_runtime_lst, pscan_plus_best_parallel_runtime_lst,
                     data_set_name_lst, append_txt)
     speedup_full_lst = map(lambda pair: format_str(pair[0] / pair[1]) + "",
                            zip(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst))
     speedup_best_lst = map(lambda pair: format_str(pair[0] / pair[1]),
                            zip(pscan_serial_runtime_lst, pscan_plus_best_parallel_runtime_lst))
     pscan_serial_runtime_lst = map(lambda num: str(num) + 's', pscan_serial_runtime_lst)
-    best_thread_lst = [16, 32, 40, 40, 40, 32, 40, 40]
 
-    print 'dataset lst:', data_set_name_lst
-    print 'edge_num lst:', edge_num_lst
+    print 'dataset lst:', data_set_name_lst, '\n', 'edge_num lst:', edge_num_lst
     print 'pscan serial runtime lst:', pscan_serial_runtime_lst
     print 'speedup lst 40-core:', speedup_full_lst
     print 'speedup lst best thread num:', speedup_best_lst
-    print 'best performance thread_num_lst:', best_thread_lst
+    print 'best performance thread_num_lst:', best_thread_lst, '\n'
 
-    print
     for idx in xrange(len(best_thread_lst)):
         row = [data_set_name_lst[idx], edge_num_lst[idx], pscan_serial_runtime_lst[idx], speedup_full_lst[idx],
                speedup_best_lst[idx], best_thread_lst[idx]]
@@ -121,18 +115,10 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
     plt.show()
 
 
-def illustrate_comp_io_portion():
-    data_set_lst = ['small_snap_dblp',
-                    'snap_pokec', 'snap_livejournal', 'snap_orkut',
-                    'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster']
-
+def illustrate_comp_io_portion(input_time_lst, output_time_lst):
     best_thread_lst = []
     best_info_lst = []
     full_core_info_lst = []
-
-    input_time_lst = [217, 1522, 3453, 9720, 13254, 45982, 47910, 215101]
-    output_time_lst = [298, 325, 2468, 1169, 11487, 62141, 3007, 9967]
 
     root_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments'
 
@@ -150,11 +136,9 @@ def illustrate_comp_io_portion():
         print time_info_dict[40], '\n', to_grouped_statistics(time_info_dict[40]), '\n'
         full_core_info_lst.append(to_grouped_statistics(time_info_dict[40]))
 
-    print 'best_thread_lst:', best_thread_lst
-    print 'best_info_lst:', best_info_lst
+    print 'best_thread_lst:', best_thread_lst, '\n', 'best_info_lst:', best_info_lst
     print 'full_core_info_lst:', full_core_info_lst
-    print 'input_time_lst:', input_time_lst
-    print 'output_time_lst:', output_time_lst
+    print 'input_time_lst:', input_time_lst, '\n', 'output_time_lst:', output_time_lst
 
     append_txt = ' - '.join(['eps:0.3', 'min_pts:5', 'with all logical cores'])
     zipped_lst = to_portion_lst(full_core_info_lst, input_time_lst, output_time_lst)
@@ -164,22 +148,28 @@ def illustrate_comp_io_portion():
     zipped_lst = to_portion_lst(best_info_lst, input_time_lst, output_time_lst)
     display_comp_io_portion(zipped_lst, map(lambda my_str: my_str.split('_')[-1], data_set_lst), append_txt)
 
+    def to_float_str(time_val_lst):
+        return eval(format_str(float(time_val_lst[0]) / 1000))
+
+    return best_thread_lst, map(to_float_str, best_info_lst), map(to_float_str, full_core_info_lst)
+
 
 if __name__ == '__main__':
     overview_figure_folder = 'scalability_overview_robust'
+    data_set_lst = ['small_snap_dblp',
+                    'snap_pokec', 'snap_livejournal', 'snap_orkut',
+                    'webgraph_uk', 'webgraph_webbase',
+                    'webgraph_twitter', 'snap_friendster']
     os.system('mkdir -p ./figures/' + overview_figure_folder)
 
-    illustrate_comp_io_portion()
+    thread_lst, best_thread_time_lst, full_core_time_lst = \
+        illustrate_comp_io_portion(input_time_lst=[217, 1522, 3453, 9720, 13254, 45982, 47910, 215101],
+                                   output_time_lst=[298, 325, 2468, 1169, 11487, 62141, 3007, 9967])
     serial_time_lst = [0.5550, 8.5970, 21.8460, 164.2480, 18.4980, 63.7050, 2487.3170, 3726.3020]
-
-    # case study 0
-    # illustrate_speedup(
-    #     pscan_serial_runtime_lst=serial_time_lst,
-    #     pscan_plus_parallel_runtime_lst=[0.209, 0.931, 2.285, 9.756, 3.879, 26.854, 129.427, 168.866],
-    #     pscan_plus_best_parallel_runtime_lst=[0.133, 0.878, 2.285, 9.756, 3.879, 13.753, 129.427, 168.866])
 
     # case study 2
     illustrate_speedup(
         pscan_serial_runtime_lst=serial_time_lst,
-        pscan_plus_parallel_runtime_lst=[0.122, 0.856, 2.611, 10.052, 4.433, 12.508, 129.635, 171.492],
-        pscan_plus_best_parallel_runtime_lst=[0.122, 0.856, 2.494, 10.052, 4.123, 14.125, 129.635, 171.492])
+        pscan_plus_parallel_runtime_lst=best_thread_time_lst,
+        pscan_plus_best_parallel_runtime_lst=full_core_time_lst,
+        best_thread_lst=thread_lst)
