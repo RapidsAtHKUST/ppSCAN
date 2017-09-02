@@ -2,59 +2,6 @@
 
 parameter setting: `eps:0.3`, `min_pts:5`
 
-## Statistics
-
-* **eval comparison table**
- on 9 graphs.
-
-algorithm | dblp | pokec | livejournal | orkut | uk | webbase | twitter | frienster | lfr10m
---- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan   | 0.6177 | 0.8520 | 0.7243 | 0.8265	| **0.2439** | **0.2874** | 0.4471 | 0.8566 | **0.5192**
-pscan+  | 0.7370 | 0.9209 | 0.8740 | 0.9278 | **0.5175** | **0.5238** | 0.4866 | 0.8764 | **1.0000**
-
-* **`cmp`/`intersection_times` table** 
-
-algorithm | dblp | pokec | livejournal | orkut | uk | webbase | twitter | frienster | lfr10m
---- | --- | --- | --- | --- | --- | --- | --- | --- | ---
-pscan | 24.707 | 70.888 | 106.707 | 275.800 | 111.962 | **63.901** | 1841.663 | 385.317 | **22.978**
-pscan+ | 23.422 | 67.641 | 101.258 | 264.468 | 146.264 | **88.889** | 1849.282 | 377.788 | **24.199**
-
-## Observations
-
-* webbase requires much fewer computations from **eval comparison table** and **`cmp`/`intersection_times` table** 
-
-* dblp, webbase, check core 1st bsp(parallel eval) speedup degradation in 40 threads, but the runtime is still acceptable, since much less than i/o time
-
-* webbase, check core 2nd bsp(binary search) speedup degradation in 40 threads, but the runtime is still acceptable, since much less than i/o time
-
-* parallel prune speedup scales well vertically
-
-## Need to Explanation
-
-### Problems to Solve
-
-dataset | detail
---- | ---
-**dblp** | 16->40, prune not improve any more, check core 1st phase bsp becomes slower
-pokec | 32->40, prune and check core 2nd phase becomes slower
-livejournal | 24->32->40, check core 2nd phase bsp slower and faster
-orkut | 32->40, check core 2nd phase bsp slower
-**webbase** | 24->32->40, check core 1st and 2nd bsp slower
-
-### Explanations
-
-* dblp: casued by ``, from vtune report, system call cost, probably due to small tasks influencing behaviors of the thread pool, same problem with webbase
-
-* webbase: task grain differs a lot, it seems 64 vertex as a task too small for check core 1st phase comp
-
-* pokec, livejournal, orkut: maybe the same, we are required to assign tasks based on real work load, considering pruning, different degree of vertices, different degree of dst vertices
-
-### Trade-off Problem
-
-* Task too large: load imbalance, cache locality issue
-
-* Task too small: system call overheads, queue access concurrency issue, memory cost for more function objects(maybe okay)
-
 ## Speedup Overview
 
 computation and io portion
