@@ -8,9 +8,11 @@
 
 Please have a look at [pSCAN-refactor](pSCAN-refactor) and find some useful things(source codes and documents) for you. :smile:
 
-Experiments in detail are [here](python_experiments). [scalability-exp](python_experiments/figures/figures-case-study0), [workload-exp](python_experiments/figures/figures-case-study1).
+Experiments in detail are [here](python_experiments). 
 
-### Pscan Overview
+Detail: [scalability-exp](python_experiments/figures/figures-case-study0), [robust-scalability-exp](python_experiments/figures/figures-case-study2-robust), [workload-exp](python_experiments/figures/figures-case-study1).
+
+### Pscan and Pscan+ Overview
 
 * pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on **unweighted, undirected not dynamic** graph.
 
@@ -34,8 +36,9 @@ Experiments in detail are [here](python_experiments). [scalability-exp](python_e
 description | folder link
 --- | ---
 pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
-python scripts during study | [python](python)
-simd study codes | [simd_study](simd_study)
+pSCAN-fork-statistics | [pSCAN-statistics](pSCAN-statistics)
+python scripts during study | [python_playground](python_playground)
+python experiments | [python_experiments](python_experiments)
 
 ### Package Organization, [pSCAN-refactor](pSCAN-refactor)
 
@@ -61,31 +64,3 @@ file | utility
 * experimental(parallel version with adjustable thread num)
 
 see [pSCAN-refactor/experimental](pSCAN-refactor/experimental).
-
-* deprecated
-
-file | utility
---- | ---
-[MaxPriorityQueue.h](pSCAN-refactor/playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](pSCAN-refactor/playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
-[ThreadSafeDisjointSet.h](pSCAN-refactor/playground/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
-
-* profiling scrips
-
-see [run_pscan_gperftools.sh](pSCAN-refactor/run_pscan_gperftools.sh), [run_pscan_perf.sh](pSCAN-refactor/run_pscan_perf.sh), [run_pscan_valgrind.sh](pSCAN-refactor/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
-
-
-## Related Projects
-
-description | folder link
---- | ---
-spatial dbscan sc2012 project | [dbscan-v1.0.0](related_projects/dbscan-v1.0.0)
-spatial dbscan another | [markus.goetz-hpdbscan](related_projects/markus.goetz-hpdbscan)
-parameter-free scan | [gSkeletonClu](related_projects/gSkeletonClu)
-pSCAN original codes | [pSCAN](related_projects/pSCAN)
-
-* Submodules Init
-
-```
-git submodule init
-git submodule update
-```

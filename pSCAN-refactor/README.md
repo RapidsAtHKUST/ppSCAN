@@ -119,6 +119,20 @@ lfr synthetic, undirected and unweighted, `-k 15 -maxk 50 -mu 0.1 -minc 20 -maxc
 build/pSCANSerial ../dataset 0.3 5 output
 ```
 
+# Dev
+
+* deprecated
+
+file | utility
+--- | ---
+[MaxPriorityQueue.h](./playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](./playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
+[ThreadSafeDisjointSet.h](./playground/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
+
+* profiling scrips
+
+see [run_pscan_gperftools.sh](./run_pscan_gperftools.sh), [run_pscan_perf.sh](./run_pscan_perf.sh), [run_pscan_valgrind.sh](./run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
+
+
 # Citation
 
 > If you are using this code, please kindly cite the following paper.
