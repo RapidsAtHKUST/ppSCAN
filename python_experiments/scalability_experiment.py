@@ -8,7 +8,7 @@ def scalability_exp():
                     'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
                     'webgraph_uk', 'webgraph_webbase',
                     'webgraph_twitter', 'snap_friendster']
-    parameter_eps_lst = [0.3, 0.2, 0.1]
+    parameter_eps_lst = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     parameter_min_pts_lst = [5]
     thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
 
@@ -65,5 +65,5 @@ def scalability_exp():
 
 if __name__ == '__main__':
     # run 10 times and fetch the best result, to avoid machine status changes
-    for i in xrange(3):
+    for i in xrange(1):
         scalability_exp()
