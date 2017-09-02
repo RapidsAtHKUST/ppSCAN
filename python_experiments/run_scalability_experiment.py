@@ -2,21 +2,7 @@ import os
 import time
 
 
-def scalability_exp():
-    data_set_lst = ['small_snap_dblp',
-                    'snap_livejournal', 'snap_orkut', 'snap_pokec',
-                    'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
-                    'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster']
-    parameter_eps_lst = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    parameter_min_pts_lst = [5]
-    thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
-
-    # data_set_lst = ['small_snap_dblp']
-    # parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
-    # parameter_min_pts_lst = [2, 5, 10, 15]
-    # thread_num_lst = [40]
-
+def scalability_exp(data_set_lst, parameter_eps_lst, parameter_min_pts_lst, thread_num_lst, folder_name):
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
 
     print 'data set:', data_set_lst
@@ -34,7 +20,7 @@ def scalability_exp():
                     data_set_name = data_set_path.split(os.sep)[-1]
                     statistics_dir = os.sep.join(
                         map(str,
-                            ['.', 'scalability_robust', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
+                            ['.', folder_name, data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
                     os.system('mkdir -p ' + statistics_dir)
                     statistics_file_path = statistics_dir + os.sep + '-'.join(
                         map(str, ['output', data_set_name, eps, min_pts, thread_num])) + '.txt'
@@ -64,6 +50,19 @@ def scalability_exp():
 
 
 if __name__ == '__main__':
-    # run 10 times and fetch the best result, to avoid machine status changes
-    for i in xrange(1):
-        scalability_exp()
+    # parameters
+    data_set_lst = ['small_snap_dblp',
+                    'snap_livejournal', 'snap_orkut', 'snap_pokec',
+                    'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
+                    'webgraph_uk', 'webgraph_webbase',
+                    'webgraph_twitter', 'snap_friendster']
+    parameter_eps_lst = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    parameter_min_pts_lst = [5]
+    thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
+
+    # loop run experiments
+    loop_count = 1
+    for i in xrange(loop_count):
+        scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
+                        parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
+                        folder_name='scalability_robust')
