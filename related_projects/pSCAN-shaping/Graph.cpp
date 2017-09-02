@@ -82,6 +82,42 @@ void Graph::PruneAndCrossLink() {
     cout << "thread num:" << thread_num << "\n";
     vector<std::mutex> mutex_arr(n);
 
+#ifdef SERIAL
+    for (auto u = 0; u < n; u++) {
+        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+            auto v = out_edges[j];
+            if (u <= v) {
+                int deg_a = degree[u], b = degree[v];
+                if (deg_a > b) { swap(deg_a, b); };
+                if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
+                    // can be pruned
+#ifdef STATISTICS
+                    ++prune0;
+#endif
+                    min_cn[j] = NOT_DIRECT_REACHABLE;
+                } else {
+                    // can be pruned, when c <= 2
+                    int c = ComputeCnLowerBound(deg_a, b);
+                    if (c <= 2) {
+#ifdef STATISTICS
+                        ++prune1;
+#endif
+                        min_cn[j] = DIRECT_REACHABLE;
+                        ++similar_degree[u];
+                        ++similar_degree[v];
+
+                    } else {
+                        min_cn[j] = c;
+                    }
+                }
+                // find edge, in order to build cross link
+                auto r_id = BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u);
+                InitCrossLink(j, r_id);
+                UpdateViaCrossLink(j);
+            }
+        }
+    }
+#else
     auto batch_num = 16u * thread_num;
     auto batch_size = n / batch_num;
     //must iterate from 0 to n-1
@@ -151,7 +187,9 @@ void Graph::PruneAndCrossLink() {
             }
         }, my_start, my_end);
     }
+#endif
 }
+
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
@@ -165,8 +203,6 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
          cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
-//    for (ui offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-//         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1];) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
