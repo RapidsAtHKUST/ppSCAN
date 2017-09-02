@@ -39,28 +39,3 @@ pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
 pSCAN-fork-statistics | [pSCAN-statistics](pSCAN-statistics)
 python scripts during study | [python_playground](python_playground)
 python experiments | [python_experiments](python_experiments)
-
-### Package Organization, [pSCAN-refactor](pSCAN-refactor)
-
-pSCAN package further usage must follow [GPLv3 license](pSCAN-refactor/LICENSE).
-
-* pSCAN-fork-optimization implementations follow modern cpp rules, to make things easier without loss of performance.
-
-file | utility
---- | ---
-[ThreadPool.h](pSCAN-refactor/ThreadPool.h) | third-party thread pool, a simple impl
-[DisjointSet.h](pSCAN-refactor/DisjointSet.h), [DisjointSet.cpp](pSCAN-refactor/DisjointSet.cpp) | see CLRS for detail, for connected componet
-[Graph.h](pSCAN-refactor/Graph.h), [Graph.cpp](pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
-[InputOutput.h](pSCAN-refactor/InputOutput.h), [InputOutput.cpp](pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
-
-* utils and plays
-
-file | utility
---- | ---
-[pretty_print.h](pSCAN-refactor/playground/pretty_print.h) | third-party pretty print utilities
-[graph_io.cpp](pSCAN-refactor/playground/graph_io.cpp) | play ground about i/o
-[play.cpp](pSCAN-refactor/playground/play.cpp) | play ground others
-
-* experimental(parallel version with adjustable thread num)
-
-see [pSCAN-refactor/experimental](pSCAN-refactor/experimental).

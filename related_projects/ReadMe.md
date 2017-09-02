@@ -2,10 +2,10 @@
 
 description | folder link
 --- | ---
-spatial dbscan sc2012 project | [dbscan-v1.0.0](related_projects/dbscan-v1.0.0)
-spatial dbscan another | [markus.goetz-hpdbscan](related_projects/markus.goetz-hpdbscan)
-parameter-free scan | [gSkeletonClu](related_projects/gSkeletonClu)
-pSCAN original codes | [pSCAN](related_projects/pSCAN)
+spatial dbscan sc2012 project | [dbscan-v1.0.0](./dbscan-v1.0.0)
+spatial dbscan another | [markus.goetz-hpdbscan](./markus.goetz-hpdbscan)
+parameter-free scan | [gSkeletonClu](./gSkeletonClu)
+pSCAN original codes | [pSCAN](./pSCAN)
 
 * Submodules Init
 
