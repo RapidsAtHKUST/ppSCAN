@@ -1,4 +1,4 @@
-import os, sys, re
+import os, re
 from functools import partial
 
 import matplotlib.pyplot as plt
@@ -25,7 +25,7 @@ def filter_lines_by_tag(tag, lines):
                filter(lambda line: tag in line, lines))
 
 
-def get_statistics(dataset, eps, min_pts, root_dir_path='.'):
+def get_workload_statistics(dataset, eps, min_pts, root_dir_path='.'):
     file_path = os.sep.join([root_dir_path, dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts),
                              '-'.join(['output', dataset, str(eps), str(min_pts)]) + '.txt'])
     with open(file_path) as ifs:
@@ -56,7 +56,7 @@ def get_statistics(dataset, eps, min_pts, root_dir_path='.'):
 
 def case_study_fix_eps_min_pts(data_set_lst, eps, min_pts, root_dir_path='.'):
     for data_set in data_set_lst:
-        ret_dict = get_statistics(data_set, eps, min_pts, root_dir_path)
+        ret_dict = get_workload_statistics(data_set, eps, min_pts, root_dir_path)
         print ret_dict
 
 
@@ -180,7 +180,8 @@ def case_study1():
                     '10million_avgdeg15_maxdeg50_Cdefault']
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     for data_set in data_set_lst:
-        statistics_lst = map(lambda eps: get_statistics(data_set, eps, min_pts, root_dir_path), parameter_eps_lst)
+        statistics_lst = map(lambda eps: get_workload_statistics(data_set, eps, min_pts, root_dir_path),
+                             parameter_eps_lst)
         display_lst = map(lambda statistics_dict: to_display_dict(statistics_dict, 1000), statistics_lst)
         append_txt = ' - '.join([data_set, 'min_pts:' + str(min_pts)])
         display_workload_runtime(parameter_eps_lst, display_lst, title_append_txt=append_txt)

@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
-import sys
-import os
+import sys, os
 from functools import partial
 import workload_figure
 
@@ -44,7 +43,7 @@ def parse_lines(lines):
 def get_statistics(dataset, eps, min_pts, root_folder='.'):
     info_dict = dict()
     dir_path = os.sep.join([root_folder, 'scalability_robust', dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
-    pscan_time = workload_figure.get_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
+    pscan_time = workload_figure.get_workload_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
         workload_figure.runtime_tag + workload_figure.pscan_tag]
 
     for root, dirs, files in os.walk(dir_path):
@@ -65,7 +64,7 @@ def recal_for_bar_char(filtered_lst):
 
 
 # display 0: overall time cost in five phases
-def display_overview(statistics_dic, title_append_txt=''):
+def display_overview(statistics_dic, title_append_txt='', figure_folder='.'):
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
                 non_core_cluster_time_tag, pscan_runtime_tag]
 
@@ -106,14 +105,13 @@ def display_overview(statistics_dic, title_append_txt=''):
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('time (s)', fontdict=font)
 
-    os.system('mkdir -p ./figures/' + figure_folder)
     plt.savefig('./figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png',
                 bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
-
+    # plt.show()
+    plt.close()
 
 # display 1: total time and parallel part(hotspots)
-def display_filtered_tags(statistics_dic, title_append_txt=''):
+def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'):
     filtered_tag_list = [total_time_tag, first_bsp_time_tag, second_bsp_time_tag, prune_time_tag]
 
     def post_process():
@@ -138,8 +136,6 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
         # partially bind parameters
         prev_partial_func = partial(prev_partial_func, thread_lst, map(lambda time: float(time) / 1000, time_lst),
                                     shape_color_dict[tag])
-        # prev_partial_func = partial(prev_partial_func, thread_lst, map(lambda time: float(time) / 1000, time_lst),
-        #                             shape_color_dict2[tag])
     plt.subplot(211)
     prev_partial_func()
 
@@ -153,7 +149,6 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     tag_speedup_lst = map(lambda tag_time_lst_pair: (
         tag_time_lst_pair[0], map(lambda ele: max(tag_time_lst_pair[1]) / float(ele), tag_time_lst_pair[1])),
                           tag_time_lst_lst)
-    # print tag_time_lst_lst
     prev_partial_func = plt.plot
     for tag, speedup_lst in tag_speedup_lst:
         # partially bind parameters
@@ -165,13 +160,13 @@ def display_filtered_tags(statistics_dic, title_append_txt=''):
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('speedup', fontdict=font)
     plt.ylim([0, 27.0])
+
     # show the whole runtime/speedup figure
-    os.system('mkdir -p ./figures/' + figure_folder)
     plt.savefig(
         './figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'runtime-speedup.png',
         bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
-
+    # plt.show()
+    plt.close()
 
 if __name__ == '__main__':
     data_set_lst = ['small_snap_dblp',
@@ -181,6 +176,8 @@ if __name__ == '__main__':
                     '10million_avgdeg15_maxdeg50_Cdefault']
 
     figure_folder = 'scalability_robust'
+    os.system('mkdir -p ./figures/' + figure_folder)
+
     for data_set in data_set_lst:
         time_info_dict = get_statistics(data_set, 0.3, 5,
                                         root_folder='/mnt/mount-gpu/d2/yche/projects/python_experiments')
@@ -189,7 +186,7 @@ if __name__ == '__main__':
 
         append_txt = ' - '.join([data_set, 'eps:' + str(0.3), 'min_pts:' + str(5)])
         # 1st: overall time cost
-        display_overview(time_info_dict, append_txt)
+        display_overview(time_info_dict, append_txt, figure_folder)
 
         # 2nd: runtime/speedup for filtered tags
-        display_filtered_tags(time_info_dict, append_txt)
+        display_filtered_tags(time_info_dict, append_txt, figure_folder)

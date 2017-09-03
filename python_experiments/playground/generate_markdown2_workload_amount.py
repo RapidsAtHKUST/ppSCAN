@@ -44,7 +44,7 @@ if __name__ == '__main__':
     root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod'
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     for data_set in data_set_lst:
-        statistics_lst = map(lambda eps: get_statistics(data_set, eps, min_pts, root_dir_path), parameter_eps_lst)
+        statistics_lst = map(lambda eps: get_workload_statistics(data_set, eps, min_pts, root_dir_path), parameter_eps_lst)
         display_lst = map(lambda statistics_dict: to_display_dict(statistics_dict, 1000), statistics_lst)
         for display in display_lst:
             display[eval_workload_increase_tag] = display[display_pscan_plus_eval_tag] / display[display_pscan_eval_tag]

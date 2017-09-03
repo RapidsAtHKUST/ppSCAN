@@ -1,8 +1,7 @@
 import decimal
 
 
-def pretty_print(thread_lst, time_lst):
-    print
+def get_pretty_print_str(thread_lst, time_lst):
     header_1st_line = ' | '.join(
         ['thread_num', 'prune', 'check-core 1st bsp', 'check-core 2nd bsp', 'cluster-core', 'cluster-non-core',
          'total', 'total speedup'])
@@ -16,7 +15,11 @@ def pretty_print(thread_lst, time_lst):
         row_lst.append(
             decimal.Decimal.from_float(total_lst[0] / float(total_lst[i])).quantize(decimal.Decimal('0.000')))
         table_lines.append(' | '.join(map(str, row_lst)))
-    print '\n'.join(table_lines)
+    return '\n'.join(table_lines)
+
+
+def pretty_print(thread_lst, time_lst):
+    print get_pretty_print_str(thread_lst, time_lst), '\n'
 
 
 if __name__ == '__main__':
