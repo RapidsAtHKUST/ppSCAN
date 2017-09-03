@@ -13,9 +13,14 @@ workload/serial-runtime experiment | see [case-study1](case_studies/figures-case
 
 ## Todo
 
+* try to shape another branch to add the power of reducing possible eval computations
+    * eps small, easy to be a core
+    * eps large, hard to be a core
+* study other possible ways to reduce computations, e.g, optimization for skewed comparison
+* robustness of parallel scheduling
 * profile to summarize performance related issues
-* scalability experiments with different eps, from 0.1 to 0.9
-* implement complex logic(keep all pscan ideas) parallel version
+* visual aids of pscan+ comparison to pscan
+* deeper analysis of anySCAN, pSCAN, SCAN++ 
 * compare to anySCAN and SCAN++, too 
 
 ## Scripts
