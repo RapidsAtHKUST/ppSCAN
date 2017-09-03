@@ -1,8 +1,20 @@
+dataset | scalability link
+--- | ---
+small_snap_dblp | [small_snap_dblp.md](small_snap_dblp.md)
+snap_pokec | [snap_pokec.md](snap_pokec.md)
+snap_livejournal | [snap_livejournal.md](snap_livejournal.md)
+snap_orkut | [snap_orkut.md](snap_orkut.md)
+webgraph_uk | [webgraph_uk.md](webgraph_uk.md)
+webgraph_webbase | [webgraph_webbase.md](webgraph_webbase.md)
+webgraph_twitter | [webgraph_twitter.md](webgraph_twitter.md)
+snap_friendster | [snap_friendster.md](snap_friendster.md)
+
 ## eps:0.1
 
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.1-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.1-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.1-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.1-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -27,6 +39,7 @@ friendster | 3,612,134,270 | 4959.734s | 14.582 | 14.582 | 40
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.2-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.2-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.2-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.2-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -51,6 +64,7 @@ friendster | 3,612,134,270 | 4673.88s | 19.968 | 19.968 | 40
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.3-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.3-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.3-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -75,6 +89,7 @@ friendster | 3,612,134,270 | 3726.302s | 21.870 | 21.870 | 40
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.4-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.4-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.4-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.4-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -99,6 +114,7 @@ friendster | 3,612,134,270 | 2801.607s | 21.145 | 21.145 | 40
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.5-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.5-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.5-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.5-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -123,6 +139,7 @@ friendster | 3,612,134,270 | 2019.334s | 20.730 | 20.730 | 40
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.6-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.6-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.6-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.6-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -147,6 +164,7 @@ friendster | 3,612,134,270 | 1382.493s | 19.565 | 19.565 | 40
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.7-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.7-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.7-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.7-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -171,6 +189,7 @@ friendster | 3,612,134,270 | 881.861s | 11.353 | 14.295 | 32
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.8-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.8-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.8-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.8-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
@@ -195,6 +214,7 @@ friendster | 3,612,134,270 | 509.733s | 6.801 | 7.382 | 24
 with 40 full logical threads | with best thread num
 --- | ---
 ![portion with full logical threads-withalllogicalcores-comp-io-portion](../../figures/scalability_overview_robust/eps:0.9-min_pts:5-withalllogicalcores-comp-io-portion.png) | ![io portition-withbestlogicalthreadnum-comp-io-portion](../../figures/scalability_overview_robust/eps:0.9-min_pts:5-withbestlogicalthreadnum-comp-io-portion.png)
+
 with 40 full logical threads | with best thread num
 --- | ---
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_overview_robust/eps:0.9-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_overview_robust/eps:0.9-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)

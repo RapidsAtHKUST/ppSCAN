@@ -32,7 +32,6 @@ if __name__ == '__main__':
 
     for data_set in data_set_lst:
         # should generate a markdown, e.g, small_snap_dblp.md
-        with open('case_studies/figures-case-study3-scalability-differ-eps/' + data_set + '.md', 'w') as ifs:
             for eps in eps_lst:
                 time_info_dict = get_statistics(data_set, eps, min_pts,
                                                 root_folder='/mnt/mount-gpu/d2/yche/projects/python_experiments')
