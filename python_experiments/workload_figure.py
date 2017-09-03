@@ -21,7 +21,7 @@ pscan_plus_tag = ', pscan+'
 
 
 def filter_lines_by_tag(tag, lines):
-    return map(lambda my_str: eval(my_str.split(':')[-1]),
+    return map(lambda my_str: eval(my_str.split(':')[-1].replace('ms', '')),
                filter(lambda line: tag in line, lines))
 
 
@@ -119,7 +119,8 @@ def display_workload_runtime(eps_lst, display_lst, title_append_txt=''):
     os.system('mkdir -p ./figures/workload')
     plt.savefig('./figures/workload' + os.sep + title_append_txt.replace(' ', '') + '-' + 'workload.png',
                 bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
+    # plt.show()
+    plt.close()
 
 
 def display_runtime(eps_lst, display_lst, title_append_txt=''):
@@ -150,7 +151,8 @@ def display_runtime(eps_lst, display_lst, title_append_txt=''):
     os.system('mkdir -p ./figures/workload')
     plt.savefig('./figures/workload' + os.sep + title_append_txt.replace(' ', '') + '-' + 'runtime.png',
                 bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
+    # plt.show()
+    plt.close()
 
 
 def case_study0():
@@ -169,7 +171,6 @@ def case_study0():
 
 def case_study1():
     # case study 1
-    eps = 0.3
     min_pts = 5
     root_dir_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/worklaod'
 

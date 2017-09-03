@@ -7,6 +7,10 @@ def format_str(float_num):
     return str(decimal.Decimal.from_float(float_num).quantize(decimal.Decimal('0.000')))
 
 
+def ms_val_to_s(num):
+    return eval(str(decimal.Decimal.from_float(float(num) / 1000).quantize(decimal.Decimal('0.0000'))))
+
+
 def to_grouped_statistics(statistics):
     """
     :type statistics: dict
@@ -52,10 +56,11 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
 
     plt.savefig('./figures/' + overview_figure_folder + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'comp-io-portion.png', bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
+    # plt.show()
+    plt.close()
 
 
-def illustrate_comp_io_portion(input_time_lst, output_time_lst):
+def illustrate_comp_io_portion(input_time_lst, output_time_lst, eps, min_pts):
     best_thread_lst = []
     best_info_lst = []
     full_core_info_lst = []
@@ -113,11 +118,12 @@ def display_speedup(edge_num_portion_lst, pscan_serial_runtime_lst, pscan_plus_p
     plt.ylim([0.0, 25.0])
     plt.savefig('./figures/' + overview_figure_folder + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'runtime-speedup.png', bbox_inches='tight', pad_inches=0, transparent=True)
-    plt.show()
+    # plt.show()
+    plt.close()
 
 
 def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst, pscan_plus_best_parallel_runtime_lst,
-                       best_thread_lst):
+                       best_thread_lst, eps, min_pts):
     data_set_name_lst = ['dblp', 'pokec', 'livejournal', 'orkut', 'uk', 'webbase', 'twitter', 'friendster']
     edge_num_lst = ['2,099,732', '30,282,866', '69,362,378', '234,370,166', '301,136,554', '1,050,026,736',
                     '1,369,000,750', '3,612,134,270']
@@ -146,33 +152,60 @@ def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst
     print 'speedup lst best thread num:', speedup_best_lst
     print 'best performance thread_num_lst:', best_thread_lst, '\n'
 
+    rows = []
     for idx in xrange(len(best_thread_lst)):
         row = [data_set_name_lst[idx], edge_num_lst[idx], pscan_serial_runtime_lst[idx], speedup_full_lst[idx],
                speedup_best_lst[idx], best_thread_lst[idx]]
-        print ' | '.join(map(str, row))
+        rows.append(' | '.join(map(str, row)))
+    print '\n'.join(rows)
+    return rows
 
 
-def draw_overview_figure():
-    os.system('mkdir -p ./figures/' + overview_figure_folder)
+def get_output_time(data_set, eps, min_pts, root_dir_path):
+    output_time_tag = 'Total output cost'
+    file_path = os.sep.join([root_dir_path, data_set, 'eps-' + str(eps), 'min_pts-' + str(min_pts),
+                             '-'.join(['output', data_set, str(eps), str(min_pts), '40']) + '.txt'])
+    with open(file_path) as ifs:
+        lines = ifs.readlines()
+    outputs = workload_figure.filter_lines_by_tag(output_time_tag, lines)
+    return outputs[-1]
 
-    # comp/io portion
+
+def draw_overview_figure(eps=0.3, min_pts=5):
+    serial_time_lst = []
+    output_time_lst = []
+    for dataset in data_set_lst:
+        pscan_time = workload_figure.get_workload_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
+            workload_figure.runtime_tag + workload_figure.pscan_tag]
+        serial_time_lst.append(pscan_time)
+        output_time_lst.append(get_output_time(data_set=dataset, eps=eps, min_pts=min_pts,
+                                               root_dir_path='/mnt/mount-gpu/d2/yche/projects/python_experiments'
+                                                             '/scalability_input_output'))
+    serial_time_lst = map(ms_val_to_s, serial_time_lst)
+    print 'serial runtime lst:', serial_time_lst
+    print 'output time lst:', output_time_lst
+
+    # 1st: comp/io portion
     thread_lst, best_thread_time_lst, full_core_time_lst = \
         illustrate_comp_io_portion(input_time_lst=[217, 1522, 3453, 9720, 13254, 45982, 47910, 215101],
-                                   output_time_lst=[298, 325, 2468, 1169, 11487, 62141, 3007, 9967])
-    serial_time_lst = [0.5550, 8.5970, 21.8460, 164.2480, 18.4980, 63.7050, 2487.3170, 3726.3020]
+                                   output_time_lst=output_time_lst, eps=eps, min_pts=min_pts)
 
-    # speedup
-    illustrate_speedup(pscan_serial_runtime_lst=serial_time_lst, pscan_plus_parallel_runtime_lst=full_core_time_lst,
-                       pscan_plus_best_parallel_runtime_lst=best_thread_time_lst, best_thread_lst=thread_lst)
+    # 2nd: speedup
+    rows = illustrate_speedup(pscan_serial_runtime_lst=serial_time_lst,
+                              pscan_plus_parallel_runtime_lst=full_core_time_lst,
+                              pscan_plus_best_parallel_runtime_lst=best_thread_time_lst, best_thread_lst=thread_lst,
+                              eps=eps, min_pts=min_pts)
+    return thread_lst, rows
 
+
+overview_figure_folder = 'scalability_overview_robust'
+data_set_lst = ['small_snap_dblp',
+                'snap_pokec', 'snap_livejournal', 'snap_orkut',
+                'webgraph_uk', 'webgraph_webbase',
+                'webgraph_twitter', 'snap_friendster']
+root_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/'
 
 if __name__ == '__main__':
-    eps = 0.3
-    min_pts = 5
-    overview_figure_folder = 'scalability_overview_robust'
-    data_set_lst = ['small_snap_dblp',
-                    'snap_pokec', 'snap_livejournal', 'snap_orkut',
-                    'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster']
+    os.system('mkdir -p ./figures/' + overview_figure_folder)
 
     draw_overview_figure()

@@ -8,6 +8,7 @@ algorithm introduction and visualization | see [algorithm_vis](algorithm_vis), w
 dataset description | see [dataset_description](dataset_description/ReadMe.md)
 scalability experiment | see [case-study0](case_studies/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`.
 scalability robust scheduling experiment | see [case-study2-robust](case_studies/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
+scalability robust different eps | see [case-study3-scalability-differ-eps](case_studies/figures-case-study3-scalability-differ-eps), , parameter setting: `min_pts:5`.
 workload/serial-runtime experiment | see [case-study1](case_studies/figures-case-study1), parameter setting: `min_pts:5`
 
 ## Todo

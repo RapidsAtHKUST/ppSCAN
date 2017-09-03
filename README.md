@@ -12,7 +12,7 @@ Visual Aids: see [here](python_experiments/algorithm_vis).
 
 Experiments in detail are [here](python_experiments). 
 
-Detail: [scalability-exp](python_experiments/case_studies/figures-case-study0), [robust-scalability-exp](python_experiments/case_studies/figures-case-study2-robust), [workload-exp](python_experiments/case_studies/figures-case-study1).
+Detail: [scalability-exp](python_experiments/case_studies/figures-case-study0), [robust-scalability-exp](python_experiments/case_studies/figures-case-study2-robust), [scalability-robust-differ-eps](python_experiments/case_studies/figures-case-study3-scalability-differ-eps), [workload-exp](python_experiments/case_studies/figures-case-study1).
 
 description | folder link
 --- | ---
