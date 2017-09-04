@@ -25,7 +25,8 @@ target_compile_definitions(binary_file_checker PRIVATE WITHGPERFTOOLS=1)
 target_link_libraries(binary_file_checker profiler)
 
 # pSCAN release 0: serial
-add_executable(pSCANSerial ${SOURCE_FILES})
+set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/Graph.cpp InputOutput.cpp DisjointSet.cpp)
+add_executable(pSCANSerial ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANSerial PRIVATE WITHGPERFTOOLS=1 SERIAL=1)
 target_compile_options(pSCANSerial PRIVATE -O3 -g)
 target_link_libraries(pSCANSerial profiler)
@@ -38,7 +39,7 @@ target_link_libraries(pSCANParallel ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(pSCANParallel profiler)
 
 # pSCAN experimental 0: serial statistics 0
-add_executable(pSCANStatistics0 ${SOURCE_FILES})
+add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANStatistics0 PRIVATE WITHGPERFTOOLS=1 SERIAL=1 STATISTICS=1)
 target_compile_options(pSCANStatistics0 PRIVATE -O3 -g)
 target_link_libraries(pSCANStatistics0 profiler)
