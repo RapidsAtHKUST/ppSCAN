@@ -38,6 +38,7 @@ private:
     // vertex properties
     vector<int> degree;
     vector<bool> is_core_lst;
+    vector<bool> is_non_core_lst;
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
@@ -76,6 +77,8 @@ private:
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
+
+    void ClusterCoreFirstPhase(int u);
 
     void ClusterCore(int u);
 

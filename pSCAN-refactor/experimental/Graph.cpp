@@ -32,6 +32,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
     is_core_lst = vector<bool>(n, false);
+    is_non_core_lst = vector<bool>(n, false);
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 }
@@ -150,13 +151,22 @@ int Graph::EvalReachable(int u, ui edge_idx) {
 
 void Graph::CheckCoreFirstBSP(int u) {
     auto sd = 0;
+    auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         if (min_cn[edge_idx] > 0 && u <= out_edges[edge_idx]) {
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
+            auto v = out_edges[edge_idx];
+            min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = true;
+                    return;
+                }
+            } else {
+                --ed;
+                if (ed < min_u) {
+                    is_non_core_lst[u] = true;
                     return;
                 }
             }
@@ -165,9 +175,9 @@ void Graph::CheckCoreFirstBSP(int u) {
 }
 
 void Graph::CheckCoreSecondBSP(int u) {
-    if (!is_core_lst[u]) {
+    if (!is_core_lst[u] && !is_non_core_lst[u]) {
         auto sd = 0;
-        auto ed = degree[u];
+        auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
             if (min_cn[edge_idx] == NOT_SURE) {
@@ -209,15 +219,26 @@ void Graph::CheckCoreSecondBSP(int u) {
     }
 }
 
+void Graph::ClusterCoreFirstPhase(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+            if (min_cn[j] == DIRECT_REACHABLE) {
+                disjoint_set_ptr->Union(u, out_edges[j]);
+            }
+        }
+    }
+}
+
 void Graph::ClusterCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
             if (min_cn[j] > 0) {
                 min_cn[j] = EvalReachable(u, j);
-            }
-            if (min_cn[j] == DIRECT_REACHABLE) {
-                disjoint_set_ptr->Union(u, out_edges[j]);
+                if (min_cn[j] == DIRECT_REACHABLE) {
+                    disjoint_set_ptr->Union(u, out_edges[j]);
+                }
             }
         }
     }
@@ -288,6 +309,7 @@ void Graph::pSCAN() {
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
+    for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
     for (auto candidate:candidates) { ClusterCore(candidate); }
 
     auto end_core_cluster = high_resolution_clock::now();

@@ -57,6 +57,35 @@ check if it is not sure currently
 
 ## Reduce Num of Eval
 
+* update cross link, need to figure out where is redundant comp
+
+```cpp
+void Graph::CheckCoreFirstBSP(int u) {
+    auto sd = 0;
+    auto ed = degree[u] - 1;
+    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        if (min_cn[edge_idx] > 0 && u <= out_edges[edge_idx]) {
+            min_cn[edge_idx] = EvalReachable(u, edge_idx);
+            auto v = out_edges[edge_idx];
+            min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                ++sd;
+                if (sd >= min_u) {
+                    is_core_lst[u] = true;
+                    return;
+                }
+            } else {
+                --ed;
+                if (ed < min_u) {
+                    is_non_core_lst[u] = true;
+                    return;
+                }
+            }
+        }
+    }
+}
+```
+
 * use sd and ed boundary, sd: lower bound, ed: upper bound
 
 ```cpp
@@ -154,6 +183,42 @@ void Graph::ClusterNonCores() {
 
 * use disjoint-set pruning in clustering-core
 
+improved one 
+
+```cpp
+    for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
+    for (auto candidate:candidates) { ClusterCore(candidate); }
+```
+
+```cpp
+void Graph::ClusterCoreFirstPhase(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+            if (min_cn[j] == DIRECT_REACHABLE) {
+                disjoint_set_ptr->Union(u, out_edges[j]);
+            }
+        }
+    }
+}
+
+void Graph::ClusterCore(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+            if (min_cn[j] > 0) {
+                min_cn[j] = EvalReachable(u, j);
+                if (min_cn[j] == DIRECT_REACHABLE) {
+                    disjoint_set_ptr->Union(u, out_edges[j]);
+                }
+            }
+        }
+    }
+}
+```
+
+previous one
+
 ```cpp
 void Graph::ClusterCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
@@ -169,3 +234,4 @@ void Graph::ClusterCore(int u) {
     }
 }
 ```
+
