@@ -1,0 +1,15 @@
+int size:4
+n:4036538, m:69362378
+with google perf start
+thread num:8
+1st: prune and cross link execution time:1102 ms
+2nd: core clustering time:16639 ms
+3rd: non-core clustering time:620 ms
+25121224
+715258284
+1810511910
+154796461
+875
+with google perf end
+PROFILE: interrupts/evictions/bytes = 2561/1015/80544
+Total time without IO:18366 ms

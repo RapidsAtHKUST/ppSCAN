@@ -40,7 +40,7 @@ public:
     pair<int, int> ParseEps(const char *eps_s);
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
-                vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
+                vector<int> &similar_degree, vector<int> &cid, vector<int> &parent);
 };
 
 

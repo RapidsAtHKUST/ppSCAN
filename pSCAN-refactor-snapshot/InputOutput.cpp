@@ -99,13 +99,14 @@ pair<int, int> InputOutput::ParseEps(const char *eps_s) {
 }
 
 void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
-                         vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent) {
+                         vector<int> &similar_degree, vector<int> &cid, vector<int> &parent) {
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
     ofstream ofs(out_name);
     ofs << "c/n vertex_id cluster_id\n";
 
+    int mu = atoi(min_u);
     // observation 2: unique belonging
-    for (auto i = 0; i < n; i++) { if (is_core_lst[i]) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }}
+    for (auto i = 0; i < n; i++) { if (similar_degree[i] >= mu) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }}
 
     // possibly multiple belongings
     sort(noncore_cluster.begin(), noncore_cluster.end());

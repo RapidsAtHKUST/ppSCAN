@@ -5,8 +5,8 @@
 #include <atomic>
 #include <mutex>
 
-#include "InputOutput.h"
-#include "DisjointSet.h"
+#include "../InputOutput.h"
+#include "../DisjointSet.h"
 
 using namespace std;
 
@@ -21,8 +21,8 @@ namespace yche {
     }
 }
 
-// Graph instance: fast consumption object
-class Graph {
+// GraphExp instance: fast consumption object
+class GraphExp {
 private:
     unique_ptr<InputOutput> io_helper_ptr;
     // parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
@@ -39,7 +39,7 @@ private:
 
     // vertex properties
     vector<int> degree;
-    vector<bool> is_core_lst;
+    vector<int> similar_degree;
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
@@ -49,16 +49,7 @@ private:
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
-    // statistics
-#ifdef STATISTICS
-    long prune0 = 0;
-    long prune1 = 0;
-    long all_cmp0 = 0;
-    long all_cmp1 = 0;
-    long all_cmp2 = 0;
-    long intersection_times = 0;
-    int portion = 0;
-#endif
+    ui thread_num_;
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
@@ -75,6 +66,8 @@ private:
     int EvalReachable(int u, ui edge_idx);
 
     // 1st phase computation: core check and cluster
+    bool IsDefiniteCoreVertex(int u);
+
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
@@ -87,7 +80,7 @@ private:
     void ClusterNonCores();
 
 public:
-    explicit Graph(const char *dir_string, const char *eps_s, int min_u);
+    explicit GraphExp(const char *dir_string, const char *eps_s, int min_u, ui thread_num);
 
     void pSCAN();
 

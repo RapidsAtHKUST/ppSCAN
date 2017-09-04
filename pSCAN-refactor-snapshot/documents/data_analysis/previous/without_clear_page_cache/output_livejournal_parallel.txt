@@ -1,0 +1,44 @@
+// desktop
+int size:4
+n:4036538, m:69362378
+Total input cost:550 ms
+
+with google perf start
+1st: prune and cross link execution time:966 ms
+2nd: core check time:2503 ms
+3rd: core clustering time:374 ms
+4th: non-core clustering time:314 ms
+
+with google perf end
+PROFILE: interrupts/evictions/bytes = 2806/294/36656
+Total time without IO:4159 ms
+Total output cost:479 ms
+Using local file build/pSCAN.
+Using local file pscanProfile.log.
+
+// luocpu8
+int size:4
+n:4036538, m:69362378
+Total input cost:883 ms
+
+with google perf start
+1st: prune and cross link execution time:1096 ms
+2nd: core check time:2624 ms
+3rd: core clustering time:522 ms
+4th: non-core clustering time:426 ms
+
+with google perf end
+PROFILE: interrupts/evictions/bytes = 3546/1934/220152
+Total time without IO:4675 ms
+Total output cost:935 ms
+
+// gpu-23
+int size:4
+n:4036538, m:69362378
+Total input cost:3102 ms
+1st: prune and cross link execution time:537 ms
+2nd: core check time:1656 ms
+3rd: core clustering time:686 ms
+4th: non-core clustering time:409 ms
+Total time without IO:3291 ms
+Total output cost:2189 ms

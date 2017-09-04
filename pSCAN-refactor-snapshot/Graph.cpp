@@ -37,14 +37,14 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
-    is_core_lst = vector<bool>(n, false);
+    similar_degree = vector<int>(n, 0);
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, disjoint_set_ptr->parent);
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, similar_degree, cluster_dict, disjoint_set_ptr->parent);
 }
 
 ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
@@ -172,6 +172,10 @@ int Graph::EvalReachable(int u, ui edge_idx) {
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
+bool Graph::IsDefiniteCoreVertex(int u) {
+    return similar_degree[u] >= min_u;
+}
+
 void Graph::CheckCoreFirstBSP(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         if (min_cn[edge_idx] > 0 && u <= out_edges[edge_idx]) {
@@ -181,31 +185,20 @@ void Graph::CheckCoreFirstBSP(int u) {
 }
 
 void Graph::CheckCoreSecondBSP(int u) {
-    auto sd = 0;
-    auto ed = degree[u];
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u > v) {
             min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
         }
         if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-            ++sd;
-            if (sd >= min_u) {
-                is_core_lst[u] = true;
-                return;
-            }
-        } else {
-            --ed;
-            if (ed < min_u) {
-                return;
-            }
+            ++similar_degree[u];
         }
     }
 }
 
 void Graph::ClusterCore(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-        if (min_cn[j] == DIRECT_REACHABLE && is_core_lst[out_edges[j]]) {
+        if (min_cn[j] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[j])) {
             disjoint_set_ptr->Union(u, out_edges[j]);
         }
     }
@@ -216,7 +209,7 @@ void Graph::MarkClusterMinEleAsId() {
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
     for (auto i = 0; i < n; i++) {
-        if (is_core_lst[i]) {
+        if (IsDefiniteCoreVertex(i)) {
             // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
             int x = disjoint_set_ptr->FindRoot(i);
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
@@ -230,18 +223,11 @@ void Graph::ClusterNonCores() {
 
     MarkClusterMinEleAsId();
     for (auto i = 0; i < n; i++) {
-        if (is_core_lst[i]) {
+        if (IsDefiniteCoreVertex(i)) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 // observation 3: check non-core neighbors
-                auto v = out_edges[j];
-                if (!is_core_lst[v]) {
-                    if (min_cn[j] >= 0) {
-                        min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
-                    }
-                    if (min_cn[j] == DIRECT_REACHABLE) {
-                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
-                    }
-
+                if (!IsDefiniteCoreVertex(out_edges[j]) && min_cn[j] == DIRECT_REACHABLE) {
+                    noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
                 }
             }
         }
@@ -268,7 +254,7 @@ void Graph::pSCAN() {
 
     for (auto i = 0; i < n; i++) {
         CheckCoreSecondBSP(i);
-        if (is_core_lst[i]) { candidates.emplace_back(i); }
+        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
     }
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
@@ -358,7 +344,7 @@ void Graph::pSCAN() {
                 auto candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) {
                     CheckCoreSecondBSP(i);
-                    if (is_core_lst[i]) { candidates.emplace_back(i); }
+                    if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
                 }
                 return candidates;
             }, my_start, my_end));
