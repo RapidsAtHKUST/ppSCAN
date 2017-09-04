@@ -56,9 +56,9 @@ void Graph::Prune() {
     for (auto u = 0; u < n; u++) {
         for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
             auto v = out_edges[j];
+            int deg_a = degree[u], b = degree[v];
+            if (deg_a > b) { swap(deg_a, b); };
             if (u <= v) {
-                int deg_a = degree[u], b = degree[v];
-                if (deg_a > b) { swap(deg_a, b); };
                 if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
                     // can be pruned
 #ifdef STATISTICS
@@ -72,6 +72,19 @@ void Graph::Prune() {
 #ifdef STATISTICS
                         ++prune1;
 #endif
+                        min_cn[j] = DIRECT_REACHABLE;
+                    } else {
+                        min_cn[j] = c;
+                    }
+                }
+            } else {
+                if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
+                    // can be pruned
+                    min_cn[j] = NOT_DIRECT_REACHABLE;
+                } else {
+                    // can be pruned, when c <= 2
+                    int c = ComputeCnLowerBound(deg_a, b);
+                    if (c <= 2) {
                         min_cn[j] = DIRECT_REACHABLE;
                     } else {
                         min_cn[j] = c;
