@@ -32,7 +32,6 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
     is_core_lst = vector<bool>(n, false);
-    is_non_core_lst = vector<bool>(n, false);
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 }
@@ -138,7 +137,6 @@ int Graph::EvalReachable(int u, ui edge_idx) {
 
 void Graph::CheckCoreFirstBSP(int u) {
     auto sd = 0;
-    auto ed = degree[u];
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         if (min_cn[edge_idx] > 0 && u <= out_edges[edge_idx]) {
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
@@ -148,28 +146,19 @@ void Graph::CheckCoreFirstBSP(int u) {
                     is_core_lst[u] = true;
                     return;
                 }
-            } else {
-                --ed;
-                if (ed < min_u) {
-                    is_non_core_lst[u] = true;
-                    return;
-                }
             }
         }
     }
 }
 
 void Graph::CheckCoreSecondBSP(int u) {
-    if (!is_core_lst[u] && !is_non_core_lst[u]) {
+    if (!is_core_lst[u]) {
         auto sd = 0;
         auto ed = degree[u];
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
             if (min_cn[edge_idx] == NOT_SURE) {
                 min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
-            }
-            if (min_cn[edge_idx] > 0) {
-                min_cn[edge_idx] = EvalReachable(u, edge_idx);
             }
 
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -178,10 +167,29 @@ void Graph::CheckCoreSecondBSP(int u) {
                     is_core_lst[u] = true;
                     return;
                 }
-            } else {
+            }
+            if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
                 --ed;
                 if (ed < min_u) {
                     return;
+                }
+            }
+        }
+
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            if (min_cn[edge_idx] > 0) {
+                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                    ++sd;
+                    if (sd >= min_u) {
+                        is_core_lst[u] = true;
+                        return;
+                    }
+                } else {
+                    --ed;
+                    if (ed < min_u) {
+                        return;
+                    }
                 }
             }
         }
