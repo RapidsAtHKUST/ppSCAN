@@ -51,7 +51,7 @@ private:
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
     vector<pair<ui, ui>> union_candidates;
-    long count = 0;
+    long candidate_count = 0;
 
     // statistics
 #ifdef STATISTICS

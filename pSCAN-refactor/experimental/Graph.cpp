@@ -221,9 +221,9 @@ void Graph::ClusterCoreFirstPhase(int u) {
 
 void Graph::ClusterCore(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        count++;
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+            candidate_count++;
             if (min_cn[edge_idx] == NOT_SURE) {
                 min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
             }
@@ -232,7 +232,7 @@ void Graph::ClusterCore(int u) {
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                     union_candidates.emplace_back(u, out_edges[edge_idx]);
                 }
-                if (count % 1024 * 128 == 0) {
+                if (candidate_count % 1024 * 128 == 0) {
                     for (auto candidate:union_candidates) {
                         disjoint_set_ptr->Union(candidate.first, candidate.second);
                     }

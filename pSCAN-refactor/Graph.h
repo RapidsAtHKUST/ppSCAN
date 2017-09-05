@@ -2,11 +2,11 @@
 #define _GRAPH_H_
 
 #include <memory>
-#include <atomic>
-#include <mutex>
+#include <unordered_set>
 
 #include "InputOutput.h"
 #include "DisjointSet.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -40,6 +40,7 @@ private:
     // vertex properties
     vector<int> degree;
     vector<bool> is_core_lst;
+    vector<bool> is_non_core_lst;
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
@@ -48,6 +49,9 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
+
+    vector<pair<ui, ui>> union_candidates;
+    long candidate_count = 0;
 
     // statistics
 #ifdef STATISTICS
@@ -78,6 +82,8 @@ private:
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
+
+    void ClusterCoreFirstPhase(int u);
 
     void ClusterCore(int u);
 

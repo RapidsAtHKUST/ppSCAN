@@ -6,14 +6,9 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
-
+#include <chrono>
 #include "playground/pretty_print.h"
-
-#ifndef SERIAL
-
 #include "ThreadPool.h"
-
-#endif
 
 using namespace std::chrono;
 
@@ -38,7 +33,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
     is_core_lst = vector<bool>(n, false);
-
+    is_non_core_lst = vector<bool>(n, false);
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 }
@@ -60,35 +55,6 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 }
 
 void Graph::Prune() {
-#ifdef SERIAL
-    for (auto u = 0; u < n; u++) {
-        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-            auto v = out_edges[j];
-            if (u <= v) {
-                int deg_a = degree[u], b = degree[v];
-                if (deg_a > b) { swap(deg_a, b); };
-                if (((long long) deg_a) * eps_b2 < ((long long) b) * eps_a2) {
-                    // can be pruned
-#ifdef STATISTICS
-                    ++prune0;
-#endif
-                    min_cn[j] = NOT_DIRECT_REACHABLE;
-                } else {
-                    // can be pruned, when c <= 2
-                    int c = ComputeCnLowerBound(deg_a, b);
-                    if (c <= 2) {
-#ifdef STATISTICS
-                        ++prune1;
-#endif
-                        min_cn[j] = DIRECT_REACHABLE;
-                    } else {
-                        min_cn[j] = c;
-                    }
-                }
-            }
-        }
-    }
-#else
     auto thread_num = std::thread::hardware_concurrency();
     auto batch_size = 8192u;
     ThreadPool pool(thread_num);
@@ -100,23 +66,20 @@ void Graph::Prune() {
             for (auto u = i_start; u < i_end; u++) {
                 for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
                     auto v = out_edges[edge_idx];
-                    if (u <= v) {
-                        int deg_a = degree[u], deg_b = degree[v];
-                        if (deg_a > deg_b) { swap(deg_a, deg_b); }
-                        if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
-                            // can be pruned
-                            min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
-                        } else {
-                            // can be pruned, when c <= 2
-                            int c = ComputeCnLowerBound(deg_a, deg_b);
-                            min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
-                        }
+                    int deg_a = degree[u], deg_b = degree[v];
+                    if (deg_a > deg_b) { swap(deg_a, deg_b); }
+                    if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
+                        // can be pruned
+                        min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
+                    } else {
+                        // can be pruned, when c <= 2
+                        int c = ComputeCnLowerBound(deg_a, deg_b);
+                        min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
                     }
                 }
             }
         }, my_start, my_end);
     }
-#endif
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -173,40 +136,105 @@ int Graph::EvalReachable(int u, ui edge_idx) {
 }
 
 void Graph::CheckCoreFirstBSP(int u) {
+    auto sd = 0;
+    auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        if (min_cn[edge_idx] > 0 && u <= out_edges[edge_idx]) {
+        auto v = out_edges[edge_idx];
+        if (min_cn[edge_idx] > 0 && u <= v) {
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
+            min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                ++sd;
+                if (sd >= min_u) {
+                    is_core_lst[u] = true;
+                    return;
+                }
+            } else {
+                --ed;
+                if (ed < min_u) {
+                    is_non_core_lst[u] = true;
+                    return;
+                }
+            }
         }
     }
 }
 
 void Graph::CheckCoreSecondBSP(int u) {
-    auto sd = 0;
-    auto ed = degree[u];
-    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        auto v = out_edges[edge_idx];
-        if (u > v) {
-            min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
-        }
-        if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-            ++sd;
-            if (sd >= min_u) {
-                is_core_lst[u] = true;
-                return;
+    if (!is_core_lst[u] && !is_non_core_lst[u]) {
+        auto sd = 0;
+        auto ed = degree[u] - 1;
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                ++sd;
+                if (sd >= min_u) {
+                    is_core_lst[u] = true;
+                    return;
+                }
             }
-        } else {
-            --ed;
-            if (ed < min_u) {
-                return;
+            if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+                --ed;
+                if (ed < min_u) {
+                    return;
+                }
+            }
+        }
+
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            auto v = out_edges[edge_idx];
+            if (min_cn[edge_idx] == NOT_SURE) {
+                min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
+            }
+            if (min_cn[edge_idx] > 0) {
+                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                    ++sd;
+                    if (sd >= min_u) {
+                        is_core_lst[u] = true;
+                        return;
+                    }
+                } else {
+                    --ed;
+                    if (ed < min_u) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Graph::ClusterCoreFirstPhase(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+            if (min_cn[j] == DIRECT_REACHABLE) {
+                disjoint_set_ptr->Union(u, out_edges[j]);
             }
         }
     }
 }
 
 void Graph::ClusterCore(int u) {
-    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-        if (min_cn[j] == DIRECT_REACHABLE && is_core_lst[out_edges[j]]) {
-            disjoint_set_ptr->Union(u, out_edges[j]);
+    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        auto v = out_edges[edge_idx];
+        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+            candidate_count++;
+            if (min_cn[edge_idx] == NOT_SURE) {
+                min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
+            }
+            if (min_cn[edge_idx] > 0) {
+                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                    union_candidates.emplace_back(u, out_edges[edge_idx]);
+                }
+                if (candidate_count % 1024 * 128 == 0) {
+                    for (auto candidate:union_candidates) {
+                        disjoint_set_ptr->Union(candidate.first, candidate.second);
+                    }
+                    union_candidates.clear();
+                }
+            }
         }
     }
 }
@@ -225,23 +253,55 @@ void Graph::MarkClusterMinEleAsId() {
 }
 
 void Graph::ClusterNonCores() {
-    noncore_cluster = vector<pair<int, int>>();
+    noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
     MarkClusterMinEleAsId();
+
+    auto tmp_start = high_resolution_clock::now();
+    auto thread_num=std::thread::hardware_concurrency();
+    vector<std::future<vector<int>>> future_vec;
+    {
+        ThreadPool pool(thread_num);
+
+        auto batch_size = 1024u;
+        for (auto v_i = 0; v_i < n; v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(n, my_start + batch_size);
+            future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
+                auto candidates = vector<int>();
+                for (auto i = i_start; i < i_end; i++) {
+                    if (is_core_lst[i]) {
+                        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+                            auto v = out_edges[j];
+                            if (!is_core_lst[v]) {
+                                if (min_cn[j] == NOT_SURE) {
+                                    min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
+                                }
+                                if (min_cn[j] > 0) {
+                                    min_cn[j] = EvalReachable(i, j);
+                                }
+                            }
+                        }
+                    }
+                }
+                return candidates;
+            }, my_start, my_end));
+        }
+    }
+    auto tmp_end = high_resolution_clock::now();
+    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
+         << " ms\n";
+
     for (auto i = 0; i < n; i++) {
         if (is_core_lst[i]) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
-                // observation 3: check non-core neighbors
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
-                    if (min_cn[j] >= 0) {
-                        min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
-                    }
+                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
                     if (min_cn[j] == DIRECT_REACHABLE) {
-                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
+                        noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
                     }
-
                 }
             }
         }
@@ -249,35 +309,16 @@ void Graph::ClusterNonCores() {
 }
 
 void Graph::pSCAN() {
-    // 1st: pre-processing
+    // 1 prune
+    cout << "new algo" << endl;
     auto prune_start = high_resolution_clock::now();
     Prune();
     auto prune_end = high_resolution_clock::now();
     cout << "1st: prune execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
 
-    // 2nd: find all cores
+    // 2.1 check-core 1st bsp
     auto find_core_start = high_resolution_clock::now();
-#ifdef SERIAL
-    vector<int> union_candidates;
-    for (auto i = 0; i < n; i++) {
-        CheckCoreFirstBSP(i);
-    }
-    auto first_bsp_end = high_resolution_clock::now();
-    cout << "2nd: check core first-phase bsp time:"
-         << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
-
-    for (auto i = 0; i < n; i++) {
-        CheckCoreSecondBSP(i);
-        if (is_core_lst[i]) { union_candidates.emplace_back(i); }
-    }
-    auto second_bsp_end = high_resolution_clock::now();
-    cout << "2nd: check core second-phase bsp time:"
-         << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
-
-    for (auto candidate:union_candidates) { ClusterCore(candidate); }
-#else
     auto thread_num = std::thread::hardware_concurrency();
-
     {
         ThreadPool pool(thread_num);
 
@@ -341,11 +382,11 @@ void Graph::pSCAN() {
             }
         }
     }
-
     auto first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
+    // 2.2 check-core 2nd bsp
     vector<std::future<vector<int>>> future_vec;
     {
         ThreadPool pool(thread_num);
@@ -364,26 +405,41 @@ void Graph::pSCAN() {
             }, my_start, my_end));
         }
     }
+
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
-    // 3rd: cluster cores
-    for (auto &future:future_vec) {
-        auto candidates = future.get();
+    // 3 cluster core
+    auto tmp_start = high_resolution_clock::now();
+    auto candidates_lst = vector<vector<int>>();
+    for (auto &future_value: future_vec) { candidates_lst.emplace_back(std::move(future_value.get())); }
+
+    for (auto &candidates: candidates_lst) {
+        for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
+    }
+    auto tmp_end = high_resolution_clock::now();
+    cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
+    // cluster-core 2nd phase
+    candidates_lst.reserve(future_vec.size());
+    for (auto &candidates: candidates_lst) {
         for (auto candidate:candidates) { ClusterCore(candidate); }
     }
-#endif
+    for (auto candidate:union_candidates) {
+        disjoint_set_ptr->Union(candidate.first, candidate.second);
+    }
+
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()
          << " ms\n";
 
-    // 4th: non-core clustering
+    // 4 non-core clustering
     ClusterNonCores();
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
          << " ms\n";
 
+    // output statistics
 #ifdef STATISTICS
     cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
     cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
