@@ -261,21 +261,32 @@ void Graph::ClusterNonCores() {
     noncore_cluster.reserve(n);
 
     MarkClusterMinEleAsId();
-    pair<int, int> my_pair;
+
+    auto tmp_start = high_resolution_clock::now();
     for (auto i = 0; i < n; i++) {
         if (is_core_lst[i]) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
-                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
-                    my_pair.first = root_of_i;
-                    my_pair.second = v;
                     if (min_cn[j] == NOT_SURE) {
                         min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
                     }
                     if (min_cn[j] > 0) {
                         min_cn[j] = EvalReachable(i, j);
                     }
+                }
+            }
+        }
+    }
+    auto tmp_end = high_resolution_clock::now();
+    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
+
+    for (auto i = 0; i < n; i++) {
+        if (is_core_lst[i]) {
+            for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
+                auto v = out_edges[j];
+                if (!is_core_lst[v]) {
+                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
                     if (min_cn[j] == DIRECT_REACHABLE) {
                         noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
                     }
@@ -313,7 +324,12 @@ void Graph::pSCAN() {
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
     // 3 cluster core
+
+    auto tmp_start = high_resolution_clock::now();
     for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
+    auto tmp_end = high_resolution_clock::now();
+    cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
+
     for (auto candidate:candidates) { ClusterCore(candidate); }
     for (auto candidate:union_candidates) {
         disjoint_set_ptr->Union(candidate.first, candidate.second);
