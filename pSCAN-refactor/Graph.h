@@ -2,6 +2,7 @@
 #define _GRAPH_H_
 
 #include <memory>
+#include <future>
 
 #include "InputOutput.h"
 #include "DisjointSet.h"
@@ -51,6 +52,8 @@ private:
 
     vector<pair<ui, ui>> union_candidates;
     long candidate_count = 0;
+
+    vector<std::future<vector<int>>> future_vec;
 private:
     // 1st optimization: cross-link
     // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
@@ -66,7 +69,6 @@ private:
 
     int EvalReachable(int u, ui edge_idx);
 
-    // 1st phase computation: core check and cluster
     bool IsDefiniteCoreVertex(int u);
 
     void CheckCoreFirstBSP(int u);
@@ -77,13 +79,23 @@ private:
 
     void ClusterCore(int u);
 
-    // 2nd phase computation
     void MarkClusterMinEleAsId();
 
     void ClusterNonCores();
 
+    // four phases
+    void pSCANFirstPhasePrune();
+
+    void pSCANSecondPhaseCheckCore();
+
+    void pSCANThirdPhaseClusterCore();
+
+    void pSCANFourthPhaseClusterNonCore();
+
 public:
     explicit Graph(const char *dir_string, const char *eps_s, int min_u);
+
+
 
     void pSCAN();
 

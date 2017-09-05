@@ -4,7 +4,7 @@ project(pSCAN)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
-        DisjointSet.cpp DisjointSet.h ThreadPool.h)
+        DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h)
 
 find_package(Threads REQUIRED)
 

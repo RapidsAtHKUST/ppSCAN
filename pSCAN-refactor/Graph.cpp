@@ -69,10 +69,8 @@ void Graph::Prune() {
                     int deg_a = degree[u], deg_b = degree[v];
                     if (deg_a > deg_b) { swap(deg_a, deg_b); }
                     if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
-                        // can be pruned
                         min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
                     } else {
-                        // can be pruned, when c <= 2
                         int c = ComputeCnLowerBound(deg_a, deg_b);
                         min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
                     }
@@ -85,11 +83,6 @@ void Graph::Prune() {
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
-#ifdef STATISTICS
-    intersection_times++;
-    auto tmp0 = 0;
-    auto tmp1 = 0;
-#endif
 
     auto offset_nei_u_end = out_edge_start[u + 1];
     auto offset_nei_v_end = out_edge_start[v + 1];
@@ -99,34 +92,15 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             ++offset_nei_u;
-#ifdef STATISTICS
-            ++all_cmp0;
-            ++tmp0;
-#endif
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
             ++offset_nei_v;
-#ifdef STATISTICS
-            ++all_cmp1;
-            ++tmp1;
-#endif
         } else {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
-#ifdef STATISTICS
-            ++all_cmp2;
-            ++tmp0;
-            ++tmp1;
-#endif
         }
     }
-#ifdef STATISTICS
-    int max_val = max(tmp0, tmp1);
-    int min_val = min(tmp0, tmp1);
-    int local_portion = min_val == 0 ? max_val : max_val / min_val;
-    portion = max(portion, local_portion);
-#endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
@@ -232,7 +206,7 @@ void Graph::ClusterCore(int u) {
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                     union_candidates.emplace_back(u, out_edges[edge_idx]);
                 }
-                if (candidate_count % 1024 * 128 == 0) {
+                if (candidate_count % 1024 == 0) {
                     for (auto candidate:union_candidates) {
                         disjoint_set_ptr->Union(candidate.first, candidate.second);
                     }
@@ -268,7 +242,7 @@ void Graph::ClusterNonCores() {
     {
         ThreadPool pool(thread_num);
 
-        auto batch_size = 1024u;
+        auto batch_size = 128u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
@@ -313,78 +287,26 @@ void Graph::ClusterNonCores() {
     }
 }
 
-void Graph::pSCAN() {
-    // 1 prune
-    cout << "new algo" << endl;
+
+void Graph::pSCANFirstPhasePrune() {
     auto prune_start = high_resolution_clock::now();
     Prune();
     auto prune_end = high_resolution_clock::now();
     cout << "1st: prune execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
+}
 
-    // 2.1 check-core 1st bsp
+void Graph::pSCANSecondPhaseCheckCore() {
     auto find_core_start = high_resolution_clock::now();
     auto thread_num = std::thread::hardware_concurrency();
     {
         ThreadPool pool(thread_num);
-
-        // lfr benchmark graphs
-        if (n == 10000001) {
-            auto batch_size = 256u;
-            for (auto v_i = 0; v_i < n; v_i += batch_size) {
-                int my_start = v_i;
-                int my_end = min(n, my_start + batch_size);
-                pool.enqueue([this](int i_start, int i_end) {
-                    for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-                }, my_start, my_end);
-            }
-        } else {
-            auto task_count = 0u;
-
-            // 50,000,000
-            if (min_cn.size() > 50000000) {
-                // medium, large datasets
-                // > 1000,000,000 large datsets, `min_cn.size() / n < 20`: non-social-network
-                auto threshold_sum =
-                        min_cn.size() < 1000000000 ? 1024 * 16 : (min_cn.size() / n < 20 ? 64 * 1024 : 1024 * 32);
-
-                auto prev_start = 0;
-                int cur_end;
-                for (auto v_i = 0; v_i < n; ++v_i) {
-                    cur_end = v_i + 1;
-
-                    auto tmp_sum = 0u;
-                    auto cmp0 = degree[v_i];
-                    for (auto edge_idx = out_edge_start[v_i]; edge_idx < out_edge_start[v_i + 1]; edge_idx++) {
-                        auto dst_idx = out_edges[edge_idx];
-                        if (v_i < dst_idx && min_cn[edge_idx] > 0) {
-                            tmp_sum += cmp0 + degree[dst_idx];
-                        }
-                    }
-
-                    if (tmp_sum > threshold_sum) {
-                        pool.enqueue([this](int i_start, int i_end) {
-                            for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-                        }, prev_start, cur_end);
-
-                        prev_start = cur_end;
-                        ++task_count;
-                    }
-                }
-                pool.enqueue([this](int i_start, int i_end) {
-                    for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-                }, prev_start, cur_end);
-                cout << "total task count:" << task_count << endl;
-            } else {
-                // small datasets
-                auto batch_size = 256u;
-                for (auto v_i = 0; v_i < n; v_i += batch_size) {
-                    int my_start = v_i;
-                    int my_end = min(n, my_start + batch_size);
-                    pool.enqueue([this](int i_start, int i_end) {
-                        for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-                    }, my_start, my_end);
-                }
-            }
+        auto batch_size = 256u;
+        for (auto v_i = 0; v_i < n; v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(n, my_start + batch_size);
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+            }, my_start, my_end);
         }
     }
     auto first_bsp_end = high_resolution_clock::now();
@@ -392,7 +314,6 @@ void Graph::pSCAN() {
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
     // 2.2 check-core 2nd bsp
-    vector<std::future<vector<int>>> future_vec;
     {
         ThreadPool pool(thread_num);
 
@@ -414,18 +335,23 @@ void Graph::pSCAN() {
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
+}
 
-    // 3 cluster core
+void Graph::pSCANThirdPhaseClusterCore() {
     auto tmp_start = high_resolution_clock::now();
+
     // prepare data
     auto candidates_lst = vector<vector<int>>();
     for (auto &future_value: future_vec) { candidates_lst.emplace_back(std::move(future_value.get())); }
+
     // cluster-core 1st phase
     for (auto &candidates: candidates_lst) {
         for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
     }
+
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
+
     // cluster-core 2nd phase
     candidates_lst.reserve(future_vec.size());
     for (auto &candidates: candidates_lst) {
@@ -436,12 +362,27 @@ void Graph::pSCAN() {
     }
 
     auto end_core_cluster = high_resolution_clock::now();
-    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()
+    cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
          << " ms\n";
+}
 
-    // 4 non-core clustering
+void Graph::pSCANFourthPhaseClusterNonCore() {
     ClusterNonCores();
+}
+
+void Graph::pSCAN() {
+    auto tmp_start = high_resolution_clock::now();
+
+    cout << "new algo" << endl;
+    pSCANFirstPhasePrune();
+
+    pSCANSecondPhaseCheckCore();
+
+    pSCANThirdPhaseClusterCore();
+
+    pSCANFourthPhaseClusterNonCore();
+
     auto all_end = high_resolution_clock::now();
-    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
+    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }

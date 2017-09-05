@@ -353,3 +353,4 @@ void Graph::pSCAN() {
     cout << "max portion:" << portion << endl;
 #endif
 }
+
