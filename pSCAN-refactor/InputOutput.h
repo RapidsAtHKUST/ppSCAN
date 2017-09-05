@@ -31,11 +31,11 @@ public:
     ui n;
     ui m;
 
-// csr
+    // csr
     vector<ui> offset_out_edges;
     vector<int> out_edges;
 
-// vertex property
+    // vertex property
     vector<int> degree;
 
     void ReadGraph();

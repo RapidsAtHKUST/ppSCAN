@@ -279,7 +279,8 @@ void Graph::ClusterNonCores() {
         }
     }
     auto tmp_end = high_resolution_clock::now();
-    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
+    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
+         << " ms\n";
 
     for (auto i = 0; i < n; i++) {
         if (is_core_lst[i]) {

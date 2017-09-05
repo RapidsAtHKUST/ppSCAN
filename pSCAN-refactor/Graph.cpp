@@ -287,7 +287,6 @@ void Graph::ClusterNonCores() {
     }
 }
 
-
 void Graph::pSCANFirstPhasePrune() {
     auto prune_start = high_resolution_clock::now();
     Prune();
@@ -313,7 +312,6 @@ void Graph::pSCANSecondPhaseCheckCore() {
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
-    // 2.2 check-core 2nd bsp
     {
         ThreadPool pool(thread_num);
 

@@ -55,22 +55,22 @@ private:
 
     vector<std::future<vector<int>>> future_vec;
 private:
-    // 1st optimization: cross-link
-    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
-    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
-
-    // 2nd optimization: common-neighbor check pruning, as a pre-processing phase
+    // optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
     void Prune();
 
-    // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
     int EvalReachable(int u, ui edge_idx);
 
+    // optimization: cross-link
+    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
+    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
+
     bool IsDefiniteCoreVertex(int u);
 
+    // parallel computation logic
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
@@ -94,8 +94,6 @@ private:
 
 public:
     explicit Graph(const char *dir_string, const char *eps_s, int min_u);
-
-
 
     void pSCAN();
 
