@@ -412,9 +412,10 @@ void Graph::pSCAN() {
 
     // 3 cluster core
     auto tmp_start = high_resolution_clock::now();
+    // prepare data
     auto candidates_lst = vector<vector<int>>();
     for (auto &future_value: future_vec) { candidates_lst.emplace_back(std::move(future_value.get())); }
-
+    // cluster-core 1st phase
     for (auto &candidates: candidates_lst) {
         for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
     }
@@ -438,12 +439,4 @@ void Graph::pSCAN() {
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - end_core_cluster).count()
          << " ms\n";
-
-    // output statistics
-#ifdef STATISTICS
-    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
-    cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
-         << "\nequal cmp:" << all_cmp2 << "\n";
-    cout << "max portion:" << portion << endl;
-#endif
 }

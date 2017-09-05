@@ -13,7 +13,7 @@
 
 #endif
 
-#include "Graph.h"
+#include "GraphSeqExp.h"
 
 void Usage() {
     cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold [4]density-threshold [5 optional]Output\n";

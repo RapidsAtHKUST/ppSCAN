@@ -25,7 +25,7 @@ target_compile_definitions(binary_file_checker PRIVATE WITHGPERFTOOLS=1)
 target_link_libraries(binary_file_checker profiler)
 
 # pSCAN release 0: serial
-set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/Graph.cpp InputOutput.cpp DisjointSet.cpp)
+set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/GraphSeqExp.cpp InputOutput.cpp DisjointSet.cpp)
 add_executable(pSCANSerial ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANSerial PRIVATE WITHGPERFTOOLS=1 SERIAL=1)
 target_compile_options(pSCANSerial PRIVATE -O3 -g)
