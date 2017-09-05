@@ -8,6 +8,9 @@
 #include <fstream>
 #include <vector>
 #include <atomic>
+#include <unordered_set>
+
+#include "Util.h"
 
 using ui=unsigned int;
 using namespace std;
@@ -41,6 +44,9 @@ public:
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
+
+    void Output(const char *eps_s, const char *min_u, unordered_set<pair<int, int>> &noncore_cluster_set,
+                             vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
 };
 
 

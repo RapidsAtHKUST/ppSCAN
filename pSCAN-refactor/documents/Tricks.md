@@ -186,8 +186,8 @@ void Graph::ClusterNonCores() {
 improved one 
 
 ```cpp
-    for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
-    for (auto candidate:candidates) { ClusterCore(candidate); }
+    for (auto candidate:union_candidates) { ClusterCoreFirstPhase(candidate); }
+    for (auto candidate:union_candidates) { ClusterCore(candidate); }
 ```
 
 ```cpp

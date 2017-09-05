@@ -221,6 +221,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
 
 void Graph::ClusterCore(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        count++;
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
             if (min_cn[edge_idx] == NOT_SURE) {
@@ -229,7 +230,13 @@ void Graph::ClusterCore(int u) {
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-                    disjoint_set_ptr->Union(u, out_edges[edge_idx]);
+                    union_candidates.emplace_back(u, out_edges[edge_idx]);
+                }
+                if (count % 1024 * 128 == 0) {
+                    for (auto candidate:union_candidates) {
+                        disjoint_set_ptr->Union(candidate.first, candidate.second);
+                    }
+                    union_candidates.clear();
                 }
             }
         }
@@ -250,15 +257,19 @@ void Graph::MarkClusterMinEleAsId() {
 }
 
 void Graph::ClusterNonCores() {
-    noncore_cluster = vector<pair<int, int>>();
+    noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
     MarkClusterMinEleAsId();
+    pair<int, int> my_pair;
     for (auto i = 0; i < n; i++) {
         if (is_core_lst[i]) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
+                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
+                    my_pair.first = root_of_i;
+                    my_pair.second = v;
                     if (min_cn[j] == NOT_SURE) {
                         min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
                     }
@@ -266,7 +277,7 @@ void Graph::ClusterNonCores() {
                         min_cn[j] = EvalReachable(i, j);
                     }
                     if (min_cn[j] == DIRECT_REACHABLE) {
-                        noncore_cluster.emplace_back(cluster_dict[disjoint_set_ptr->FindRoot(i)], out_edges[j]);
+                        noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
                     }
                 }
             }
@@ -304,6 +315,9 @@ void Graph::pSCAN() {
     // 3 cluster core
     for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
     for (auto candidate:candidates) { ClusterCore(candidate); }
+    for (auto candidate:union_candidates) {
+        disjoint_set_ptr->Union(candidate.first, candidate.second);
+    }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()

@@ -2,9 +2,11 @@
 #define _GRAPH_H_
 
 #include <memory>
+#include <unordered_set>
 
 #include "../InputOutput.h"
 #include "../DisjointSet.h"
+#include "../Util.h"
 
 using namespace std;
 
@@ -47,6 +49,9 @@ private:
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
+
+    vector<pair<ui, ui>> union_candidates;
+    long count = 0;
 
     // statistics
 #ifdef STATISTICS

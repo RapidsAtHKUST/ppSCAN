@@ -258,7 +258,7 @@ void Graph::pSCAN() {
     // 2nd: find all cores
     auto find_core_start = high_resolution_clock::now();
 #ifdef SERIAL
-    vector<int> candidates;
+    vector<int> union_candidates;
     for (auto i = 0; i < n; i++) {
         CheckCoreFirstBSP(i);
     }
@@ -268,13 +268,13 @@ void Graph::pSCAN() {
 
     for (auto i = 0; i < n; i++) {
         CheckCoreSecondBSP(i);
-        if (is_core_lst[i]) { candidates.emplace_back(i); }
+        if (is_core_lst[i]) { union_candidates.emplace_back(i); }
     }
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
-    for (auto candidate:candidates) { ClusterCore(candidate); }
+    for (auto candidate:union_candidates) { ClusterCore(candidate); }
 #else
     auto thread_num = std::thread::hardware_concurrency();
 

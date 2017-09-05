@@ -254,7 +254,7 @@ void Graph::pSCAN() {
 
     // 2.1 check-core 1st bsp
     auto find_core_start = high_resolution_clock::now();
-    vector<int> candidates;
+    vector<int> union_candidates;
     for (auto i = 0; i < n; i++) {
         CheckCoreFirstBSP(i);
     }
@@ -265,15 +265,15 @@ void Graph::pSCAN() {
     // 2.2 check-core 2nd bsp
     for (auto i = 0; i < n; i++) {
         CheckCoreSecondBSP(i);
-        if (is_core_lst[i]) { candidates.emplace_back(i); }
+        if (is_core_lst[i]) { union_candidates.emplace_back(i); }
     }
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
     // 3 cluster core
-    for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
-    for (auto candidate:candidates) { ClusterCore(candidate); }
+    for (auto candidate:union_candidates) { ClusterCoreFirstPhase(candidate); }
+    for (auto candidate:union_candidates) { ClusterCore(candidate); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()

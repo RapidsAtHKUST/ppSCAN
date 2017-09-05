@@ -96,11 +96,11 @@ remove ed
 
 ```cpp
 #ifdef STATISTICS
-    vector<int> candidates;
+    vector<int> union_candidates;
     for (auto i = 0; i < n; i++) {
 //        if (effective_degree[i] >= min_u) {
             CheckCoreFirstBSP(i);
-            if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+            if (IsDefiniteCoreVertex(i)) { union_candidates.emplace_back(i); }
 //        }
     }
 #else
@@ -115,14 +115,14 @@ remove ed
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
             future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
-                auto candidates = vector<int>();
+                auto union_candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) {
 //                    if (effective_degree[i] >= min_u) {
                         CheckCoreFirstBSP(i);
-                        if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
+                        if (IsDefiniteCoreVertex(i)) { union_candidates.emplace_back(i); }
 //                    }
                 }
-                return candidates;
+                return union_candidates;
             }, my_start, my_end));
         }
     }

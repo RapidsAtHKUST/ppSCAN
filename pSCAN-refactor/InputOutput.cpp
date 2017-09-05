@@ -113,3 +113,24 @@ void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, 
     for_each(noncore_cluster.begin(), iter_end,
              [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }
+
+void InputOutput::Output(const char *eps_s, const char *min_u, unordered_set<pair<int, int>> &noncore_cluster_set,
+                         vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent) {
+    string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
+    ofstream ofs(out_name);
+    ofs << "c/n vertex_id cluster_id\n";
+
+    // observation 2: unique belonging
+    for (auto i = 0; i < n; i++) { if (is_core_lst[i]) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }}
+
+    // possibly multiple belongings
+    cout << "non core label num:" << noncore_cluster_set.size() << endl;
+    vector<pair<int, int>> noncore_cluster;
+    noncore_cluster.reserve(n);
+    for (auto my_pair: noncore_cluster_set) {
+        noncore_cluster.push_back(my_pair);
+    };
+    sort(noncore_cluster.begin(), noncore_cluster.end());
+    for_each(noncore_cluster.begin(), noncore_cluster.end(),
+             [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
+}
