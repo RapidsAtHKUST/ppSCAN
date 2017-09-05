@@ -134,3 +134,19 @@ void InputOutput::Output(const char *eps_s, const char *min_u, unordered_set<pai
     for_each(noncore_cluster.begin(), noncore_cluster.end(),
              [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }
+
+void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                         vector<char> &is_core_lst, vector<int> &cid, vector<int> &parent) {
+    string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
+    ofstream ofs(out_name);
+    ofs << "c/n vertex_id cluster_id\n";
+
+    // observation 2: unique belonging
+    for (auto i = 0; i < n; i++) { if (is_core_lst[i] == TRUE) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }}
+
+    // possibly multiple belongings
+    sort(noncore_cluster.begin(), noncore_cluster.end());
+    auto iter_end = unique(noncore_cluster.begin(), noncore_cluster.end());
+    for_each(noncore_cluster.begin(), iter_end,
+             [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
+}

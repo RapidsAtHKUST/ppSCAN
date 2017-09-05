@@ -32,8 +32,8 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
-    is_core_lst = vector<bool>(n, false);
-    is_non_core_lst = vector<bool>(n, false);
+    is_core_lst = vector<char>(n, FALSE);
+    is_non_core_lst = vector<char>(n, FALSE);
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 }
@@ -135,6 +135,10 @@ int Graph::EvalReachable(int u, ui edge_idx) {
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
+bool Graph::IsDefiniteCoreVertex(int u) {
+    return is_core_lst[u] == TRUE;
+}
+
 void Graph::CheckCoreFirstBSP(int u) {
     auto sd = 0;
     auto ed = degree[u] - 1;
@@ -146,13 +150,13 @@ void Graph::CheckCoreFirstBSP(int u) {
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                 ++sd;
                 if (sd >= min_u) {
-                    is_core_lst[u] = true;
+                    is_core_lst[u] = TRUE;
                     return;
                 }
             } else {
                 --ed;
                 if (ed < min_u) {
-                    is_non_core_lst[u] = true;
+                    is_non_core_lst[u] = FALSE;
                     return;
                 }
             }
@@ -161,14 +165,14 @@ void Graph::CheckCoreFirstBSP(int u) {
 }
 
 void Graph::CheckCoreSecondBSP(int u) {
-    if (!is_core_lst[u] && !is_non_core_lst[u]) {
+    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                 ++sd;
                 if (sd >= min_u) {
-                    is_core_lst[u] = true;
+                    is_core_lst[u] = TRUE;
                     return;
                 }
             }
@@ -207,7 +211,7 @@ void Graph::CheckCoreSecondBSP(int u) {
 void Graph::ClusterCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
-        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
             if (min_cn[j] == DIRECT_REACHABLE) {
                 disjoint_set_ptr->Union(u, out_edges[j]);
             }
@@ -218,7 +222,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
 void Graph::ClusterCore(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
-        if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
+        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
             candidate_count++;
             if (min_cn[edge_idx] == NOT_SURE) {
                 min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
@@ -244,7 +248,7 @@ void Graph::MarkClusterMinEleAsId() {
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
     for (auto i = 0; i < n; i++) {
-        if (is_core_lst[i]) {
+        if (IsDefiniteCoreVertex(i)) {
             // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
             int x = disjoint_set_ptr->FindRoot(i);
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
@@ -259,7 +263,7 @@ void Graph::ClusterNonCores() {
     MarkClusterMinEleAsId();
 
     auto tmp_start = high_resolution_clock::now();
-    auto thread_num=std::thread::hardware_concurrency();
+    auto thread_num = std::thread::hardware_concurrency();
     vector<std::future<vector<int>>> future_vec;
     {
         ThreadPool pool(thread_num);
@@ -271,12 +275,13 @@ void Graph::ClusterNonCores() {
             future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
                 auto candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) {
-                    if (is_core_lst[i]) {
+                    if (IsDefiniteCoreVertex(i)) {
                         for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                             auto v = out_edges[j];
-                            if (!is_core_lst[v]) {
+                            if (!IsDefiniteCoreVertex(v)) {
                                 if (min_cn[j] == NOT_SURE) {
-                                    min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
+                                    min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1],
+                                                                    i)];
                                 }
                                 if (min_cn[j] > 0) {
                                     min_cn[j] = EvalReachable(i, j);
@@ -294,10 +299,10 @@ void Graph::ClusterNonCores() {
          << " ms\n";
 
     for (auto i = 0; i < n; i++) {
-        if (is_core_lst[i]) {
+        if (IsDefiniteCoreVertex(i)) {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 auto v = out_edges[j];
-                if (!is_core_lst[v]) {
+                if (!IsDefiniteCoreVertex(v)) {
                     auto root_of_i = disjoint_set_ptr->FindRoot(i);
                     if (min_cn[j] == DIRECT_REACHABLE) {
                         noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
@@ -399,7 +404,7 @@ void Graph::pSCAN() {
                 auto candidates = vector<int>();
                 for (auto i = i_start; i < i_end; i++) {
                     CheckCoreSecondBSP(i);
-                    if (is_core_lst[i]) { candidates.emplace_back(i); }
+                    if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
                 }
                 return candidates;
             }, my_start, my_end));

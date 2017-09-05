@@ -14,5 +14,7 @@ namespace std {
         }
     };
 }
+constexpr char TRUE = 1;
+constexpr char FALSE = 0;
 
 #endif //PSCAN_DATA_STRUCTURE_UTIL_H

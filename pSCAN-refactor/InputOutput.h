@@ -47,6 +47,9 @@ public:
 
     void Output(const char *eps_s, const char *min_u, unordered_set<pair<int, int>> &noncore_cluster_set,
                              vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
+
+    void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                             vector<char> &is_core_lst, vector<int> &cid, vector<int> &parent);
 };
 
 
