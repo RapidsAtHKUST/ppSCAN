@@ -144,6 +144,25 @@ void Graph::CheckCoreFirstBSP(int u) {
     auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
+        if (u <= v) {
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                ++sd;
+                if (sd >= min_u) {
+                    is_core_lst[u] = true;
+                    return;
+                }
+            } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+                --ed;
+                if (ed < min_u) {
+                    is_non_core_lst[u] = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        auto v = out_edges[edge_idx];
         if (min_cn[edge_idx] > 0 && u <= v) {
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
             min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];

@@ -6,7 +6,7 @@
 #include <iostream>
 #include <algorithm>
 #include <numeric>
-#include <chrono>
+
 #include "playground/pretty_print.h"
 #include "ThreadPool.h"
 
@@ -16,6 +16,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     io_helper_ptr = yche::make_unique<InputOutput>(dir_string);
     io_helper_ptr->ReadGraph();
 
+    auto tmp_start = high_resolution_clock::now();
     // 1st: parameter
     std::tie(eps_a2, eps_b2) = io_helper_ptr->ParseEps(eps_s);
     this->min_u = min_u;
@@ -36,6 +37,9 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     is_non_core_lst = vector<char>(n, FALSE);
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
+    auto all_end = high_resolution_clock::now();
+    cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
+         << " ms\n";
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
@@ -383,7 +387,6 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
 }
 
 void Graph::pSCAN() {
-
     cout << "new algo" << endl;
     pSCANFirstPhasePrune();
 
