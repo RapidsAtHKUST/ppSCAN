@@ -315,8 +315,9 @@ void Graph::ClusterNonCores() {
 }
 
 void Graph::pSCAN() {
-    // 1 prune
     cout << "new algo" << endl;
+
+    // 1 prune
     auto prune_start = high_resolution_clock::now();
     Prune();
     auto prune_end = high_resolution_clock::now();
@@ -342,16 +343,12 @@ void Graph::pSCAN() {
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
 
     // 3 cluster core
-
     auto tmp_start = high_resolution_clock::now();
     for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
-
     for (auto candidate:candidates) { ClusterCore(candidate); }
-    for (auto candidate:union_candidates) {
-        disjoint_set_ptr->Union(candidate.first, candidate.second);
-    }
+    for (auto candidate:union_candidates) { disjoint_set_ptr->Union(candidate.first, candidate.second); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()

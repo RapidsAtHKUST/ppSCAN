@@ -182,8 +182,10 @@ void Graph::CheckCoreSecondBSP(int u) {
         }
 
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            auto v = out_edges[edge_idx];
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                     ++sd;
                     if (sd >= min_u) {
