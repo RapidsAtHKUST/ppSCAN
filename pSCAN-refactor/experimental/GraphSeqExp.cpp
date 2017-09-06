@@ -97,6 +97,7 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
 #ifdef STATISTICS
     intersection_times++;
+    max_cmp += du - 2 + dv - 2;
     auto tmp0 = 0;
     auto tmp1 = 0;
 #endif
@@ -365,6 +366,12 @@ void Graph::pSCAN() {
     cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
     cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
+    cout << "total:" << (all_cmp0 + all_cmp1 + all_cmp2) << " ,max:" << max_cmp << " ,portion:"
+         << (static_cast<double >(all_cmp0 + all_cmp1 + all_cmp2) / max_cmp) << " ,avg eval:"
+         << (static_cast<double >(all_cmp0 + all_cmp1 + all_cmp2) / intersection_times) << "\n";
+    cout << "absolute intersect portion:" << static_cast<double >(intersection_times) / (min_cn.size() / 2) << "\n";
+    cout << "filtered intersect portion:"
+         << static_cast<double >(intersection_times) / (min_cn.size() / 2 - prune0 - prune1) << "\n";
     cout << "max portion:" << portion << endl;
 #endif
 }
