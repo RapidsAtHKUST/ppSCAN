@@ -15,6 +15,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     io_helper_ptr = yche::make_unique<InputOutput>(dir_string);
     io_helper_ptr->ReadGraph();
 
+    auto tmp_start = high_resolution_clock::now();
     // 1st: parameter
     std::tie(eps_a2, eps_b2) = io_helper_ptr->ParseEps(eps_s);
     this->min_u = min_u;
@@ -35,6 +36,9 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     is_non_core_lst = vector<bool>(n, false);
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
+    auto all_end = high_resolution_clock::now();
+    cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
+         << " ms\n";
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
@@ -205,9 +209,6 @@ void Graph::CheckCoreSecondBSP(int u) {
 
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
-            if (min_cn[edge_idx] == NOT_SURE) {
-                min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
-            }
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -243,9 +244,6 @@ void Graph::ClusterCore(int u) {
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
             candidate_count++;
-            if (min_cn[edge_idx] == NOT_SURE) {
-                min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
-            }
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -287,9 +285,6 @@ void Graph::ClusterNonCores() {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
-                    if (min_cn[j] == NOT_SURE) {
-                        min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], i)];
-                    }
                     if (min_cn[j] > 0) {
                         min_cn[j] = EvalReachable(i, j);
                     }
