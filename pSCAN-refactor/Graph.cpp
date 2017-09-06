@@ -118,7 +118,26 @@ void Graph::CheckCoreFirstBSP(int u) {
     auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
-        if (min_cn[edge_idx] > 0 && u <= v) {
+        if (u <= v) {
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                ++sd;
+                if (sd >= min_u) {
+                    is_core_lst[u] = TRUE;
+                    return;
+                }
+            } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+                --ed;
+                if (ed < min_u) {
+                    is_non_core_lst[u] = TRUE;
+                    return;
+                }
+            }
+        }
+    }
+
+    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        auto v = out_edges[edge_idx];
+        if (u <= v && min_cn[edge_idx] > 0) {
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
             min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -130,7 +149,7 @@ void Graph::CheckCoreFirstBSP(int u) {
             } else {
                 --ed;
                 if (ed < min_u) {
-                    is_non_core_lst[u] = FALSE;
+                    is_non_core_lst[u] = TRUE;
                     return;
                 }
             }
@@ -159,16 +178,12 @@ void Graph::CheckCoreSecondBSP(int u) {
         }
 
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-            auto v = out_edges[edge_idx];
-            if (min_cn[edge_idx] == NOT_SURE) {
-                min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
-            }
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                     ++sd;
                     if (sd >= min_u) {
-                        is_core_lst[u] = true;
+                        is_core_lst[u] = TRUE;
                         return;
                     }
                 } else {
@@ -198,9 +213,6 @@ void Graph::ClusterCore(int u) {
         auto v = out_edges[edge_idx];
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
             candidate_count++;
-            if (min_cn[edge_idx] == NOT_SURE) {
-                min_cn[edge_idx] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)];
-            }
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -253,10 +265,6 @@ void Graph::ClusterNonCores() {
                         for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                             auto v = out_edges[j];
                             if (!IsDefiniteCoreVertex(v)) {
-                                if (min_cn[j] == NOT_SURE) {
-                                    min_cn[j] = min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1],
-                                                                    i)];
-                                }
                                 if (min_cn[j] > 0) {
                                     min_cn[j] = EvalReachable(i, j);
                                 }
@@ -365,11 +373,16 @@ void Graph::pSCANThirdPhaseClusterCore() {
 }
 
 void Graph::pSCANFourthPhaseClusterNonCore() {
+    auto tmp_start = high_resolution_clock::now();
+
     ClusterNonCores();
+
+    auto all_end = high_resolution_clock::now();
+    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
+         << " ms\n";
 }
 
 void Graph::pSCAN() {
-    auto tmp_start = high_resolution_clock::now();
 
     cout << "new algo" << endl;
     pSCANFirstPhasePrune();
@@ -379,8 +392,4 @@ void Graph::pSCAN() {
     pSCANThirdPhaseClusterCore();
 
     pSCANFourthPhaseClusterNonCore();
-
-    auto all_end = high_resolution_clock::now();
-    cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
-         << " ms\n";
 }
