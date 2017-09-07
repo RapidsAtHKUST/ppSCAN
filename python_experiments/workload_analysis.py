@@ -1,6 +1,6 @@
 import os
 from workload_figure import filter_lines_by_tag
-from scalability_figure_overview import ms_val_to_s
+from scalability_figure_overview import ms_val_to_s, format_str
 
 runtime_tag = 'Total time without IO'
 abs_eval_portion_tag = 'absolute intersect portion'
@@ -48,7 +48,7 @@ def get_markdown_table(dataset, tag_lst):
     rows = [header_line, second_line]
 
     def statistics_dict_to_str(statistics_dict):
-        return '/'.join(map(lambda tag: str(statistics_dict[tag]), tag_lst))
+        return '/'.join(map(lambda tag: format_str(statistics_dict[tag]), tag_lst))
 
     folder_path = '/mnt/mount-gpu/d2/yche/projects/python_experiments/eval-workload'
     for min_pts in min_pts_lst:
