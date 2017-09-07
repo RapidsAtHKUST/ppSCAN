@@ -62,12 +62,12 @@ def get_markdown_table(dataset, tag_lst):
 
 def generate_markdown_file(dataset):
     with open(case_study_folder + os.sep + dataset + '.md', 'w') as ofs:
-        runtime_table_str = get_markdown_table(dataset, tag_lst=[runtime_tag])
-        avg_eval_table_str = get_markdown_table(dataset, tag_lst=[avg_eval_tag, portion_tag])
-        workload_table_str = get_markdown_table(dataset, tag_lst=[abs_eval_portion_tag, filtered_eval_portion_tag])
         ofs.write(
-            '\n\n'.join(['## Avg Eval/Cmp Ratio', avg_eval_table_str, '## Workload', workload_table_str, '## Runtime',
-                         runtime_table_str]))
+            '\n\n'.join(['## Avg Eval/Cmp Ratio', get_markdown_table(dataset, tag_lst=[avg_eval_tag]),
+                         get_markdown_table(dataset, tag_lst=[portion_tag])
+                            , '## Workload', get_markdown_table(dataset, tag_lst=[abs_eval_portion_tag]),
+                         get_markdown_table(dataset, tag_lst=[filtered_eval_portion_tag]), '## Runtime',
+                         get_markdown_table(dataset, tag_lst=[runtime_tag])]))
 
 
 if __name__ == '__main__':
