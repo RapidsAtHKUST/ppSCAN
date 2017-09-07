@@ -9,7 +9,7 @@ if __name__ == '__main__':
                     'webgraph_uk', 'webgraph_webbase',
                     'webgraph_twitter', 'snap_friendster']
     # parameter_eps_lst = [0.3]
-    parameter_min_pts_lst = [5]
+    parameter_min_pts_lst = [2, 10, 15]
 
     # data_set_lst = ['small_snap_dblp']
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
