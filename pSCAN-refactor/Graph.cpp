@@ -90,16 +90,20 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 
     auto offset_nei_u_end = out_edge_start[u + 1];
     auto offset_nei_v_end = out_edge_start[v + 1];
-    for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-         offset_nei_u < offset_nei_u_end && offset_nei_v < offset_nei_v_end &&
-         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
-        if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+    for (; offset_nei_u < offset_nei_u_end && offset_nei_v < offset_nei_v_end &&
+           cn < min_cn_num;) {
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
+            if (du < min_cn_num) { return NOT_DIRECT_REACHABLE; }
             ++offset_nei_u;
-        } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+        }
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
+            if (dv < min_cn_num) { return NOT_DIRECT_REACHABLE; }
             ++offset_nei_v;
-        } else {
+        }
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;

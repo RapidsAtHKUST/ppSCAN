@@ -7,6 +7,77 @@
 * try to reduce the cost of if-branch miss in `IntersectNeighborSets(int u, int v, int min_cn_num)`, 
 still keep early quit intersection functionality
 
+## Optimized Merge
+
+```cpp
+int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+    int cn = 2; // count for self and v, count for self and u
+    int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
+#ifdef STATISTICS
+    intersection_times++;
+    max_cmp += du - 2 + dv - 2;
+    auto tmp0 = 0;
+    auto tmp1 = 0;
+#endif
+
+    auto offset_nei_u_end = out_edge_start[u + 1], offset_nei_v_end = out_edge_start[v + 1];
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+    for (; offset_nei_u < offset_nei_u_end && offset_nei_v < offset_nei_v_end && cn < min_cn_num;) {
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+#ifdef STATISTICS
+            ++all_cmp0;
+            ++tmp0;
+#endif
+            --du;
+            if (du < min_cn_num) {
+#ifdef STATISTICS
+                int max_val = max(tmp0, tmp1);
+    int min_val = min(tmp0, tmp1);
+    int local_portion = min_val == 0 ? max_val : max_val / min_val;
+    portion = max(portion, local_portion);
+#endif
+                return NOT_DIRECT_REACHABLE;
+            }
+            ++offset_nei_u;
+        }
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+#ifdef STATISTICS
+            ++all_cmp1;
+            ++tmp1;
+#endif
+            --dv;
+            if (dv < min_cn_num) {
+#ifdef STATISTICS
+                int max_val = max(tmp0, tmp1);
+    int min_val = min(tmp0, tmp1);
+    int local_portion = min_val == 0 ? max_val : max_val / min_val;
+    portion = max(portion, local_portion);
+#endif
+                return NOT_DIRECT_REACHABLE;
+            }
+            ++offset_nei_v;
+        }
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+#ifdef STATISTICS
+            ++all_cmp2;
+            ++tmp0;
+            ++tmp1;
+#endif
+            ++cn;
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+#ifdef STATISTICS
+    int max_val = max(tmp0, tmp1);
+    int min_val = min(tmp0, tmp1);
+    int local_portion = min_val == 0 ? max_val : max_val / min_val;
+    portion = max(portion, local_portion);
+#endif
+    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+}
+```
+
 ## Not Useful
 
 ```cpp
