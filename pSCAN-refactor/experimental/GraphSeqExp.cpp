@@ -267,6 +267,9 @@ void GraphSeqExp::ClusterCore(int u) {
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
             candidate_count++;
             if (min_cn[edge_idx] > 0) {
+#ifdef STATISTICS
+                serial_intersection_times++;
+#endif
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                     union_candidates.emplace_back(u, out_edges[edge_idx]);
@@ -382,6 +385,7 @@ void GraphSeqExp::pSCAN() {
     // output statistics
 #ifdef STATISTICS
     cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
+    cout << "serial intersection times:" << serial_intersection_times << "\n";
     cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
     cout << "total:" << (all_cmp0 + all_cmp1 + all_cmp2) << " ,max:" << max_cmp << " ,portion:"
