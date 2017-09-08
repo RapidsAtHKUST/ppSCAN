@@ -22,7 +22,10 @@ def to_grouped_statistics(statistics):
 def to_portion_lst(info_lst, input_time_lst, output_time_lst):
     zipped_lst = map(lambda my_tuple: my_tuple[0] + [my_tuple[1], my_tuple[2]],
                      zip(info_lst, input_time_lst, output_time_lst))
-    zipped_lst = map(lambda lst: map(lambda ele: float(ele) / lst[0], lst), zipped_lst)
+    # print zipped_lst
+    # zipped_lst = map(lambda lst: map(lambda ele: float(ele) / lst[0], lst), zipped_lst)
+    zipped_lst = map(lambda lst: map(lambda ele: 100.0 * float(ele) / sum(lst[1:]), lst), zipped_lst)
+    print zipped_lst
 
     def transpose():
         return map(lambda idx: map(lambda lst: lst[idx], zipped_lst), range(len(zipped_lst[0])))
@@ -49,7 +52,7 @@ def display_comp_io_portion(portion_lst_lst, data_set_name_lst, title_append_txt
         cur_shape_color_idx += 1
 
     plt.xlabel('real-world data set', fontdict=font)
-    plt.ylim([0.0, 10.0])
+    plt.ylim([0.0, 100.0])
     plt.xticks(range(1, len(data_set_name_lst) + 1), data_set_name_lst, rotation=20)
     plt.ylabel('portion', fontdict=font)
     plt.legend(['input time', 'output time', 'parallel part time', 'serial part time'])
@@ -72,19 +75,20 @@ def illustrate_comp_io_portion(input_time_lst, output_time_lst, eps, min_pts):
 
         best_obj = sorted(time_info_dict.iteritems(), key=lambda pair: pair[1][total_time_tag])[0]
         best_thread_lst.append(best_obj[0])
-        print data_set
-        print best_obj[1], '\n', to_grouped_statistics(best_obj[1])
+        # print data_set
+        # print best_obj[1], '\n', to_grouped_statistics(best_obj[1])
         best_info_lst.append(to_grouped_statistics(best_obj[1]))
 
-        print time_info_dict[40], '\n', to_grouped_statistics(time_info_dict[40]), '\n'
+        # print time_info_dict[40], '\n', to_grouped_statistics(time_info_dict[40]), '\n'
         full_core_info_lst.append(to_grouped_statistics(time_info_dict[40]))
 
-    print 'best_thread_lst:', best_thread_lst, '\n', 'best_info_lst:', best_info_lst
-    print 'full_core_info_lst:', full_core_info_lst
-    print 'input_time_lst:', input_time_lst, '\n', 'output_time_lst:', output_time_lst
+    # print 'best_thread_lst:', best_thread_lst, '\n', 'best_info_lst:', best_info_lst
+    # print 'full_core_info_lst:', full_core_info_lst
+    # print 'input_time_lst:', input_time_lst, '\n', 'output_time_lst:', output_time_lst
 
     append_txt = ' - '.join(['eps:' + str(eps), 'min_pts:' + str(min_pts), 'with all logical cores'])
     zipped_lst = to_portion_lst(full_core_info_lst, input_time_lst, output_time_lst)
+    # print zipped_lst
     display_comp_io_portion(zipped_lst, map(lambda my_str: my_str.split('_')[-1], data_set_lst), append_txt)
 
     append_txt = ' - '.join(['eps:' + str(eps), 'min_pts:' + str(min_pts), 'with best logical thread num'])
@@ -146,10 +150,10 @@ def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst
                            zip(pscan_serial_runtime_lst, pscan_plus_best_parallel_runtime_lst))
     pscan_serial_runtime_lst = map(lambda num: str(num) + 's', pscan_serial_runtime_lst)
 
-    print 'dataset lst:', data_set_name_lst, '\n', 'edge_num lst:', edge_num_lst
-    print 'pscan serial runtime lst:', pscan_serial_runtime_lst
-    print 'speedup lst 40-core:', speedup_full_lst
-    print 'speedup lst best thread num:', speedup_best_lst
+    # print 'dataset lst:', data_set_name_lst, '\n', 'edge_num lst:', edge_num_lst
+    # print 'pscan serial runtime lst:', pscan_serial_runtime_lst
+    # print 'speedup lst 40-core:', speedup_full_lst
+    # print 'speedup lst best thread num:', speedup_best_lst
     print 'best performance thread_num_lst:', best_thread_lst, '\n'
 
     rows = []
