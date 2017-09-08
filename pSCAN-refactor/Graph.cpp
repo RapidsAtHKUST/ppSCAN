@@ -88,11 +88,10 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
 
-    auto offset_nei_u_end = out_edge_start[u + 1];
-    auto offset_nei_v_end = out_edge_start[v + 1];
     auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-    for (; offset_nei_u < offset_nei_u_end && offset_nei_v < offset_nei_v_end &&
-           cn < min_cn_num;) {
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    while (cn < min_cn_num) {
         while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             if (du < min_cn_num) { return NOT_DIRECT_REACHABLE; }
