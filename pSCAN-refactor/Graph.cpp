@@ -263,7 +263,7 @@ void Graph::ClusterNonCores() {
     {
         ThreadPool pool(thread_num);
 
-        auto batch_size = 128u;
+        auto batch_size = 32 * 64u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);

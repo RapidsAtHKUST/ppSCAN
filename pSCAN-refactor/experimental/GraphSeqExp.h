@@ -63,6 +63,9 @@ private:
     long all_cmp2 = 0;
     long intersection_times = 0;
     long serial_intersection_times = 0;
+    long first_bsp_intersection_times = 0;
+    long second_bsp_intersection_times = 0;
+    long core_non_core_intersection_times = 0;
     int portion = 0;
 #endif
 private:

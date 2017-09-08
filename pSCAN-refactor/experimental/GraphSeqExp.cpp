@@ -189,6 +189,9 @@ void GraphSeqExp::CheckCoreFirstBSP(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u <= v && min_cn[edge_idx] > 0) {
+#ifdef STATISTICS
+            first_bsp_intersection_times++;
+#endif
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
             min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -231,6 +234,9 @@ void GraphSeqExp::CheckCoreSecondBSP(int u) {
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
             if (min_cn[edge_idx] > 0) {
+#ifdef STATISTICS
+                second_bsp_intersection_times++;
+#endif
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
@@ -311,6 +317,9 @@ void GraphSeqExp::ClusterNonCores() {
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
                     if (min_cn[j] > 0) {
+#ifdef STATISTICS
+                        core_non_core_intersection_times++;
+#endif
                         min_cn[j] = EvalReachable(i, j);
                     }
                 }
@@ -385,16 +394,26 @@ void GraphSeqExp::pSCAN() {
     // output statistics
 #ifdef STATISTICS
     cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
-    cout << "serial intersection times:" << serial_intersection_times << "\n";
-    cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
+    cout << "absolute intersect portion:" << static_cast<double >(intersection_times) / (min_cn.size() / 2) << "\n";
+    cout << "filtered intersect portion:"
+         << static_cast<double >(intersection_times) / (min_cn.size() / 2 - prune0 - prune1) << "\n\n";
+
+    cout << "1st bsp intersection times:" << first_bsp_intersection_times << ", ratio:"
+         << static_cast<double >(first_bsp_intersection_times) / intersection_times << "\n";
+    cout << "2nd bsp intersection times:" << second_bsp_intersection_times << ", ratio:"
+         << static_cast<double >(second_bsp_intersection_times) / intersection_times << "\n";
+    cout << "serial intersection times:" << serial_intersection_times << ", ratio:"
+         << static_cast<double >(serial_intersection_times) / intersection_times << "\n";
+    cout << "core non-core intersection times:" << core_non_core_intersection_times << ", ratio:"
+         << static_cast<double >(core_non_core_intersection_times) / intersection_times << "\n";
+    cout << "intersection times:" << intersection_times << "\n\n";
+
+    cout << "cmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
     cout << "total:" << (all_cmp0 + all_cmp1 + all_cmp2) << " ,max:" << max_cmp << " ,portion:"
          << (static_cast<double >(all_cmp0 + all_cmp1 + all_cmp2) / max_cmp) << " ,avg eval:"
          << (static_cast<double >(all_cmp0 + all_cmp1 + all_cmp2) / intersection_times) << "\n";
-    cout << "absolute intersect portion:" << static_cast<double >(intersection_times) / (min_cn.size() / 2) << "\n";
-    cout << "filtered intersect portion:"
-         << static_cast<double >(intersection_times) / (min_cn.size() / 2 - prune0 - prune1) << "\n";
-    cout << "max portion:" << portion << endl;
+    cout << "max portion:" << portion << "\n" << endl;
 #endif
 }
 
