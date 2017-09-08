@@ -316,7 +316,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
     auto thread_num = std::thread::hardware_concurrency();
     {
         ThreadPool pool(thread_num);
-        auto batch_size = 256u;
+        auto batch_size = 32u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
@@ -332,7 +332,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
     {
         ThreadPool pool(thread_num);
 
-        auto batch_size = 1024u;
+        auto batch_size = 64u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);

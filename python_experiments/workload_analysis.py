@@ -77,6 +77,7 @@ if __name__ == '__main__':
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
+                    'webgraph_twitter', 'snap_friendster',
                     '10million_avgdeg15_maxdeg50_Cdefault']
 
     for data_set in data_set_lst:
