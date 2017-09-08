@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
         // input
         using namespace std::chrono;
         auto io_start = high_resolution_clock::now();
-        auto *graph = new Graph(argv[1], argv[2], atoi(argv[3]));
+        auto *graph = new GraphSeqExp(argv[1], argv[2], atoi(argv[3]));
         auto io_end = high_resolution_clock::now();
         cout << "\nTotal input cost:" << duration_cast<milliseconds>(io_end - io_start).count() << " ms\n";
 

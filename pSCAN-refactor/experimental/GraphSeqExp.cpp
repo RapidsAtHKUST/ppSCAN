@@ -11,7 +11,7 @@
 
 using namespace std::chrono;
 
-Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
+GraphSeqExp::GraphSeqExp(const char *dir_string, const char *eps_s, int min_u) {
     io_helper_ptr = yche::make_unique<InputOutput>(dir_string);
     io_helper_ptr->ReadGraph();
 
@@ -43,23 +43,23 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
          << " ms\n";
 }
 
-void Graph::Output(const char *eps_s, const char *miu) {
+void GraphSeqExp::Output(const char *eps_s, const char *miu) {
     io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, disjoint_set_ptr->parent);
 }
 
-ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
+ui GraphSeqExp::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
     auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
     if (array[mid] == val) { return mid; }
     return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
 
-int Graph::ComputeCnLowerBound(int du, int dv) {
+int GraphSeqExp::ComputeCnLowerBound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) { ++c; }
     return c;
 }
 
-void Graph::Prune() {
+void GraphSeqExp::Prune() {
     for (auto u = 0; u < n; u++) {
         for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
             auto v = out_edges[j];
@@ -92,7 +92,7 @@ void Graph::Prune() {
     }
 }
 
-int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
 #ifdef STATISTICS
@@ -159,12 +159,12 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
 
-int Graph::EvalReachable(int u, ui edge_idx) {
+int GraphSeqExp::EvalReachable(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
 
-void Graph::CheckCoreFirstBSP(int u) {
+void GraphSeqExp::CheckCoreFirstBSP(int u) {
     auto sd = 0;
     auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
@@ -208,7 +208,7 @@ void Graph::CheckCoreFirstBSP(int u) {
     }
 }
 
-void Graph::CheckCoreSecondBSP(int u) {
+void GraphSeqExp::CheckCoreSecondBSP(int u) {
     if (!is_core_lst[u] && !is_non_core_lst[u]) {
         auto sd = 0;
         auto ed = degree[u] - 1;
@@ -250,7 +250,7 @@ void Graph::CheckCoreSecondBSP(int u) {
     }
 }
 
-void Graph::ClusterCoreFirstPhase(int u) {
+void GraphSeqExp::ClusterCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -261,7 +261,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
     }
 }
 
-void Graph::ClusterCore(int u) {
+void GraphSeqExp::ClusterCore(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -282,7 +282,7 @@ void Graph::ClusterCore(int u) {
     }
 }
 
-void Graph::MarkClusterMinEleAsId() {
+void GraphSeqExp::MarkClusterMinEleAsId() {
     cluster_dict = vector<int>(n);
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
@@ -295,7 +295,7 @@ void Graph::MarkClusterMinEleAsId() {
     }
 }
 
-void Graph::ClusterNonCores() {
+void GraphSeqExp::ClusterNonCores() {
     noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
@@ -333,7 +333,7 @@ void Graph::ClusterNonCores() {
     }
 }
 
-void Graph::pSCAN() {
+void GraphSeqExp::pSCAN() {
     cout << "new algo" << endl;
 
     // 1 prune

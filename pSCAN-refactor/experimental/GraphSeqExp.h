@@ -1,5 +1,5 @@
-#ifndef _GRAPH_H_
-#define _GRAPH_H_
+#ifndef _GRAPH_SEQ_EXP_H_
+#define _GRAPH_SEQ_EXP_H_
 
 #include <memory>
 #include <unordered_set>
@@ -22,7 +22,7 @@ namespace yche {
 }
 
 // Graph instance: fast consumption object
-class Graph {
+class GraphSeqExp {
 private:
     unique_ptr<InputOutput> io_helper_ptr;
     // parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
@@ -94,7 +94,7 @@ private:
     void ClusterNonCores();
 
 public:
-    explicit Graph(const char *dir_string, const char *eps_s, int min_u);
+    explicit GraphSeqExp(const char *dir_string, const char *eps_s, int min_u);
 
     void pSCAN();
 
