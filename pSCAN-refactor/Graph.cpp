@@ -262,19 +262,18 @@ void Graph::ClusterNonCores() {
     {
         ThreadPool pool(thread_num);
 
-        auto batch_size = 32 * 64u;
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
+        auto batch_size = 64u;
+        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
             int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
             pool.enqueue([this](int i_start, int i_end) {
                 for (auto i = i_start; i < i_end; i++) {
-                    if (IsDefiniteCoreVertex(i)) {
-                        for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
-                            auto v = out_edges[j];
-                            if (!IsDefiniteCoreVertex(v)) {
-                                if (min_cn[j] > 0) {
-                                    min_cn[j] = EvalReachable(i, j);
-                                }
+                    auto u = cores[i];
+                    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                        auto v = out_edges[j];
+                        if (!IsDefiniteCoreVertex(v)) {
+                            if (min_cn[j] > 0) {
+                                min_cn[j] = EvalReachable(u, j);
                             }
                         }
                     }
@@ -286,15 +285,13 @@ void Graph::ClusterNonCores() {
     cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
          << " ms\n";
 
-    for (auto i = 0; i < n; i++) {
-        if (IsDefiniteCoreVertex(i)) {
-            for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
-                auto v = out_edges[j];
-                if (!IsDefiniteCoreVertex(v)) {
-                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
-                    if (min_cn[j] == DIRECT_REACHABLE) {
-                        noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
-                    }
+    for (auto u : cores) {
+        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+            auto v = out_edges[j];
+            if (!IsDefiniteCoreVertex(v)) {
+                auto root_of_u = disjoint_set_ptr->FindRoot(u);
+                if (min_cn[j] == DIRECT_REACHABLE) {
+                    noncore_cluster.emplace_back(cluster_dict[root_of_u], v);
                 }
             }
         }
@@ -349,7 +346,6 @@ void Graph::pSCANSecondPhaseCheckCore() {
 void Graph::pSCANThirdPhaseClusterCore() {
     auto tmp_start = high_resolution_clock::now();
 
-    auto cores = vector<int>();
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
     }

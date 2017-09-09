@@ -50,6 +50,7 @@ private:
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
+    vector<int> cores;
     vector<pair<ui, ui>> union_candidates;
     long candidate_count = 0;
 
