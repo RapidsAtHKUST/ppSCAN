@@ -53,7 +53,6 @@ private:
     vector<pair<ui, ui>> union_candidates;
     long candidate_count = 0;
 
-    vector<std::future<vector<int>>> future_vec;
 private:
     // optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);

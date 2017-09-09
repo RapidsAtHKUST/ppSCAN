@@ -259,7 +259,6 @@ void Graph::ClusterNonCores() {
 
     auto tmp_start = high_resolution_clock::now();
     auto thread_num = std::thread::hardware_concurrency();
-    vector<std::future<vector<int>>> future_vec;
     {
         ThreadPool pool(thread_num);
 
@@ -267,8 +266,7 @@ void Graph::ClusterNonCores() {
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
-            future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
-                auto candidates = vector<int>();
+            pool.enqueue([this](int i_start, int i_end) {
                 for (auto i = i_start; i < i_end; i++) {
                     if (IsDefiniteCoreVertex(i)) {
                         for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
@@ -281,8 +279,7 @@ void Graph::ClusterNonCores() {
                         }
                     }
                 }
-                return candidates;
-            }, my_start, my_end));
+            }, my_start, my_end);
         }
     }
     auto tmp_end = high_resolution_clock::now();
@@ -336,14 +333,11 @@ void Graph::pSCANSecondPhaseCheckCore() {
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
             int my_end = min(n, my_start + batch_size);
-            future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<int> {
-                auto candidates = vector<int>();
+            pool.enqueue([this](int i_start, int i_end) {
                 for (auto i = i_start; i < i_end; i++) {
                     CheckCoreSecondBSP(i);
-                    if (IsDefiniteCoreVertex(i)) { candidates.emplace_back(i); }
                 }
-                return candidates;
-            }, my_start, my_end));
+            }, my_start, my_end);
         }
     }
 
@@ -355,26 +349,23 @@ void Graph::pSCANSecondPhaseCheckCore() {
 void Graph::pSCANThirdPhaseClusterCore() {
     auto tmp_start = high_resolution_clock::now();
 
+    auto cores = vector<int>();
+    for (auto i = 0; i < n; i++) {
+        if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
+    }
     // prepare data
-    auto candidates_lst = vector<vector<int>>();
-    for (auto &future_value: future_vec) { candidates_lst.emplace_back(std::move(future_value.get())); }
+    auto tmp_end0 = high_resolution_clock::now();
+    cout << "3rd: copy time: " << duration_cast<milliseconds>(tmp_end0 - tmp_start).count() << " ms\n";
 
     // cluster-core 1st phase
-    for (auto &candidates: candidates_lst) {
-        for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
-    }
+    for (auto core:cores) { ClusterCoreFirstPhase(core); }
 
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // cluster-core 2nd phase
-    candidates_lst.reserve(future_vec.size());
-    for (auto &candidates: candidates_lst) {
-        for (auto candidate:candidates) { ClusterCore(candidate); }
-    }
-    for (auto candidate:union_candidates) {
-        disjoint_set_ptr->Union(candidate.first, candidate.second);
-    }
+    for (auto core:cores) { ClusterCore(core); }
+    for (auto candidate:union_candidates) { disjoint_set_ptr->Union(candidate.first, candidate.second); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
