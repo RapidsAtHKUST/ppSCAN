@@ -87,7 +87,7 @@ private:
 
     void ClusterCoreFirstPhase(int u);
 
-    void ClusterCore(int u);
+    void ClusterCoreSecondPhase(int u);
 
     // 2nd phase computation
     void MarkClusterMinEleAsId();

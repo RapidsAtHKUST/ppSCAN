@@ -185,7 +185,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
     }
 }
 
-void Graph::ClusterCore(int u) {
+void Graph::ClusterCoreSecondPhase(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -273,7 +273,7 @@ void Graph::pSCAN() {
 
     // 3 cluster core
     for (auto candidate:union_candidates) { ClusterCoreFirstPhase(candidate); }
-    for (auto candidate:union_candidates) { ClusterCore(candidate); }
+    for (auto candidate:union_candidates) { ClusterCoreSecondPhase(candidate); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()

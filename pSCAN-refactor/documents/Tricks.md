@@ -187,7 +187,7 @@ improved one
 
 ```cpp
     for (auto candidate:union_candidates) { ClusterCoreFirstPhase(candidate); }
-    for (auto candidate:union_candidates) { ClusterCore(candidate); }
+    for (auto candidate:union_candidates) { ClusterCoreSecondPhase(candidate); }
 ```
 
 ```cpp
@@ -202,7 +202,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
     }
 }
 
-void Graph::ClusterCore(int u) {
+void Graph::ClusterCoreSecondPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -220,7 +220,7 @@ void Graph::ClusterCore(int u) {
 previous one
 
 ```cpp
-void Graph::ClusterCore(int u) {
+void Graph::ClusterCoreSecondPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {

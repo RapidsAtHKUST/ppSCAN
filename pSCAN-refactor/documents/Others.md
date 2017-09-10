@@ -227,7 +227,7 @@ remove `cores` member
 
         int index_i = CheckCoreFirstBSP(u);
 
-        if (IsDefiniteCoreVertex(u)) { ClusterCore(u, index_i); }
+        if (IsDefiniteCoreVertex(u)) { ClusterCoreSecondPhase(u, index_i); }
     }
 
 //    {
@@ -271,7 +271,7 @@ CheckCoreFirstBSP
 //            ReactAfterEvalDensity(v, idx);
 ```
 
-ClusterCore
+ClusterCoreSecondPhase
 
 ```cpp
 
@@ -384,7 +384,7 @@ int Graph::EvalReachable(int u, ui edge_idx) {
 ```
 
 ```cpp
-void Graph::ClusterCore(int u, int index_i) {
+void Graph::ClusterCoreSecondPhase(int u, int index_i) {
     for (auto idx : reachable_candidate_vertices) {
         // u and v similar, and v is also a core vertex
         if (min_cn[idx] == DIRECT_REACHABLE && IsDefiniteCoreVertex(out_edges[idx])) {

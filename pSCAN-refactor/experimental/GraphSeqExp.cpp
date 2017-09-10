@@ -267,7 +267,7 @@ void GraphSeqExp::ClusterCoreFirstPhase(int u) {
     }
 }
 
-void GraphSeqExp::ClusterCore(int u) {
+void GraphSeqExp::ClusterCoreSecondPhase(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -371,7 +371,7 @@ void GraphSeqExp::pSCAN() {
     for (auto candidate:candidates) { ClusterCoreFirstPhase(candidate); }
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
-    for (auto candidate:candidates) { ClusterCore(candidate); }
+    for (auto candidate:candidates) { ClusterCoreSecondPhase(candidate); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()

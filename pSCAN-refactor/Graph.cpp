@@ -217,7 +217,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
     }
 }
 
-void Graph::ClusterCore(int u) {
+void Graph::ClusterCoreSecondPhase(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
@@ -353,7 +353,7 @@ void Graph::pSCANThirdPhaseClusterCore() {
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // cluster-core 2nd phase
-    for (auto core:cores) { ClusterCore(core); }
+    for (auto core:cores) { ClusterCoreSecondPhase(core); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
