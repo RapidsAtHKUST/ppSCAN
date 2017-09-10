@@ -1,4 +1,4 @@
-## related computations
+## Related Computations
 
 ```cpp
 void Graph::ClusterCoreFirstPhase(int u) {
@@ -27,7 +27,11 @@ void Graph::ClusterCoreSecondPhase(int u) {
 }
 ```
 
-## parallelism
+## Parallelism
+
+parallelism for `disjoint_set` is non-trivial
+
+* `FindRoot` invoked by `disjoint_set_ptr->IsSameSet(u, v)` should also be thread-safe first for the correctness, due to the optimization technique of compression-by-path
 
 * take `ClusterCoreFirstPhase(int u)` for example, inspired by `a new scalable parallel DBSCAN algorithm using the disjoint-set data sturcture`
 
