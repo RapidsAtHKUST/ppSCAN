@@ -1,32 +1,18 @@
 # pScan Optimizing
 
-## My Work Overview
-
-**Project**: pScan (Graph Clustering) Optimization.
-
-**Target**: Exact, Efficient(Time/Space), Scalable(Parallel).
-
-**set-intersection-count-with-early-exit**: computing the number of common neighbors, is the bottleneck in the current pScan design.
-
-Visual Aids: see [here](python_experiments/algorithm_vis).
-
-Experiments in detail are [here](python_experiments). 
-
-Detail: [scalability-exp](python_experiments/case_studies/figures-case-study0), [robust-scalability-exp](python_experiments/case_studies/figures-case-study2-robust), [scalability-robust-differ-eps](python_experiments/case_studies/figures-case-study3-scalability-differ-eps), [workload-exp](python_experiments/case_studies/figures-case-study1).
-
 description | folder link
 --- | ---
 pSCAN-fork-optimization | [pSCAN-refactor](pSCAN-refactor)
 pSCAN-fork-statistics | [pSCAN-statistics](pSCAN-statistics)
 python scripts during study | [python_playground](python_playground)
 python experiments | [python_experiments](python_experiments)
+related projects | [related_projects](related_projects)
 
 ## pSCAN Overview
+
 pScan: extension of spatial dbScan to graph, in order to explore structural clusters, current research focus on **unweighted, undirected not dynamic** graph.
 
-* two parameters: **density threshold**, **min number of neighbors**, input graph representation: csr representation.
-
-* density function: `number of common neighbors` / `(sqrt(du * dv))`
+* two parameters: density threshold, min number of neighbors, input graph representation: csr representation. density function: `number of common neighbors` / `(sqrt(du * dv))`
 
 * pScan basic concepts:
   * important: introduce `min_cn`, alternative values: reachable, not_reachable, min_cn for guaranteeing a core

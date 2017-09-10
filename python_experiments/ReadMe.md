@@ -31,6 +31,7 @@ category | detail
 --- | ---
 workload: prune/eval, serial-runtime experiment | see [case-study1](case_studies/figures-case-study1), parameter setting: `min_pts:5`
 workload: avg cmp/eval portion experiment | see [case-study4](case_studies/case-study4-workload), varying `min_pts` and varying `eps`
+work-efficient: prune/eval, serial-runtime experiment | see [case-study5](case_studies/figures-case-study5-workload-efficient), parameter setting: `min_pts:5`
 
 ### Synthetic Graphs
 
