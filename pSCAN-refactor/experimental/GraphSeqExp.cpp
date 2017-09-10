@@ -261,7 +261,7 @@ void GraphSeqExp::ClusterCoreFirstPhase(int u) {
         auto v = out_edges[j];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
             if (min_cn[j] == DIRECT_REACHABLE) {
-                disjoint_set_ptr->Union(u, out_edges[j]);
+                disjoint_set_ptr->Union(u, v);
             }
         }
     }
@@ -271,20 +271,13 @@ void GraphSeqExp::ClusterCore(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
-            candidate_count++;
             if (min_cn[edge_idx] > 0) {
 #ifdef STATISTICS
                 serial_intersection_times++;
 #endif
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-                    union_candidates.emplace_back(u, out_edges[edge_idx]);
-                }
-                if (candidate_count % 1024 * 128 == 0) {
-                    for (auto candidate:union_candidates) {
-                        disjoint_set_ptr->Union(candidate.first, candidate.second);
-                    }
-                    union_candidates.clear();
+                    disjoint_set_ptr->Union(u, v);
                 }
             }
         }
@@ -379,7 +372,6 @@ void GraphSeqExp::pSCAN() {
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
     for (auto candidate:candidates) { ClusterCore(candidate); }
-    for (auto candidate:union_candidates) { disjoint_set_ptr->Union(candidate.first, candidate.second); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - second_bsp_end).count()

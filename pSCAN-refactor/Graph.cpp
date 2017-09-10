@@ -211,7 +211,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
         auto v = out_edges[j];
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
             if (min_cn[j] == DIRECT_REACHABLE) {
-                disjoint_set_ptr->Union(u, out_edges[j]);
+                disjoint_set_ptr->Union(u, v);
             }
         }
     }
@@ -221,17 +221,10 @@ void Graph::ClusterCore(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
-            candidate_count++;
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-                    union_candidates.emplace_back(u, out_edges[edge_idx]);
-                }
-                if (candidate_count % 1024 == 0) {
-                    for (auto candidate:union_candidates) {
-                        disjoint_set_ptr->Union(candidate.first, candidate.second);
-                    }
-                    union_candidates.clear();
+                    disjoint_set_ptr->Union(u, v);
                 }
             }
         }
@@ -361,7 +354,6 @@ void Graph::pSCANThirdPhaseClusterCore() {
 
     // cluster-core 2nd phase
     for (auto core:cores) { ClusterCore(core); }
-    for (auto candidate:union_candidates) { disjoint_set_ptr->Union(candidate.first, candidate.second); }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
