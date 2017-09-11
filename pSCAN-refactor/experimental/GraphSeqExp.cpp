@@ -94,7 +94,8 @@ void GraphSeqExp::Prune() {
 
 int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
-    int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
 #ifdef STATISTICS
     intersection_times++;
     max_cmp += du - 2 + dv - 2;
