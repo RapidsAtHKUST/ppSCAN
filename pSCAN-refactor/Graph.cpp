@@ -86,7 +86,8 @@ void Graph::Prune() {
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
-    int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
 
     auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
 
