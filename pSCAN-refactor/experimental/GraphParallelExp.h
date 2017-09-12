@@ -1,12 +1,12 @@
-#ifndef _GRAPH_H_
-#define _GRAPH_H_
+#ifndef _GraphParallelExp_H_
+#define _GraphParallelExp_H_
 
 #include <memory>
-#include <atomic>
-#include <mutex>
+#include <future>
 
 #include "../InputOutput.h"
 #include "../DisjointSet.h"
+#include "../Util.h"
 
 using namespace std;
 
@@ -21,8 +21,8 @@ namespace yche {
     }
 }
 
-// GraphExp instance: fast consumption object
-class GraphExp {
+// GraphParallelExp instance: fast consumption object
+class GraphParallelExp {
 private:
     unique_ptr<InputOutput> io_helper_ptr;
     // parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
@@ -39,7 +39,8 @@ private:
 
     // vertex properties
     vector<int> degree;
-    vector<int> similar_degree;
+    vector<char> is_core_lst;
+    vector<char> is_non_core_lst;
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
@@ -49,38 +50,49 @@ private:
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
 
+    vector<int> cores;
+
     ui thread_num_;
 private:
-    // 1st optimization: cross-link
-    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
-    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
-
-    // 2nd optimization: common-neighbor check pruning, as a pre-processing phase
+    // optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
     void Prune();
 
-    // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
     int EvalReachable(int u, ui edge_idx);
 
-    // 1st phase computation: core check and cluster
+    // optimization: cross-link
+    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
+    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
+
     bool IsDefiniteCoreVertex(int u);
 
+    // parallel computation logic
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
 
-    void ClusterCore(int u);
+    void ClusterCoreFirstPhase(int u);
 
-    // 2nd phase computation
+    void ClusterCoreSecondPhase(int u);
+
     void MarkClusterMinEleAsId();
 
     void ClusterNonCores();
 
+    // four phases
+    void pSCANFirstPhasePrune();
+
+    void pSCANSecondPhaseCheckCore();
+
+    void pSCANThirdPhaseClusterCore();
+
+    void pSCANFourthPhaseClusterNonCore();
+
 public:
-    explicit GraphExp(const char *dir_string, const char *eps_s, int min_u, ui thread_num);
+    explicit GraphParallelExp(const char *dir_string, const char *eps_s, int min_u, ui thread_num);
 
     void pSCAN();
 
