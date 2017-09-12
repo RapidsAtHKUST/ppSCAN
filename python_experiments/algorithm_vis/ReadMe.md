@@ -1,6 +1,6 @@
 # pSCAN+ Introduction
 
-python implementation (just for demonstration), see [disjoint_set.py](disjoint_set.py), [pscan_algo.py](pscan_algo.py)
+python implementation (just for demonstration), see [disjoint_set.py](disjoint_set.py), [pscan_algo.py](pscan_algo_naive.py)
 
 usage, with input edge list [demo_input_graph.txt](demo_input_graph.txt):
 

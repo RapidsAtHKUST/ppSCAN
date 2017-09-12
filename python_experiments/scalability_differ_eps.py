@@ -20,10 +20,11 @@ def post_process(statistics_dic):
 
 
 if __name__ == '__main__':
-    data_set_lst = ['small_snap_dblp',
-                    'snap_pokec', 'snap_livejournal', 'snap_orkut',
-                    'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster']
+    data_set_lst = [
+        'small_snap_dblp',
+        'snap_pokec', 'snap_livejournal', 'snap_orkut',
+        'webgraph_uk', 'webgraph_webbase',
+        'webgraph_twitter', 'snap_friendster']
 
     figure_folder = 'scalability_robust'
     os.system('mkdir -p ./figures/' + figure_folder)
@@ -31,13 +32,11 @@ if __name__ == '__main__':
     eps_lst = [float(i + 1) / 10 for i in xrange(9)]
 
     for data_set in data_set_lst:
-        # should generate a markdown, e.g, small_snap_dblp.md
+        with open('case_studies/figures-case-study3-scalability-differ-eps' + os.sep + data_set + '.md', 'w') as ifs:
+            # should generate a markdown, e.g, small_snap_dblp.md
             for eps in eps_lst:
-                time_info_dict = get_statistics(data_set, eps, min_pts,
+                time_info_dict = get_statistics(data_set, eps, min_pts, figure_folder=figure_folder,
                                                 root_folder='/mnt/mount-gpu/d2/yche/projects/python_experiments')
-                if data_set == '10million_avgdeg15_maxdeg50_Cdefault':
-                    data_set = 'lfr_10million_avgdeg15'
-
                 append_txt = ' - '.join([data_set, 'eps:' + str(eps), 'min_pts:' + str(min_pts)])
                 # 1st: overall time cost
                 display_overview(time_info_dict, append_txt, figure_folder)

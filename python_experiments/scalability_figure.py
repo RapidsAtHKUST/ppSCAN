@@ -40,9 +40,9 @@ def parse_lines(lines):
     return my_dict
 
 
-def get_statistics(dataset, eps, min_pts, root_folder='.'):
+def get_statistics(dataset, eps, min_pts, figure_folder, root_folder='.'):
     info_dict = dict()
-    dir_path = os.sep.join([root_folder, 'scalability_robust', dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
+    dir_path = os.sep.join([root_folder, figure_folder, dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
     pscan_time = workload_figure.get_workload_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
         workload_figure.runtime_tag + workload_figure.pscan_tag]
 
@@ -110,6 +110,7 @@ def display_overview(statistics_dic, title_append_txt='', figure_folder='.'):
     # plt.show()
     plt.close()
 
+
 # display 1: total time and parallel part(hotspots)
 def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'):
     filtered_tag_list = [total_time_tag, first_bsp_time_tag, second_bsp_time_tag, prune_time_tag]
@@ -159,7 +160,7 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('speedup', fontdict=font)
-    plt.ylim([0, 27.0])
+    plt.ylim([0, 28.5])
 
     # show the whole runtime/speedup figure
     plt.savefig(
@@ -168,6 +169,7 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     # plt.show()
     plt.close()
 
+
 if __name__ == '__main__':
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
@@ -175,11 +177,11 @@ if __name__ == '__main__':
                     'webgraph_twitter', 'snap_friendster',
                     '10million_avgdeg15_maxdeg50_Cdefault']
 
-    figure_folder = 'scalability_robust'
+    figure_folder = 'scalability_new0'
     os.system('mkdir -p ./figures/' + figure_folder)
 
     for data_set in data_set_lst:
-        time_info_dict = get_statistics(data_set, 0.3, 5,
+        time_info_dict = get_statistics(data_set, 0.3, 5, figure_folder=figure_folder,
                                         root_folder='/mnt/mount-gpu/d2/yche/projects/python_experiments')
         if data_set == '10million_avgdeg15_maxdeg50_Cdefault':
             data_set = 'lfr_10million_avgdeg15'

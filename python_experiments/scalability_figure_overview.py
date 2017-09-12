@@ -71,24 +71,17 @@ def illustrate_comp_io_portion(input_time_lst, output_time_lst, eps, min_pts):
     root_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments'
 
     for data_set in data_set_lst:
-        time_info_dict = get_statistics(data_set, eps, min_pts, root_folder=root_folder)
+        time_info_dict = get_statistics(data_set, eps, min_pts, figure_folder=overview_figure_folder,
+                                        root_folder=root_folder)
 
         best_obj = sorted(time_info_dict.iteritems(), key=lambda pair: pair[1][total_time_tag])[0]
         best_thread_lst.append(best_obj[0])
-        # print data_set
-        # print best_obj[1], '\n', to_grouped_statistics(best_obj[1])
         best_info_lst.append(to_grouped_statistics(best_obj[1]))
 
-        # print time_info_dict[40], '\n', to_grouped_statistics(time_info_dict[40]), '\n'
         full_core_info_lst.append(to_grouped_statistics(time_info_dict[40]))
-
-    # print 'best_thread_lst:', best_thread_lst, '\n', 'best_info_lst:', best_info_lst
-    # print 'full_core_info_lst:', full_core_info_lst
-    # print 'input_time_lst:', input_time_lst, '\n', 'output_time_lst:', output_time_lst
 
     append_txt = ' - '.join(['eps:' + str(eps), 'min_pts:' + str(min_pts), 'with all logical cores'])
     zipped_lst = to_portion_lst(full_core_info_lst, input_time_lst, output_time_lst)
-    # print zipped_lst
     display_comp_io_portion(zipped_lst, map(lambda my_str: my_str.split('_')[-1], data_set_lst), append_txt)
 
     append_txt = ' - '.join(['eps:' + str(eps), 'min_pts:' + str(min_pts), 'with best logical thread num'])
@@ -119,7 +112,7 @@ def display_speedup(edge_num_portion_lst, pscan_serial_runtime_lst, pscan_plus_p
     plt.ylabel('speedup', fontdict=font)
     plt.legend(['parallel pscan+ speedup over serial pscan'])
 
-    plt.ylim([0.0, 25.0])
+    plt.ylim([0.0, 32.0])
     plt.savefig('./figures/' + overview_figure_folder + os.sep + title_append_txt.replace(' ', '')
                 + '-' + 'runtime-speedup.png', bbox_inches='tight', pad_inches=0, transparent=True)
     # plt.show()
@@ -127,8 +120,7 @@ def display_speedup(edge_num_portion_lst, pscan_serial_runtime_lst, pscan_plus_p
 
 
 def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst, pscan_plus_best_parallel_runtime_lst,
-                       best_thread_lst, eps, min_pts):
-    data_set_name_lst = ['dblp', 'pokec', 'livejournal', 'orkut', 'uk', 'webbase', 'twitter', 'friendster']
+                       best_thread_lst, eps, min_pts, data_set_name_lst):
     edge_num_lst = ['2,099,732', '30,282,866', '69,362,378', '234,370,166', '301,136,554', '1,050,026,736',
                     '1,369,000,750', '3,612,134,270']
 
@@ -150,10 +142,6 @@ def illustrate_speedup(pscan_serial_runtime_lst, pscan_plus_parallel_runtime_lst
                            zip(pscan_serial_runtime_lst, pscan_plus_best_parallel_runtime_lst))
     pscan_serial_runtime_lst = map(lambda num: str(num) + 's', pscan_serial_runtime_lst)
 
-    # print 'dataset lst:', data_set_name_lst, '\n', 'edge_num lst:', edge_num_lst
-    # print 'pscan serial runtime lst:', pscan_serial_runtime_lst
-    # print 'speedup lst 40-core:', speedup_full_lst
-    # print 'speedup lst best thread num:', speedup_best_lst
     print 'best performance thread_num_lst:', best_thread_lst, '\n'
 
     rows = []
@@ -198,15 +186,16 @@ def draw_overview_figure(eps=0.3, min_pts=5):
     rows = illustrate_speedup(pscan_serial_runtime_lst=serial_time_lst,
                               pscan_plus_parallel_runtime_lst=full_core_time_lst,
                               pscan_plus_best_parallel_runtime_lst=best_thread_time_lst, best_thread_lst=thread_lst,
-                              eps=eps, min_pts=min_pts)
+                              eps=eps, min_pts=min_pts, data_set_name_lst=data_set_lst)
     return thread_lst, rows
 
 
-overview_figure_folder = 'scalability_overview_robust'
-data_set_lst = ['small_snap_dblp',
-                'snap_pokec', 'snap_livejournal', 'snap_orkut',
-                'webgraph_uk', 'webgraph_webbase',
-                'webgraph_twitter', 'snap_friendster']
+overview_figure_folder = 'scalability_new0'
+data_set_lst = [
+    # 'small_snap_dblp',
+    'snap_pokec', 'snap_livejournal', 'snap_orkut',
+    'webgraph_uk', 'webgraph_webbase',
+    'webgraph_twitter', 'snap_friendster']
 root_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/'
 
 if __name__ == '__main__':
