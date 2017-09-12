@@ -301,9 +301,8 @@ void GraphParallelExp::pSCANFirstPhasePrune() {
 
 void GraphParallelExp::pSCANSecondPhaseCheckCore() {
     auto find_core_start = high_resolution_clock::now();
-    auto thread_num = std::thread::hardware_concurrency();
     {
-        ThreadPool pool(thread_num);
+        ThreadPool pool(thread_num_);
         auto batch_size = 32u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
             int my_start = v_i;
@@ -318,7 +317,7 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
     {
-        ThreadPool pool(thread_num);
+        ThreadPool pool(thread_num_);
 
         auto batch_size = 64u;
         for (auto v_i = 0; v_i < n; v_i += batch_size) {
