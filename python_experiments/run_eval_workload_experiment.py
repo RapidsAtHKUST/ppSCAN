@@ -2,7 +2,6 @@ import os
 import time
 
 if __name__ == '__main__':
-    # data_set_lst = ['small_snap_dblp']
     data_set_lst = ['small_snap_dblp',
                     'snap_livejournal', 'snap_orkut', 'snap_pokec',
                     'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',

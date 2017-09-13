@@ -24,15 +24,17 @@ if __name__ == '__main__':
         'small_snap_dblp',
         'snap_pokec', 'snap_livejournal', 'snap_orkut',
         'webgraph_uk', 'webgraph_webbase',
-        'webgraph_twitter', 'snap_friendster']
+        'webgraph_twitter',
+        # 'snap_friendster'
+    ]
 
-    figure_folder = 'scalability_robust'
+    figure_folder = 'scalability_new0'
     os.system('mkdir -p ./figures/' + figure_folder)
     min_pts = 5
     eps_lst = [float(i + 1) / 10 for i in xrange(9)]
 
     for data_set in data_set_lst:
-        with open('case_studies/figures-case-study3-scalability-differ-eps' + os.sep + data_set + '.md', 'w') as ifs:
+        with open('case_studies/figures-case-study6-scalability-new0' + os.sep + data_set + '.md', 'w') as ifs:
             # should generate a markdown, e.g, small_snap_dblp.md
             for eps in eps_lst:
                 time_info_dict = get_statistics(data_set, eps, min_pts, figure_folder=figure_folder,

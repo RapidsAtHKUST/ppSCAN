@@ -1,5 +1,4 @@
-import os, re
-import decimal
+import os, re, decimal
 from functools import partial
 
 import matplotlib.pyplot as plt

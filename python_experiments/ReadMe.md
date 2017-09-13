@@ -24,6 +24,7 @@ category | detail
 scalability: speedup/comp-io portion experiment | see [case-study0](case_studies/figures-case-study0), parameter setting: `eps:0.3`, `min_pts:5`.
 scalability: robust scheduling speedup/comp-io portion experiment | see [case-study2-robust](case_studies/figures-case-study2-robust)， parameter setting: `eps:0.3`, `min_pts:5`
 scalability: robust scheduling speedup/comp-io portion, different eps | see [case-study3-scalability-differ-eps](case_studies/figures-case-study3-scalability-differ-eps), , parameter setting: `min_pts:5`.
+scalability: new work-efficient but not balanced | see [case-study6-scalability-new0](case_studies/figures-case-study6-scalability-new0)
 
 ### Workload
 
