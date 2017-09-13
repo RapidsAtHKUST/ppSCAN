@@ -156,6 +156,7 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int min_val = min(tmp0, tmp1);
     int local_portion = min_val == 0 ? max_val : max_val / min_val;
     portion = max(portion, local_portion);
+    single_max_cmp = max(single_max_cmp, tmp0 + tmp1);
 #endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
 }
@@ -401,6 +402,7 @@ void GraphSeqExp::pSCAN() {
          << static_cast<double >(core_non_core_intersection_times) / intersection_times << "\n";
     cout << "intersection times:" << intersection_times << "\n\n";
 
+    cout << "single max cmp:" << single_max_cmp << "\n";
     cout << "cmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
     cout << "total:" << (all_cmp0 + all_cmp1 + all_cmp2) << " ,max:" << max_cmp << " ,portion:"
