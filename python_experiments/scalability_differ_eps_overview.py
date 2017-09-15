@@ -11,9 +11,9 @@ if __name__ == '__main__':
     overview_figure_folder = 'scalability_new0'
 
     drawer = ScalabilityFigureDrawer(
-        data_set_lst=all_data_set_lst[:-1],
-        input_time_lst=all_input_time_lst[:-1],
-        edge_num_lst=all_edge_num_lst[:-1],
+        data_set_lst=all_data_set_lst,
+        input_time_lst=all_input_time_lst,
+        edge_num_lst=all_edge_num_lst,
         server_root_dir_path='/mnt/mount-gpu/d2/yche/projects/python_experiments'
                              '/scalability_input_output',
         overview_folder='scalability_new0')

@@ -25,7 +25,7 @@ if __name__ == '__main__':
         'snap_pokec', 'snap_livejournal', 'snap_orkut',
         'webgraph_uk', 'webgraph_webbase',
         'webgraph_twitter',
-        # 'snap_friendster'
+        'snap_friendster'
     ]
 
     figure_folder = 'scalability_new0'
