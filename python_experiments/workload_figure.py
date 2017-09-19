@@ -217,16 +217,16 @@ def case_study1():
 
 
 if __name__ == '__main__':
-    server_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/workload-work-efficient'
+    server_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/workload-work-efficient-1'
     local_folder = './figures/' + 'workload-efficient'
-    markdown_folder = 'case_studies/figures-case-study5-workload-efficient'
+    markdown_folder = 'case_studies/figures-case-study7-workload-efficient-1'
     os.system('mkdir -p ' + local_folder)
     os.system('mkdir -p ' + markdown_folder)
 
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster',
+                    # 'webgraph_twitter', 'snap_friendster',
                     '10million_avgdeg15_maxdeg50_Cdefault'
                     ]
 

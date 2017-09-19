@@ -126,6 +126,7 @@ void Graph::CheckCoreFirstBSP(int u) {
     auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
+        // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torned
 //        if (u <= v) {
         if (min_cn[edge_idx] == DIRECT_REACHABLE) {
             ++sd;
