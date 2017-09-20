@@ -35,7 +35,8 @@ private:
     vector<int> out_edges;
 
     // edge properties
-    vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
+//    vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
+    int *min_cn;
 
     // vertex properties
     vector<int> degree;
@@ -96,6 +97,8 @@ public:
     void pSCAN();
 
     void Output(const char *eps_s, const char *miu);
+
+    virtual ~Graph();
 };
 
 #endif

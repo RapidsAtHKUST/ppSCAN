@@ -2,10 +2,12 @@
 
 #include <cstring>
 #include <cmath>
+#include <mm_malloc.h>
 
 #include <iostream>
 #include <algorithm>
 #include <numeric>
+#include <cassert>
 
 #include "../playground/pretty_print.h"
 #include "../ThreadPool.h"
@@ -30,8 +32,12 @@ GraphParallelExp::GraphParallelExp(const char *dir_string, const char *eps_s, in
     out_edges = std::move(io_helper_ptr->out_edges);
 
     // edge properties
-    min_cn = vector<int>(io_helper_ptr->m);
-    std::fill(min_cn.begin(), min_cn.end(), NOT_SURE);
+//    min_cn = vector<int>(io_helper_ptr->m);
+//    std::fill(min_cn.begin(), min_cn.end(), NOT_SURE);
+    min_cn = static_cast<int *>(_mm_malloc(io_helper_ptr->m * sizeof(int), 32));
+//    printf("%p", min_cn);
+#define PTR_TO_UINT64(x) (uint64_t)(uintptr_t)(x)
+    assert(PTR_TO_UINT64(min_cn) % 32 == 0);
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
@@ -380,4 +386,8 @@ void GraphParallelExp::pSCAN() {
     pSCANThirdPhaseClusterCore();
 
     pSCANFourthPhaseClusterNonCore();
+}
+
+GraphParallelExp::~GraphParallelExp() {
+    _mm_free(min_cn);
 }
