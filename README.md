@@ -20,30 +20,31 @@ data | type | functionality
 `disjoint-set` | union-find set | inside two arrays, `parent` and `rank`, union-by-rank, compress-in-find-root, each tree represent a set
 `cluster_id` | vertex property array | for looking up min core vertex id in this cluster represented by root. in other words, `cluster_id[FindRoot(u)]` is this cluster id
 
+parallel-execution takes most workloads(over 90%)
 
 intentions in each phase:
 
-* Prune: initialize some values in `min_cn`, which can be easily computated with arithmetic operations instead of 
+* 1 Prune(parallel): initialize some values in `min_cn`, which can be easily computated with arithmetic operations instead of 
 set-intersection computations. There are two types, first is definitely not similar two vertices, second is defintely 
 similar two vertices.
 
-* CheckCoreFirstPhase: evaluate similarities for relationships from source vertex `u` to 
+* 2.1 CheckCoreFirstPhase(parallel): evaluate similarities for relationships from source vertex `u` to 
 destination vertex `v` for all `u<v` and update corresponding similarity from source vertex `v` to destination vertex `u`. 
 Min-max pruning is applied in this phase. Mark definite cores and definite non-cores with `is_core` and `is_non_core` array.
 
-* CheckCoreSecondPhase: since the existence of min-max pruning, some vertices can not be determined by two bloom filters, `is_core` and `is_non_core`, thus similarities sourcing from these vertices that are not evaluated 
+* 2.2 CheckCoreSecondPhase(parallel): since the existence of min-max pruning, some vertices can not be determined by two bloom filters, `is_core` and `is_non_core`, thus similarities sourcing from these vertices that are not evaluated 
 are evaluated and relationship is established for reversed edge.
 
-* ClusterCoreFirstPhase: without further evaluation of similarities, union similar core-cores.
+* 3.1 ClusterCoreFirstPhase(serial): without further evaluation of similarities, union similar core-cores.
 
-* ClusterCoreSecondPhase: some similarity predicates of core-cores are not know, evaluate them only when they are not in the same tree in the disjoint-set yet, 
+* 3.2 ClusterCoreSecondPhase(serial): some similarity predicates of core-cores are not know, evaluate them only when they are not in the same tree in the disjoint-set yet, 
 if they are similar, union them.
 
 * Trivial Preparing: Line 11 to 14 is for initializing `cluster_id` for looking up `cluster_id[FindRoot(u)]`.
 
-* ClusterNonCoreFirstPhase: evaluate some unknow similarities among cores and non-co res.
+* 4.1 ClusterNonCoreFirstPhase(parallel): evaluate some unknow similarities among cores and non-co res.
 
-* ClusterNonCoreSecondPhase: cluster non-cores when they are similar to cores 
+* 4.2 ClusterNonCoreSecondPhase(serial): cluster non-cores when they are similar to cores 
 
 ## Project 
 
