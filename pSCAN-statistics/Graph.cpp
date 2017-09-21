@@ -385,7 +385,36 @@ void Graph::pSCAN(const char *eps_s, int _miu) {
 #endif
 }
 
+
+
 int Graph::check_common_neighbor(int u, int v, int c) {
+#ifdef IMPROVED_SET_INTERSECT
+    int cn = 2; // count for self and v, count for self and u
+    int du = pstart[u + 1] - pstart[u] + 2, dv =
+            pstart[v + 1] - pstart[v] + 2; // count for self and v, count for self and u
+
+    auto offset_nei_u = pstart[u], offset_nei_v = pstart[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    while (cn < c) {
+        while (edges[offset_nei_u] < edges[offset_nei_v]) {
+            --du;
+            if (du < c) { return -2; }
+            ++offset_nei_u;
+        }
+        while (edges[offset_nei_u] > edges[offset_nei_v]) {
+            --dv;
+            if (dv < c) { return -2; }
+            ++offset_nei_v;
+        }
+        if (edges[offset_nei_u] == edges[offset_nei_v]) {
+            ++cn;
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+    return cn >= c ? -1 : -2;
+#else
     int cn = 2;
     if (degree[u] > degree[v]) swap(u, v);
     int du = degree[u] + 1, dv = degree[v] + 1;
@@ -430,8 +459,10 @@ int Graph::check_common_neighbor(int u, int v, int c) {
     int local_portion = min_val == 0 ? max_val : max_val / min_val;
     portion = max(portion, local_portion);
 #endif
+
     if (cn >= c) return -1;
     return -2;
+#endif
 }
 
 int Graph::similar_check_OP(int u, ui idx, int eps_a2, int eps_b2) {
