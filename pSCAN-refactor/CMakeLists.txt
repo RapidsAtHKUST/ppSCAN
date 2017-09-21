@@ -58,4 +58,9 @@ set(EXP_FILES experimental/main_exp_parallel.cpp experimental/GraphParallelExp.c
 add_executable(pSCANParallelExp0 ${EXP_FILES})
 target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g)
 target_link_libraries(pSCANParallelExp0 ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(pSCANParallelExp0 profiler)
+
+# pSCAN parallel experimental 1: naive-set-intersection
+add_executable(pSCANParallelExp1 ${EXP_FILES})
+target_compile_options(pSCANParallelExp1 PRIVATE -O3 -g)
+target_compile_definitions(pSCANParallelExp1 PRIVATE NAIVE_SET_INTERSECTION=1)
+target_link_libraries(pSCANParallelExp1 ${CMAKE_THREAD_LIBS_INIT})
