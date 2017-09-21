@@ -30,7 +30,7 @@ add_executable(pSCANSerial ${SERIAL_SOURCE_FILES})
 #target_compile_definitions(pSCANSerial PRIVATE WITHGPERFTOOLS=1 SERIAL=1)
 target_compile_definitions(pSCANSerial PRIVATE SERIAL=1)
 target_compile_options(pSCANSerial PRIVATE -O3 -g)
-target_link_libraries(pSCANSerial profiler)
+#target_link_libraries(pSCANSerial profiler)
 
 # pSCAN release 1: parallel
 add_executable(pSCANParallel ${SOURCE_FILES})
@@ -38,13 +38,19 @@ add_executable(pSCANParallel ${SOURCE_FILES})
 target_compile_definitions(pSCANParallel PRIVATE)
 target_compile_options(pSCANParallel PRIVATE -O3 -g)
 target_link_libraries(pSCANParallel ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(pSCANParallel profiler)
+#target_link_libraries(pSCANParallel profiler)
 
-# pSCAN experimental 0: serial statistics 0
+# pSCAN serial experimental 0: statistics 0
 add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANStatistics0 PRIVATE WITHGPERFTOOLS=1 SERIAL=1 STATISTICS=1)
 target_compile_options(pSCANStatistics0 PRIVATE -O3 -g)
 target_link_libraries(pSCANStatistics0 profiler)
+
+# pSCAN serial experimental 1: naive-set-intersection
+add_executable(pSCANSerialNaive ${SERIAL_SOURCE_FILES})
+target_compile_definitions(pSCANSerialNaive PRIVATE SERIAL=1 NAIVE_SET_INTERSECTION=1)
+target_compile_options(pSCANSerialNaive PRIVATE -O3 -g)
+#target_link_libraries(pSCANSerialNaive profiler)
 
 # pSCAN parallel experimental 0
 set(EXP_FILES experimental/main_exp_parallel.cpp experimental/GraphParallelExp.cpp experimental/GraphParallelExp.h

@@ -93,6 +93,31 @@ void GraphSeqExp::Prune() {
 }
 
 int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
+#ifdef NAIVE_SET_INTERSECTION
+    int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
+         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
+        if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            ++offset_nei_u;
+        } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            ++offset_nei_v;
+        } else {
+            ++cn;
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+#else
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
             out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
@@ -159,7 +184,9 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     single_max_cmp = max(single_max_cmp, tmp0 + tmp1);
 #endif
     return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+#endif
 }
+
 
 int GraphSeqExp::EvalReachable(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
