@@ -1,14 +1,12 @@
-# pSCAN
+# ppSCAN
 
-pSCAN: Fast and Exact Structural Graph Clustering.
+ppSCAN: pruning-based structural clustering algorithm on networks.
 
 for supplementary documents, see [documents](documents).
 
 # Compile
 
-g++ should support c++11, e.g, g++ 4.8+
-
-cmake should be 3.6+, allowing for modern cmake
+g++ should support c++11, e.g, g++ 4.8+, cmake should be 3.6+, allowing for modern cmake
 
 ```zsh
 mkdir -p build
@@ -27,11 +25,12 @@ make
 
 ```zsh
 build/pSCANSerial ../dataset 0.3 5 output
+build/pSCANParallel ../dataset 0.3 5 output
 ```
 
 # Package Organization
 
-pSCAN package further usage must follow [GPLv3 license](../pSCAN-refactor/LICENSE).
+ppSCAN package further usage must follow [GPLv3 license](../pSCAN-refactor/LICENSE).
 
 * pSCAN-fork-optimization implementations follow modern cpp rules, to make things easier without loss of performance.
 
@@ -41,6 +40,7 @@ file | utility
 [DisjointSet.h](../pSCAN-refactor/DisjointSet.h), [DisjointSet.cpp](../pSCAN-refactor/DisjointSet.cpp) | see CLRS for detail, for connected componet
 [Graph.h](../pSCAN-refactor/Graph.h), [Graph.cpp](../pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
 [InputOutput.h](../pSCAN-refactor/InputOutput.h), [InputOutput.cpp](../pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
+[EdgeListToBinsConverter.cpp](converter/EdgeListToBinsConverter.cpp) | utility converter for processing edge list into binary files
 
 * utils and plays
 
@@ -62,9 +62,11 @@ file | utility
 
 * profiling scrips
 
-see [run_pscan_gperftools.sh](./run_pscan_gperftools.sh), [run_pscan_perf.sh](./run_pscan_perf.sh), [run_pscan_valgrind.sh](./run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
+see [run_pscan_gperftools.sh](shell_playground/run_pscan_gperftools.sh), [run_pscan_perf.sh](shell_playground/run_pscan_perf.sh), [run_pscan_valgrind.sh](shell_playground/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
 
-# Citation
+for more advanced profiling, please use intel vtune 
+
+# pSCAN Citation
 
 > If you are using this code, please kindly cite the following paper.
 
