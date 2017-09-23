@@ -66,6 +66,20 @@ int GraphParallelExp::ComputeCnLowerBound(int du, int dv) {
     return c;
 }
 
+void GraphParallelExp::PruneDetail(int u) {
+    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        auto v = out_edges[edge_idx];
+        int deg_a = degree[u], deg_b = degree[v];
+        if (deg_a > deg_b) { swap(deg_a, deg_b); }
+        if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
+            min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
+        } else {
+            int c = ComputeCnLowerBound(deg_a, deg_b);
+            min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
+        }
+    }
+}
+
 void GraphParallelExp::Prune() {
     auto batch_size = 8192u;
     ThreadPool pool(thread_num_);
@@ -75,17 +89,7 @@ void GraphParallelExp::Prune() {
 
         pool.enqueue([this](int i_start, int i_end) {
             for (auto u = i_start; u < i_end; u++) {
-                for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-                    auto v = out_edges[edge_idx];
-                    int deg_a = degree[u], deg_b = degree[v];
-                    if (deg_a > deg_b) { swap(deg_a, deg_b); }
-                    if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
-                        min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
-                    } else {
-                        int c = ComputeCnLowerBound(deg_a, deg_b);
-                        min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
-                    }
-                }
+                PruneDetail(u);
             }
         }, my_start, my_end);
     }
@@ -417,3 +421,5 @@ void GraphParallelExp::pSCAN() {
 GraphParallelExp::~GraphParallelExp() {
     _mm_free(min_cn);
 }
+
+

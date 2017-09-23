@@ -57,6 +57,8 @@ private:
     // optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
+    void PruneDetail(int u);
+
     void Prune();
 
     int IntersectNeighborSets(int u, int v, int min_cn_num);
