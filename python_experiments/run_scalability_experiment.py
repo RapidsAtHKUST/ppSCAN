@@ -59,11 +59,12 @@ if __name__ == '__main__':
     parameter_eps_lst = [0.1, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     # parameter_eps_lst = [0.3]
     parameter_min_pts_lst = [5]
-    thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
+    # thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
+    thread_num_lst = [1, 4, 8, 16, 24, 32, 40]
 
     # loop run experiments
     loop_count = 1
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
-                        folder_name='scalability_new0')
+                        folder_name='scalability_new1_better_pruning')
