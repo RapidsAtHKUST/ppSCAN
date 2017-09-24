@@ -65,17 +65,29 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 }
 
 void Graph::PruneDetail(int u) {
+    auto sd = 0;
+    auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         int deg_a = degree[u], deg_b = degree[v];
         if (deg_a > deg_b) { swap(deg_a, deg_b); }
         if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
             min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
+            ed--;
         } else {
             int c = ComputeCnLowerBound(deg_a, deg_b);
             min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
+            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                sd++;
+            }
         }
     }
+    if (sd >= min_u) {
+        is_core_lst[u] = TRUE;
+    } else if (ed < min_u) {
+        is_non_core_lst[u] = TRUE;
+    }
+
 }
 
 void Graph::Prune() {
@@ -132,44 +144,46 @@ bool Graph::IsDefiniteCoreVertex(int u) {
 }
 
 void Graph::CheckCoreFirstBSP(int u) {
-    auto sd = 0;
-    auto ed = degree[u] - 1;
-    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        auto v = out_edges[edge_idx];
-        // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torned
+    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
+        auto sd = 0;
+        auto ed = degree[u] - 1;
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+//        auto v = out_edges[edge_idx];
+            // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torned
 //        if (u <= v) {
-        if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-            ++sd;
-            if (sd >= min_u) {
-                is_core_lst[u] = TRUE;
-                return;
-            }
-        } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
-            --ed;
-            if (ed < min_u) {
-                is_non_core_lst[u] = TRUE;
-                return;
-            }
-        }
-//        }
-    }
-
-    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        auto v = out_edges[edge_idx];
-        if (u <= v && min_cn[edge_idx] > 0) {
-            min_cn[edge_idx] = EvalReachable(u, edge_idx);
-            min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = TRUE;
                     return;
                 }
-            } else {
+            } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
                 --ed;
                 if (ed < min_u) {
                     is_non_core_lst[u] = TRUE;
                     return;
+                }
+            }
+//        }
+        }
+
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            auto v = out_edges[edge_idx];
+            if (u <= v && min_cn[edge_idx] > 0) {
+                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
+                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                    ++sd;
+                    if (sd >= min_u) {
+                        is_core_lst[u] = TRUE;
+                        return;
+                    }
+                } else {
+                    --ed;
+                    if (ed < min_u) {
+                        is_non_core_lst[u] = TRUE;
+                        return;
+                    }
                 }
             }
         }
@@ -315,14 +329,24 @@ void Graph::pSCANSecondPhaseCheckCore() {
     auto thread_num = std::thread::hardware_concurrency();
     {
         ThreadPool pool(thread_num);
-        auto batch_size = 32u;
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-            }, my_start, my_end);
+
+        auto v_start = 0;
+        auto count = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+                count++;
+                if (count % 16 == 0) {
+                    pool.enqueue([this](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+                    }, v_start, v_i + 1);
+                    v_start = v_i + 1;
+                }
+            }
         }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+        }, v_start, n);
     }
     auto first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
@@ -331,16 +355,23 @@ void Graph::pSCANSecondPhaseCheckCore() {
     {
         ThreadPool pool(thread_num);
 
-        auto batch_size = 64u;
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) {
-                    CheckCoreSecondBSP(i);
+        auto v_start = 0;
+        auto count = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+                count++;
+                if (count % 64 == 0) {
+                    pool.enqueue([this](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
+                    }, v_start, v_i + 1);
+                    v_start = v_i + 1;
                 }
-            }, my_start, my_end);
+            }
         }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
+        }, v_start, n);
     }
 
     auto second_bsp_end = high_resolution_clock::now();
