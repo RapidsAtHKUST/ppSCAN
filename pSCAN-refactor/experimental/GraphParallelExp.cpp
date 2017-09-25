@@ -313,14 +313,7 @@ void GraphParallelExp::ClusterNonCores() {
             pool.enqueue([this](int i_start, int i_end) {
                 for (auto i = i_start; i < i_end; i++) {
                     auto u = cores[i];
-                    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-                        auto v = out_edges[j];
-                        if (!IsDefiniteCoreVertex(v)) {
-                            if (min_cn[j] > 0) {
-                                min_cn[j] = EvalReachable(u, j);
-                            }
-                        }
-                    }
+                    ClusterNonCoreFirstPhase(u);
                 }
             }, my_start, my_end);
         }
