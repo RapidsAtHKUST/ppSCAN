@@ -76,8 +76,9 @@ void Graph::PruneDetail(int u) {
             ed--;
         } else {
             int c = ComputeCnLowerBound(deg_a, deg_b);
-            min_cn[edge_idx] = c <= 2 ? DIRECT_REACHABLE : c;
-            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+            auto is_similar_flag = c <= 2;
+            min_cn[edge_idx] = is_similar_flag ? DIRECT_REACHABLE : c;
+            if (is_similar_flag) {
                 sd++;
             }
         }
@@ -87,7 +88,6 @@ void Graph::PruneDetail(int u) {
     } else if (ed < min_u) {
         is_non_core_lst[u] = TRUE;
     }
-
 }
 
 void Graph::Prune() {
@@ -331,11 +331,12 @@ void Graph::pSCANSecondPhaseCheckCore() {
         ThreadPool pool(thread_num);
 
         auto v_start = 0;
-        auto count = 0;
+        long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
             if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
-                count++;
-                if (count % 16 == 0) {
+                deg_sum += degree[v_i];
+                if (deg_sum > 32 * 1024) {
+                    deg_sum = 0;
                     pool.enqueue([this](int i_start, int i_end) {
                         for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
                     }, v_start, v_i + 1);
@@ -356,11 +357,12 @@ void Graph::pSCANSecondPhaseCheckCore() {
         ThreadPool pool(thread_num);
 
         auto v_start = 0;
-        auto count = 0;
+        long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
             if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
-                count++;
-                if (count % 64 == 0) {
+                deg_sum += degree[v_i];
+                if (deg_sum > 64 * 1024) {
+                    deg_sum = 0;
                     pool.enqueue([this](int i_start, int i_end) {
                         for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
                     }, v_start, v_i + 1);
