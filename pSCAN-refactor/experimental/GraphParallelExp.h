@@ -83,6 +83,8 @@ private:
 
     void MarkClusterMinEleAsId();
 
+    void ClusterNonCoreFirstPhase(int u);
+
     void ClusterNonCores();
 
     // four phases

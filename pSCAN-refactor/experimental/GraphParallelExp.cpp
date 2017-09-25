@@ -159,44 +159,46 @@ bool GraphParallelExp::IsDefiniteCoreVertex(int u) {
 }
 
 void GraphParallelExp::CheckCoreFirstBSP(int u) {
-    auto sd = 0;
-    auto ed = degree[u] - 1;
-    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        auto v = out_edges[edge_idx];
-        // be careful, the next line can only be commented when memory load/store of min_cn is atomic
+    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
+        auto sd = 0;
+        auto ed = degree[u] - 1;
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            auto v = out_edges[edge_idx];
+            // be careful, the next line can only be commented when memory load/store of min_cn is atomic
 //        if (u <= v) {
-        if (min_cn[edge_idx] == DIRECT_REACHABLE) {
-            ++sd;
-            if (sd >= min_u) {
-                is_core_lst[u] = TRUE;
-                return;
-            }
-        } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
-            --ed;
-            if (ed < min_u) {
-                is_non_core_lst[u] = TRUE;
-                return;
-            }
-        }
-//        }
-    }
-
-    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        auto v = out_edges[edge_idx];
-        if (u <= v && min_cn[edge_idx] > 0) {
-            min_cn[edge_idx] = EvalReachable(u, edge_idx);
-            min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
             if (min_cn[edge_idx] == DIRECT_REACHABLE) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = TRUE;
                     return;
                 }
-            } else {
+            } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
                 --ed;
                 if (ed < min_u) {
                     is_non_core_lst[u] = TRUE;
                     return;
+                }
+            }
+//        }
+        }
+
+        for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            auto v = out_edges[edge_idx];
+            if (u <= v && min_cn[edge_idx] > 0) {
+                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
+                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                    ++sd;
+                    if (sd >= min_u) {
+                        is_core_lst[u] = TRUE;
+                        return;
+                    }
+                } else {
+                    --ed;
+                    if (ed < min_u) {
+                        is_non_core_lst[u] = TRUE;
+                        return;
+                    }
                 }
             }
         }
@@ -283,6 +285,17 @@ void GraphParallelExp::MarkClusterMinEleAsId() {
     }
 }
 
+void GraphParallelExp::ClusterNonCoreFirstPhase(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (!IsDefiniteCoreVertex(v)) {
+            if (min_cn[j] > 0) {
+                min_cn[j] = EvalReachable(u, j);
+            }
+        }
+    }
+}
+
 void GraphParallelExp::ClusterNonCores() {
     noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
@@ -340,14 +353,24 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
     auto find_core_start = high_resolution_clock::now();
     {
         ThreadPool pool(thread_num_);
-        auto batch_size = 32u;
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
-            }, my_start, my_end);
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+                deg_sum += degree[v_i];
+                if (deg_sum > 32 * 1024) {
+                    deg_sum = 0;
+                    pool.enqueue([this](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+                    }, v_start, v_i + 1);
+                    v_start = v_i + 1;
+                }
+            }
         }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+        }, v_start, n);
     }
     auto first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
@@ -356,16 +379,24 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
     {
         ThreadPool pool(thread_num_);
 
-        auto batch_size = 64u;
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) {
-                    CheckCoreSecondBSP(i);
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+                deg_sum += degree[v_i];
+                if (deg_sum > 64 * 1024) {
+                    deg_sum = 0;
+                    pool.enqueue([this](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
+                    }, v_start, v_i + 1);
+                    v_start = v_i + 1;
                 }
-            }, my_start, my_end);
+            }
         }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
+        }, v_start, n);
     }
 
     auto second_bsp_end = high_resolution_clock::now();
@@ -421,5 +452,6 @@ void GraphParallelExp::pSCAN() {
 GraphParallelExp::~GraphParallelExp() {
     _mm_free(min_cn);
 }
+
 
 

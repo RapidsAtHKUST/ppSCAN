@@ -92,18 +92,28 @@ void Graph::PruneDetail(int u) {
 
 void Graph::Prune() {
     auto thread_num = std::thread::hardware_concurrency();
-    auto batch_size = 8192u;
     ThreadPool pool(thread_num);
-    for (auto v_i = 0; v_i < n; v_i += batch_size) {
-        int my_start = v_i;
-        int my_end = min(n, my_start + batch_size);
 
-        pool.enqueue([this](int i_start, int i_end) {
-            for (auto u = i_start; u < i_end; u++) {
-                PruneDetail(u);
-            }
-        }, my_start, my_end);
+    auto v_start = 0;
+    long deg_sum = 0;
+    for (auto v_i = 0; v_i < n; v_i++) {
+        deg_sum += degree[v_i];
+        if (deg_sum > 64 * 1024) {
+            deg_sum = 0;
+
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto u = i_start; u < i_end; u++) {
+                    PruneDetail(u);
+                }
+            }, v_start, v_i + 1);
+            v_start = v_i + 1;
+        }
     }
+    pool.enqueue([this](int i_start, int i_end) {
+        for (auto u = i_start; u < i_end; u++) {
+            PruneDetail(u);
+        }
+    }, v_start, n);
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -270,6 +280,17 @@ void Graph::MarkClusterMinEleAsId() {
     }
 }
 
+void Graph::ClusterNonCoreFirstPhase(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (!IsDefiniteCoreVertex(v)) {
+            if (min_cn[j] > 0) {
+                min_cn[j] = EvalReachable(u, j);
+            }
+        }
+    }
+}
+
 void Graph::ClusterNonCores() {
     noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
@@ -280,7 +301,6 @@ void Graph::ClusterNonCores() {
     auto thread_num = std::thread::hardware_concurrency();
     {
         ThreadPool pool(thread_num);
-
         auto batch_size = 64u;
         for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
             int my_start = v_i;
@@ -288,18 +308,12 @@ void Graph::ClusterNonCores() {
             pool.enqueue([this](int i_start, int i_end) {
                 for (auto i = i_start; i < i_end; i++) {
                     auto u = cores[i];
-                    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-                        auto v = out_edges[j];
-                        if (!IsDefiniteCoreVertex(v)) {
-                            if (min_cn[j] > 0) {
-                                min_cn[j] = EvalReachable(u, j);
-                            }
-                        }
-                    }
+                    ClusterNonCoreFirstPhase(u);
                 }
             }, my_start, my_end);
         }
     }
+
     auto tmp_end = high_resolution_clock::now();
     cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
          << " ms\n";
@@ -429,5 +443,7 @@ void Graph::pSCAN() {
 Graph::~Graph() {
     _mm_free(min_cn);
 }
+
+
 
 
