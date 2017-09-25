@@ -24,11 +24,11 @@ if __name__ == '__main__':
         'small_snap_dblp',
         'snap_pokec', 'snap_livejournal', 'snap_orkut',
         'webgraph_uk', 'webgraph_webbase',
-        'webgraph_twitter', 'snap_friendster'
+        # 'webgraph_twitter', 'snap_friendster'
     ]
 
-    figure_folder = 'scalability_new1_better_pruning'
-    markdown_folder = 'case_studies/figures-case-study8-scalability-differ-eps-improved-prune'
+    figure_folder = 'scalability_new2_opt_scheduler'
+    markdown_folder = 'case_studies/figures-case-study9-scalability-differ-eps'
 
     os.system('mkdir -p ./figures/' + figure_folder)
     min_pts = 5

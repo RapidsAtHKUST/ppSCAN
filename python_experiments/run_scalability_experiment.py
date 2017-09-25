@@ -56,7 +56,7 @@ if __name__ == '__main__':
                     'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
                     'webgraph_uk', 'webgraph_webbase',
                     'webgraph_twitter', 'snap_friendster']
-    parameter_eps_lst = [0.1, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    parameter_eps_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     # parameter_eps_lst = [0.3]
     parameter_min_pts_lst = [5]
     # thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
@@ -67,4 +67,4 @@ if __name__ == '__main__':
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
-                        folder_name='scalability_new1_better_pruning')
+                        folder_name='scalability_new2_opt_scheduler')

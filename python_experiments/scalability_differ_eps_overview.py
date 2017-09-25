@@ -1,13 +1,13 @@
 from scalability_figure_overview import *
 
 if __name__ == '__main__':
-    overview_figure_folder = 'scalability_new1_better_pruning'
-    markdown_folder = 'case_studies/figures-case-study8-scalability-differ-eps-improved-prune'
-
+    overview_figure_folder = 'scalability_new2_opt_scheduler'
+    markdown_folder = 'case_studies/figures-case-study9-scalability-differ-eps'
+    os.system('mkdir -p '+markdown_folder)
     all_data_set_lst = [
         'small_snap_dblp', 'snap_pokec', 'snap_livejournal', 'snap_orkut',
         'webgraph_uk', 'webgraph_webbase',
-        'webgraph_twitter', 'snap_friendster'
+        # 'webgraph_twitter', 'snap_friendster'
     ]
     all_input_time_lst = [217, 1522, 3453, 9720, 13254, 45982, 47910, 215101]
     all_edge_num_lst = ['2,099,732', '30,282,866', '69,362,378', '234,370,166', '301,136,554', '1,050,026,736',
