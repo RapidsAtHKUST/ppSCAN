@@ -401,15 +401,35 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
     cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
          << " ms\n";
 
-    for (auto u : cores) {
-        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-            auto v = out_edges[j];
-            if (!IsDefiniteCoreVertex(v)) {
-                auto root_of_u = disjoint_set_ptr->FindRoot(u);
-                if (min_cn[j] == SIMILAR) {
-                    noncore_cluster.emplace_back(cluster_dict[root_of_u], v);
+    {
+        ThreadPool pool(thread_num);
+
+        auto batch_size = max(32u, static_cast<ui>(cores.size() / thread_num));
+        mutex non_core_cluster_mutex;
+        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
+            pool.enqueue([this, &non_core_cluster_mutex](int i_start, int i_end) {
+                auto tmp_cluster = vector<pair<int, int>>();
+                for (auto i = i_start; i < i_end; i++) {
+                    auto u = cores[i];
+                    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                        auto v = out_edges[j];
+                        if (!IsDefiniteCoreVertex(v)) {
+                            auto root_of_u = disjoint_set_ptr->FindRoot(u);
+                            if (min_cn[j] == SIMILAR) {
+                                tmp_cluster.emplace_back(cluster_dict[root_of_u], v);
+                            }
+                        }
+                    }
                 }
-            }
+                {
+                    unique_lock<mutex> lock(non_core_cluster_mutex);
+                    for (auto ele: tmp_cluster) {
+                        noncore_cluster.emplace_back(ele);
+                    }
+                }
+            }, my_start, my_end);
         }
     }
 
