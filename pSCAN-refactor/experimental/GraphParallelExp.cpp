@@ -126,16 +126,28 @@ bool GraphParallelExp::IsDefiniteCoreVertex(int u) {
 }
 
 void GraphParallelExp::PruneDetail(int u) {
+    auto sd = 0;
+    auto ed = degree[u] - 1;
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
         int deg_a = degree[u], deg_b = degree[v];
         if (deg_a > deg_b) { swap(deg_a, deg_b); }
         if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
             min_cn[edge_idx] = NOT_SIMILAR;
+            ed--;
         } else {
             int c = ComputeCnLowerBound(deg_a, deg_b);
-            min_cn[edge_idx] = c <= 2 ? SIMILAR : c;
+            auto is_similar_flag = c <= 2;
+            min_cn[edge_idx] = is_similar_flag ? SIMILAR : c;
+            if (is_similar_flag) {
+                sd++;
+            }
         }
+    }
+    if (sd >= min_u) {
+        is_core_lst[u] = TRUE;
+    } else if (ed < min_u) {
+        is_non_core_lst[u] = TRUE;
     }
 }
 
@@ -267,18 +279,28 @@ void GraphParallelExp::ClusterNonCoreFirstPhase(int u) {
 void GraphParallelExp::pSCANFirstPhasePrune() {
     auto prune_start = high_resolution_clock::now();
     {
-        auto batch_size = 8192u;
         ThreadPool pool(thread_num_);
-        for (auto v_i = 0; v_i < n; v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(n, my_start + batch_size);
 
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto u = i_start; u < i_end; u++) {
-                    PruneDetail(u);
-                }
-            }, my_start, my_end);
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            deg_sum += degree[v_i];
+            if (deg_sum > 64 * 1024) {
+                deg_sum = 0;
+
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto u = i_start; u < i_end; u++) {
+                        PruneDetail(u);
+                    }
+                }, v_start, v_i + 1);
+                v_start = v_i + 1;
+            }
         }
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto u = i_start; u < i_end; u++) {
+                PruneDetail(u);
+            }
+        }, v_start, n);
     }
     auto prune_end = high_resolution_clock::now();
     cout << "1st: prune execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
