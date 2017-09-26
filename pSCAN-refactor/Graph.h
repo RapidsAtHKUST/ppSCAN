@@ -10,9 +10,8 @@
 
 using namespace std;
 
-constexpr int NOT_DIRECT_REACHABLE = -2;
-constexpr int DIRECT_REACHABLE = -1;
-constexpr int NOT_SURE = 0;
+constexpr int NOT_SIMILAR = -2;
+constexpr int SIMILAR = -1;
 
 namespace yche {
     template<typename T, typename... Args>
@@ -35,8 +34,7 @@ private:
     vector<int> out_edges;
 
     // edge properties
-//    vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
-    int *min_cn;
+    int *min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
 
     // vertex properties
     vector<int> degree;
@@ -45,8 +43,10 @@ private:
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
+
     // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
+
 
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSet> disjoint_set_ptr;
@@ -54,24 +54,22 @@ private:
     vector<int> cores;
 
 private:
-    // optimization: common-neighbor check pruning, as a pre-processing phase
+    // easy-computation pruning optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
-
-    void PruneDetail(int u);
-
-    void Prune();
 
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
-    int EvalReachable(int u, ui edge_idx);
+    int EvalSimilarity(int u, ui edge_idx);
 
-    // optimization: cross-link
-    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
+    // avoiding redundant computation optimization: find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
     bool IsDefiniteCoreVertex(int u);
 
-    // parallel computation logic
+private:
+    // vertex computations in each phase
+    void PruneDetail(int u);
+
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
@@ -84,9 +82,8 @@ private:
 
     void ClusterNonCoreFirstPhase(int u);
 
-    void ClusterNonCores();
-
-    // four phases
+private:
+    // four stages
     void pSCANFirstPhasePrune();
 
     void pSCANSecondPhaseCheckCore();

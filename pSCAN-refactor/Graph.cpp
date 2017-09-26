@@ -1,13 +1,11 @@
 #include "Graph.h"
 
 #include <mm_malloc.h>
-#include <cstring>
-#include <cmath>
 #include <cassert>
+#include <cmath>
 
 #include <iostream>
 #include <algorithm>
-#include <numeric>
 
 #include "playground/pretty_print.h"
 #include "ThreadPool.h"
@@ -30,17 +28,15 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     out_edges = std::move(io_helper_ptr->out_edges);
 
     // edge properties
-//    min_cn = vector<int>(io_helper_ptr->m);
     min_cn = static_cast<int *>(_mm_malloc(io_helper_ptr->m * sizeof(int), 32));
-//    printf("%p", min_cn);
 #define PTR_TO_UINT64(x) (uint64_t)(uintptr_t)(x)
     assert(PTR_TO_UINT64(min_cn) % 32 == 0);
-//    std::fill(min_cn.begin(), min_cn.end(), NOT_SURE);
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
     is_core_lst = vector<char>(n, FALSE);
     is_non_core_lst = vector<char>(n, FALSE);
+
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
     auto all_end = high_resolution_clock::now();
@@ -52,68 +48,11 @@ void Graph::Output(const char *eps_s, const char *miu) {
     io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, disjoint_set_ptr->parent);
 }
 
-ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
-    auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
-    if (array[mid] == val) { return mid; }
-    return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
-}
 
 int Graph::ComputeCnLowerBound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) { ++c; }
     return c;
-}
-
-void Graph::PruneDetail(int u) {
-    auto sd = 0;
-    auto ed = degree[u] - 1;
-    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-        auto v = out_edges[edge_idx];
-        int deg_a = degree[u], deg_b = degree[v];
-        if (deg_a > deg_b) { swap(deg_a, deg_b); }
-        if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
-            min_cn[edge_idx] = NOT_DIRECT_REACHABLE;
-            ed--;
-        } else {
-            int c = ComputeCnLowerBound(deg_a, deg_b);
-            auto is_similar_flag = c <= 2;
-            min_cn[edge_idx] = is_similar_flag ? DIRECT_REACHABLE : c;
-            if (is_similar_flag) {
-                sd++;
-            }
-        }
-    }
-    if (sd >= min_u) {
-        is_core_lst[u] = TRUE;
-    } else if (ed < min_u) {
-        is_non_core_lst[u] = TRUE;
-    }
-}
-
-void Graph::Prune() {
-    auto thread_num = std::thread::hardware_concurrency();
-    ThreadPool pool(thread_num);
-
-    auto v_start = 0;
-    long deg_sum = 0;
-    for (auto v_i = 0; v_i < n; v_i++) {
-        deg_sum += degree[v_i];
-        if (deg_sum > 64 * 1024) {
-            deg_sum = 0;
-
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto u = i_start; u < i_end; u++) {
-                    PruneDetail(u);
-                }
-            }, v_start, v_i + 1);
-            v_start = v_i + 1;
-        }
-    }
-    pool.enqueue([this](int i_start, int i_end) {
-        for (auto u = i_start; u < i_end; u++) {
-            PruneDetail(u);
-        }
-    }, v_start, n);
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -127,12 +66,12 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     while (cn < min_cn_num) {
         while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
-            if (du < min_cn_num) { return NOT_DIRECT_REACHABLE; }
+            if (du < min_cn_num) { return NOT_SIMILAR; }
             ++offset_nei_u;
         }
         while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
             --dv;
-            if (dv < min_cn_num) { return NOT_DIRECT_REACHABLE; }
+            if (dv < min_cn_num) { return NOT_SIMILAR; }
             ++offset_nei_v;
         }
         if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
@@ -141,10 +80,10 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++offset_nei_v;
         }
     }
-    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 }
 
-int Graph::EvalReachable(int u, ui edge_idx) {
+int Graph::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
@@ -153,21 +92,53 @@ bool Graph::IsDefiniteCoreVertex(int u) {
     return is_core_lst[u] == TRUE;
 }
 
+ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
+    auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    if (array[mid] == val) { return mid; }
+    return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
+}
+
+void Graph::PruneDetail(int u) {
+    auto sd = 0;
+    auto ed = degree[u] - 1;
+    for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+        auto v = out_edges[edge_idx];
+        int deg_a = degree[u], deg_b = degree[v];
+        if (deg_a > deg_b) { swap(deg_a, deg_b); }
+        if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
+            min_cn[edge_idx] = NOT_SIMILAR;
+            ed--;
+        } else {
+            int c = ComputeCnLowerBound(deg_a, deg_b);
+            auto is_similar_flag = c <= 2;
+            min_cn[edge_idx] = is_similar_flag ? SIMILAR : c;
+            if (is_similar_flag) {
+                sd++;
+            }
+        }
+    }
+    if (sd >= min_u) {
+        is_core_lst[u] = TRUE;
+    } else if (ed < min_u) {
+        is_non_core_lst[u] = TRUE;
+    }
+}
+
 void Graph::CheckCoreFirstBSP(int u) {
     if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
+            // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torned read
 //        auto v = out_edges[edge_idx];
-            // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torned
 //        if (u <= v) {
-            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+            if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = TRUE;
                     return;
                 }
-            } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+            } else if (min_cn[edge_idx] == NOT_SIMILAR) {
                 --ed;
                 if (ed < min_u) {
                     is_non_core_lst[u] = TRUE;
@@ -180,9 +151,9 @@ void Graph::CheckCoreFirstBSP(int u) {
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
             if (u <= v && min_cn[edge_idx] > 0) {
-                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
-                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
                         is_core_lst[u] = TRUE;
@@ -205,14 +176,14 @@ void Graph::CheckCoreSecondBSP(int u) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+            if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = TRUE;
                     return;
                 }
             }
-            if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+            if (min_cn[edge_idx] == NOT_SIMILAR) {
                 --ed;
                 if (ed < min_u) {
                     return;
@@ -223,9 +194,9 @@ void Graph::CheckCoreSecondBSP(int u) {
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
             if (min_cn[edge_idx] > 0) {
-                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
-                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
                         is_core_lst[u] = TRUE;
@@ -246,7 +217,7 @@ void Graph::ClusterCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
-            if (min_cn[j] == DIRECT_REACHABLE) {
+            if (min_cn[j] == SIMILAR) {
                 disjoint_set_ptr->Union(u, v);
             }
         }
@@ -258,8 +229,8 @@ void Graph::ClusterCoreSecondPhase(int u) {
         auto v = out_edges[edge_idx];
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
             if (min_cn[edge_idx] > 0) {
-                min_cn[edge_idx] = EvalReachable(u, edge_idx);
-                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
+                if (min_cn[edge_idx] == SIMILAR) {
                     disjoint_set_ptr->Union(u, v);
                 }
             }
@@ -285,47 +256,7 @@ void Graph::ClusterNonCoreFirstPhase(int u) {
         auto v = out_edges[j];
         if (!IsDefiniteCoreVertex(v)) {
             if (min_cn[j] > 0) {
-                min_cn[j] = EvalReachable(u, j);
-            }
-        }
-    }
-}
-
-void Graph::ClusterNonCores() {
-    noncore_cluster = std::vector<pair<int, int>>();
-    noncore_cluster.reserve(n);
-
-    MarkClusterMinEleAsId();
-
-    auto tmp_start = high_resolution_clock::now();
-    auto thread_num = std::thread::hardware_concurrency();
-    {
-        ThreadPool pool(thread_num);
-        auto batch_size = 64u;
-        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) {
-                    auto u = cores[i];
-                    ClusterNonCoreFirstPhase(u);
-                }
-            }, my_start, my_end);
-        }
-    }
-
-    auto tmp_end = high_resolution_clock::now();
-    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
-         << " ms\n";
-
-    for (auto u : cores) {
-        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-            auto v = out_edges[j];
-            if (!IsDefiniteCoreVertex(v)) {
-                auto root_of_u = disjoint_set_ptr->FindRoot(u);
-                if (min_cn[j] == DIRECT_REACHABLE) {
-                    noncore_cluster.emplace_back(cluster_dict[root_of_u], v);
-                }
+                min_cn[j] = EvalSimilarity(u, j);
             }
         }
     }
@@ -333,7 +264,31 @@ void Graph::ClusterNonCores() {
 
 void Graph::pSCANFirstPhasePrune() {
     auto prune_start = high_resolution_clock::now();
-    Prune();
+    {
+        auto thread_num = std::thread::hardware_concurrency();
+        ThreadPool pool(thread_num);
+
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            deg_sum += degree[v_i];
+            if (deg_sum > 64 * 1024) {
+                deg_sum = 0;
+
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto u = i_start; u < i_end; u++) {
+                        PruneDetail(u);
+                    }
+                }, v_start, v_i + 1);
+                v_start = v_i + 1;
+            }
+        }
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto u = i_start; u < i_end; u++) {
+                PruneDetail(u);
+            }
+        }, v_start, n);
+    }
     auto prune_end = high_resolution_clock::now();
     cout << "1st: prune execution time:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
 }
@@ -420,9 +375,43 @@ void Graph::pSCANThirdPhaseClusterCore() {
 }
 
 void Graph::pSCANFourthPhaseClusterNonCore() {
-    auto tmp_start = high_resolution_clock::now();
+    noncore_cluster = std::vector<pair<int, int>>();
+    noncore_cluster.reserve(n);
 
-    ClusterNonCores();
+    MarkClusterMinEleAsId();
+
+    auto tmp_start = high_resolution_clock::now();
+    auto thread_num = std::thread::hardware_concurrency();
+    {
+        ThreadPool pool(thread_num);
+        auto batch_size = 64u;
+        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) {
+                    auto u = cores[i];
+                    ClusterNonCoreFirstPhase(u);
+                }
+            }, my_start, my_end);
+        }
+    }
+
+    auto tmp_end = high_resolution_clock::now();
+    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
+         << " ms\n";
+
+    for (auto u : cores) {
+        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+            auto v = out_edges[j];
+            if (!IsDefiniteCoreVertex(v)) {
+                auto root_of_u = disjoint_set_ptr->FindRoot(u);
+                if (min_cn[j] == SIMILAR) {
+                    noncore_cluster.emplace_back(cluster_dict[root_of_u], v);
+                }
+            }
+        }
+    }
 
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
@@ -430,7 +419,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
 }
 
 void Graph::pSCAN() {
-    cout << "new algo" << endl;
+    cout << "new algorithm ppSCAN" << endl;
     pSCANFirstPhasePrune();
 
     pSCANSecondPhaseCheckCore();
@@ -443,7 +432,3 @@ void Graph::pSCAN() {
 Graph::~Graph() {
     _mm_free(min_cn);
 }
-
-
-
-
