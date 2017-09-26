@@ -238,19 +238,6 @@ void Graph::ClusterCoreSecondPhase(int u) {
     }
 }
 
-void Graph::MarkClusterMinEleAsId() {
-    cluster_dict = vector<int>(n);
-    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
-
-    for (auto i = 0; i < n; i++) {
-        if (IsDefiniteCoreVertex(i)) {
-            // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
-            int x = disjoint_set_ptr->FindRoot(i);
-            if (i < cluster_dict[x]) { cluster_dict[x] = i; }
-        }
-    }
-}
-
 void Graph::ClusterNonCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
@@ -372,6 +359,19 @@ void Graph::pSCANThirdPhaseClusterCore() {
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
          << " ms\n";
+}
+
+void Graph::MarkClusterMinEleAsId() {
+    cluster_dict = vector<int>(n);
+    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
+
+    for (auto i = 0; i < n; i++) {
+        if (IsDefiniteCoreVertex(i)) {
+            // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
+            int x = disjoint_set_ptr->FindRoot(i);
+            if (i < cluster_dict[x]) { cluster_dict[x] = i; }
+        }
+    }
 }
 
 void Graph::pSCANFourthPhaseClusterNonCore() {

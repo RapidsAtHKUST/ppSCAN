@@ -78,17 +78,17 @@ private:
 
     void ClusterCoreSecondPhase(int u);
 
-    void MarkClusterMinEleAsId();
-
     void ClusterNonCoreFirstPhase(int u);
 
 private:
-    // four stages
+    // computation stages
     void pSCANFirstPhasePrune();
 
     void pSCANSecondPhaseCheckCore();
 
     void pSCANThirdPhaseClusterCore();
+
+    void MarkClusterMinEleAsId();
 
     void pSCANFourthPhaseClusterNonCore();
 
