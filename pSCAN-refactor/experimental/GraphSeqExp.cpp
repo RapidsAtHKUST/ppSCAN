@@ -4,9 +4,9 @@
 #include <cmath>
 
 #include <iostream>
-#include <algorithm>
-#include <numeric>
 #include <chrono>
+#include <algorithm>
+
 #include "../playground/pretty_print.h"
 
 using namespace std::chrono;
@@ -29,7 +29,6 @@ GraphSeqExp::GraphSeqExp(const char *dir_string, const char *eps_s, int min_u) {
 
     // edge properties
     min_cn = vector<int>(io_helper_ptr->m);
-    std::fill(min_cn.begin(), min_cn.end(), NOT_SURE);
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
@@ -47,49 +46,10 @@ void GraphSeqExp::Output(const char *eps_s, const char *miu) {
     io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, disjoint_set_ptr->parent);
 }
 
-ui GraphSeqExp::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
-    auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
-    if (array[mid] == val) { return mid; }
-    return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
-}
-
 int GraphSeqExp::ComputeCnLowerBound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) { ++c; }
     return c;
-}
-
-void GraphSeqExp::Prune() {
-    for (auto u = 0; u < n; u++) {
-        for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-            auto v = out_edges[j];
-            int deg_a = degree[u], deg_b = degree[v];
-            if (deg_a > deg_b) { swap(deg_a, deg_b); };
-
-            if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
-                // can be pruned
-#ifdef STATISTICS
-                if (u <= v) {
-                    ++prune0;
-                }
-#endif
-                min_cn[j] = NOT_DIRECT_REACHABLE;
-            } else {
-                // can be pruned, when c <= 2
-                int c = ComputeCnLowerBound(deg_a, deg_b);
-                if (c <= 2) {
-#ifdef STATISTICS
-                    if (u <= v) {
-                        ++prune1;
-                    }
-#endif
-                    min_cn[j] = DIRECT_REACHABLE;
-                } else {
-                    min_cn[j] = c;
-                }
-            }
-        }
-    }
 }
 
 int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
@@ -116,7 +76,7 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++offset_nei_v;
         }
     }
-    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 #else
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -144,7 +104,7 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
                 int local_portion = min_val == 0 ? max_val : max_val / min_val;
                 portion = max(portion, local_portion);
 #endif
-                return NOT_DIRECT_REACHABLE;
+                return NOT_SIMILAR;
             }
             ++offset_nei_u;
         }
@@ -161,7 +121,7 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
                 int local_portion = min_val == 0 ? max_val : max_val / min_val;
                 portion = max(portion, local_portion);
 #endif
-                return NOT_DIRECT_REACHABLE;
+                return NOT_SIMILAR;
             }
             ++offset_nei_v;
         }
@@ -183,14 +143,56 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     portion = max(portion, local_portion);
     single_max_cmp = max(single_max_cmp, tmp0 + tmp1);
 #endif
-    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 #endif
 }
-
 
 int GraphSeqExp::EvalReachable(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
+}
+
+ui GraphSeqExp::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
+    auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    if (array[mid] == val) { return mid; }
+    return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
+}
+
+void GraphSeqExp::PruneDetail(int u) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        int deg_a = degree[u], deg_b = degree[v];
+        if (deg_a > deg_b) { swap(deg_a, deg_b); };
+
+        if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
+            // can be pruned
+#ifdef STATISTICS
+            if (u <= v) {
+                    ++prune0;
+                }
+#endif
+            min_cn[j] = NOT_SIMILAR;
+        } else {
+            // can be pruned, when c <= 2
+            int c = ComputeCnLowerBound(deg_a, deg_b);
+            if (c <= 2) {
+#ifdef STATISTICS
+                if (u <= v) {
+                        ++prune1;
+                    }
+#endif
+                min_cn[j] = SIMILAR;
+            } else {
+                min_cn[j] = c;
+            }
+        }
+    }
+}
+
+void GraphSeqExp::Prune() {
+    for (auto u = 0; u < n; u++) {
+        PruneDetail(u);
+    }
 }
 
 void GraphSeqExp::CheckCoreFirstBSP(int u) {
@@ -199,13 +201,13 @@ void GraphSeqExp::CheckCoreFirstBSP(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
 //        if (u <= v) {
-        if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+        if (min_cn[edge_idx] == SIMILAR) {
             ++sd;
             if (sd >= min_u) {
                 is_core_lst[u] = true;
                 return;
             }
-        } else if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+        } else if (min_cn[edge_idx] == NOT_SIMILAR) {
             --ed;
             if (ed < min_u) {
                 is_non_core_lst[u] = true;
@@ -223,7 +225,7 @@ void GraphSeqExp::CheckCoreFirstBSP(int u) {
 #endif
             min_cn[edge_idx] = EvalReachable(u, edge_idx);
             min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
-            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+            if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = true;
@@ -245,14 +247,14 @@ void GraphSeqExp::CheckCoreSecondBSP(int u) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-            if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+            if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
                     is_core_lst[u] = true;
                     return;
                 }
             }
-            if (min_cn[edge_idx] == NOT_DIRECT_REACHABLE) {
+            if (min_cn[edge_idx] == NOT_SIMILAR) {
                 --ed;
                 if (ed < min_u) {
                     return;
@@ -268,7 +270,7 @@ void GraphSeqExp::CheckCoreSecondBSP(int u) {
 #endif
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
                 min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
-                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
                         is_core_lst[u] = true;
@@ -289,7 +291,7 @@ void GraphSeqExp::ClusterCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (u < v && is_core_lst[v] && !disjoint_set_ptr->IsSameSet(u, v)) {
-            if (min_cn[j] == DIRECT_REACHABLE) {
+            if (min_cn[j] == SIMILAR) {
                 disjoint_set_ptr->Union(u, v);
             }
         }
@@ -305,7 +307,7 @@ void GraphSeqExp::ClusterCoreSecondPhase(int u) {
                 serial_intersection_times++;
 #endif
                 min_cn[edge_idx] = EvalReachable(u, edge_idx);
-                if (min_cn[edge_idx] == DIRECT_REACHABLE) {
+                if (min_cn[edge_idx] == SIMILAR) {
                     disjoint_set_ptr->Union(u, v);
                 }
             }
@@ -358,7 +360,7 @@ void GraphSeqExp::ClusterNonCores() {
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
                     auto root_of_i = disjoint_set_ptr->FindRoot(i);
-                    if (min_cn[j] == DIRECT_REACHABLE) {
+                    if (min_cn[j] == SIMILAR) {
                         noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
                     }
                 }
@@ -368,7 +370,7 @@ void GraphSeqExp::ClusterNonCores() {
 }
 
 void GraphSeqExp::pSCAN() {
-    cout << "new algo" << endl;
+    cout << "new algorithm ppSCAN serial experimental" << endl;
 
     // 1 prune
     auto prune_start = high_resolution_clock::now();
@@ -438,4 +440,3 @@ void GraphSeqExp::pSCAN() {
     cout << "max portion:" << portion << "\n" << endl;
 #endif
 }
-

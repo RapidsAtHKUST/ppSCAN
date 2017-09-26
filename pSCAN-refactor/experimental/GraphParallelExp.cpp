@@ -80,7 +80,7 @@ int GraphParallelExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++offset_nei_v;
         }
     }
-    return cn >= min_cn_num ? DIRECT_REACHABLE : NOT_DIRECT_REACHABLE;
+    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 #else
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =

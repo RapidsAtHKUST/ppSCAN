@@ -2,7 +2,6 @@
 #define _GRAPH_SEQ_EXP_H_
 
 #include <memory>
-#include <unordered_set>
 
 #include "../InputOutput.h"
 #include "../DisjointSet.h"
@@ -10,9 +9,8 @@
 
 using namespace std;
 
-constexpr int NOT_DIRECT_REACHABLE = -2;
-constexpr int DIRECT_REACHABLE = -1;
-constexpr int NOT_SURE = 0;
+constexpr int NOT_SIMILAR = -2;
+constexpr int SIMILAR = -1;
 
 namespace yche {
     template<typename T, typename... Args>
@@ -67,21 +65,22 @@ private:
     int portion = 0;
 #endif
 private:
-    // 1st optimization: cross-link
-    // find reverse edge index, e.g, (i,j) index know, compute (j,i) index
-    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
-
-    // 2nd optimization: common-neighbor check pruning, as a pre-processing phase
+    // optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
-
-    void Prune();
 
     // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
     int EvalReachable(int u, ui edge_idx);
 
-    // 1st phase computation: core check and cluster
+    // optimization: find reverse edge index, e.g, (i,j) index know, compute (j,i) index
+    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
+
+private:
+    void PruneDetail(int u);
+
+    void Prune();
+
     void CheckCoreFirstBSP(int u);
 
     void CheckCoreSecondBSP(int u);
@@ -90,7 +89,6 @@ private:
 
     void ClusterCoreSecondPhase(int u);
 
-    // 2nd phase computation
     void MarkClusterMinEleAsId();
 
     void ClusterNonCores();
