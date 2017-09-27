@@ -46,8 +46,7 @@ GraphParallelExp::GraphParallelExp(const char *dir_string, const char *eps_s, in
 }
 
 void GraphParallelExp::Output(const char *eps_s, const char *miu) {
-    auto parent = disjoint_set_ptr->GetParent();
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, parent);
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, *disjoint_set_ptr);
 }
 
 int GraphParallelExp::ComputeCnLowerBound(int du, int dv) {
@@ -243,9 +242,10 @@ void GraphParallelExp::CheckCoreSecondBSP(int u) {
 void GraphParallelExp::ClusterCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
-        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
+                                                                             static_cast<uint32_t>(v))) {
             if (min_cn[j] == SIMILAR) {
-                disjoint_set_ptr->Union(u, v);
+                disjoint_set_ptr->Union(static_cast<uint32_t>(u), static_cast<uint32_t>(v));
             }
         }
     }
@@ -254,11 +254,12 @@ void GraphParallelExp::ClusterCoreFirstPhase(int u) {
 void GraphParallelExp::ClusterCoreSecondPhase(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
-        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
+                                                                             static_cast<uint32_t>(v))) {
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 if (min_cn[edge_idx] == SIMILAR) {
-                    disjoint_set_ptr->Union(u, v);
+                    disjoint_set_ptr->Union(static_cast<uint32_t>(u), static_cast<uint32_t>(v));
                 }
             }
         }
@@ -376,8 +377,8 @@ void GraphParallelExp::pSCANThirdPhaseClusterCore() {
         ThreadPool pool(thread_num_);
 
         auto batch_size = 64u;
-        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
-            int my_start = v_i;
+        for (auto outer_i = 0; outer_i < cores.size(); outer_i += batch_size) {
+            int my_start = outer_i;
             int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
             pool.enqueue([this](int i_start, int i_end) {
                 for (auto i = i_start; i < i_end; i++) {
@@ -417,9 +418,8 @@ void GraphParallelExp::MarkClusterMinEleAsId() {
     cluster_dict = vector<int>(n);
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
-    for (auto i = 0; i < n; i++) {
+    for (auto i = 0u; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) {
-            // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
             int x = disjoint_set_ptr->FindRoot(i);
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
         }
@@ -467,7 +467,7 @@ void GraphParallelExp::pSCANFourthPhaseClusterNonCore() {
                     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
                         auto v = out_edges[j];
                         if (!IsDefiniteCoreVertex(v)) {
-                            auto root_of_u = disjoint_set_ptr->FindRoot(u);
+                            auto root_of_u = disjoint_set_ptr->FindRoot(static_cast<uint32_t>(u));
                             if (min_cn[j] == SIMILAR) {
                                 tmp_cluster.emplace_back(cluster_dict[root_of_u], v);
                             }

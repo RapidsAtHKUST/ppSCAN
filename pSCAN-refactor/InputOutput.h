@@ -10,6 +10,7 @@
 #include <atomic>
 #include <unordered_set>
 
+#include "ThreadSafeDisjointSet.h"
 #include "Util.h"
 
 using ui=unsigned int;
@@ -50,7 +51,9 @@ public:
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                              vector<char> &is_core_lst, vector<int> &cid, vector<int> &parent);
-};
 
+    void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                             vector<char> &is_core_lst, vector<int> &cid, DisjointSets &disjoint_sets);
+};
 
 #endif //PSCAN_INPUTOUTPUT_H

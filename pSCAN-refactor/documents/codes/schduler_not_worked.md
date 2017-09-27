@@ -1,3 +1,30 @@
+to reason
+
+```cpp
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto v_i = 0; v_i < cores.size(); v_i++) {
+            deg_sum += degree[v_i];
+            if (deg_sum > 64 * 1024) {
+                deg_sum = 0;
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto i = i_start; i < i_end; i++) {
+                        auto u = cores[i];
+                        ClusterCoreSecondPhase(u);
+                    }
+                }, v_start, v_i + 1);
+                v_start = v_i + 1;
+            }
+        }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                auto u = cores[i];
+                ClusterCoreSecondPhase(u);
+            }
+        }, v_start, n);
+```
+
 too much cost in iteration
 
 ```cpp
