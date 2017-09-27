@@ -103,15 +103,6 @@ public:
         return (uint32_t) mData[id];
     }
 
-    std::vector<int> GetParent() {
-        std::vector<int> parent;
-        parent.reserve(mData.size());
-        for (auto i = 0u; i < mData.size(); i++) {
-            parent.emplace_back(static_cast<int>((uint32_t) mData[i]));
-        }
-        return parent;
-    }
-
     friend std::ostream &operator<<(std::ostream &os, const DisjointSets &f) {
         for (size_t i = 0; i < f.mData.size(); ++i)
             os << i << ": parent=" << f.parent(i) << ", rank=" << f.rank(i) << std::endl;

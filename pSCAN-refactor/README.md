@@ -4,7 +4,7 @@ ppSCAN: pruning-based structural clustering algorithm on networks.
 
 for supplementary documents, see [documents](documents).
 
-# Compile
+## Compile
 
 g++ should support c++11, e.g, g++ 4.8+, cmake should be 3.6+, allowing for modern cmake
 
@@ -15,28 +15,26 @@ cmake .. -DCMAKE_CXX_COMPILER=g++
 make
 ```
 
-# Parameter
+## Usage
 
-* eps，influence the computation workloads a lot
-
-* min_pts，not influence the workloads
-
-# Usage
+eps: influence the computation workloads a lot(from easy computation pruning), min_pts，not influence the workloads so much
 
 ```zsh
 build/pSCANSerial ../dataset 0.3 5 output
 build/pSCANParallel ../dataset 0.3 5 output
 ```
 
-# Package Organization
+## Package Organization
 
-ppSCAN package further usage must follow [GPLv3 license](../pSCAN-refactor/LICENSE).
+ppSCAN package further usage must follow [GPLv3 license](../pSCAN-refactor/LICENSE). 
+pSCAN-fork-optimization implementations follow modern cpp rules, to make things easier without loss of performance.
 
-* pSCAN-fork-optimization implementations follow modern cpp rules, to make things easier without loss of performance.
+* main files
 
 file | utility
 --- | ---
 [ThreadPool.h](../pSCAN-refactor/ThreadPool.h) | third-party thread pool, a simple impl
+[ThreadSafeDisjointSet.h](../pSCAN-refactor/ThreadSafeDisjointSet.h) | third-party thread-safe lock-free disjoint-set
 [DisjointSet.h](../pSCAN-refactor/DisjointSet.h), [DisjointSet.cpp](../pSCAN-refactor/DisjointSet.cpp) | see CLRS for detail, for connected componet
 [Graph.h](../pSCAN-refactor/Graph.h), [Graph.cpp](../pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
 [InputOutput.h](../pSCAN-refactor/InputOutput.h), [InputOutput.cpp](../pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
@@ -53,20 +51,21 @@ file | utility
 * experimental(parallel version with adjustable thread num)
 
 see [../pSCAN-refactor/experimental](../pSCAN-refactor/experimental).
+
 * deprecated
 
 file | utility
 --- | ---
 [MaxPriorityQueue.h](./playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](./playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
-[ThreadSafeDisjointSet.h](ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
 
 * profiling scrips
 
-see [run_pscan_gperftools.sh](shell_playground/run_pscan_gperftools.sh), [run_pscan_perf.sh](shell_playground/run_pscan_perf.sh), [run_pscan_valgrind.sh](shell_playground/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/).
+see [run_pscan_gperftools.sh](shell_playground/run_pscan_gperftools.sh), [run_pscan_perf.sh](shell_playground/run_pscan_perf.sh), [run_pscan_valgrind.sh](shell_playground/run_pscan_valgrind.sh) and this post [profiler tutorial](http://gernotklingler.com/blog/gprof-valgrind-gperftools-evaluation-tools-application-level-cpu-profiling-linux/). 
+for more advanced profiling, please use intel vtune.
 
-for more advanced profiling, please use intel vtune 
+## References
 
-# pSCAN Citation
+### pSCAN Citation
 
 > If you are using this code, please kindly cite the following paper.
 
