@@ -4,7 +4,6 @@
 #include <cassert>
 #include <cmath>
 
-#include <iostream>
 #include <algorithm>
 
 #include "playground/pretty_print.h"
@@ -38,14 +37,14 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     is_non_core_lst = vector<char>(n, FALSE);
 
     // 3rd: disjoint-set, make-set at the beginning
-    disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
+    disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
     auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, disjoint_set_ptr->parent);
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, *disjoint_set_ptr);
 }
 
 
@@ -216,9 +215,10 @@ void Graph::CheckCoreSecondBSP(int u) {
 void Graph::ClusterCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
-        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
+                                                                             static_cast<uint32_t>(v))) {
             if (min_cn[j] == SIMILAR) {
-                disjoint_set_ptr->Union(u, v);
+                disjoint_set_ptr->Union(static_cast<uint32_t>(u), static_cast<uint32_t>(v));
             }
         }
     }
@@ -227,11 +227,12 @@ void Graph::ClusterCoreFirstPhase(int u) {
 void Graph::ClusterCoreSecondPhase(int u) {
     for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
         auto v = out_edges[edge_idx];
-        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(u, v)) {
+        if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
+                                                                             static_cast<uint32_t>(v))) {
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 if (min_cn[edge_idx] == SIMILAR) {
-                    disjoint_set_ptr->Union(u, v);
+                    disjoint_set_ptr->Union(static_cast<uint32_t>(u), static_cast<uint32_t>(v));
                 }
             }
         }
@@ -281,6 +282,7 @@ void Graph::pSCANFirstPhasePrune() {
 }
 
 void Graph::pSCANSecondPhaseCheckCore() {
+    // check-core 1st phase
     auto find_core_start = high_resolution_clock::now();
     auto thread_num = std::thread::hardware_concurrency();
     {
@@ -309,6 +311,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
+    // check-core 2nd phase
     {
         ThreadPool pool(thread_num);
 
@@ -338,23 +341,50 @@ void Graph::pSCANSecondPhaseCheckCore() {
 }
 
 void Graph::pSCANThirdPhaseClusterCore() {
+    // prepare data
     auto tmp_start = high_resolution_clock::now();
-
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
     }
-    // prepare data
     auto tmp_end0 = high_resolution_clock::now();
     cout << "3rd: copy time: " << duration_cast<milliseconds>(tmp_end0 - tmp_start).count() << " ms\n";
 
     // cluster-core 1st phase
-    for (auto core:cores) { ClusterCoreFirstPhase(core); }
+    {
+        ThreadPool pool(std::thread::hardware_concurrency());
+
+        auto batch_size = 64u;
+        for (auto outer_i = 0; outer_i < cores.size(); outer_i += batch_size) {
+            int my_start = outer_i;
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) {
+                    auto u = cores[i];
+                    ClusterCoreFirstPhase(u);
+                }
+            }, my_start, my_end);
+        }
+    }
 
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // cluster-core 2nd phase
-    for (auto core:cores) { ClusterCoreSecondPhase(core); }
+    {
+        ThreadPool pool(std::thread::hardware_concurrency());
+
+        auto batch_size = 64u;
+        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) {
+                    auto u = cores[i];
+                    ClusterCoreSecondPhase(u);
+                }
+            }, my_start, my_end);
+        }
+    }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
@@ -365,9 +395,8 @@ void Graph::MarkClusterMinEleAsId() {
     cluster_dict = vector<int>(n);
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
-    for (auto i = 0; i < n; i++) {
+    for (auto i = 0u; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) {
-            // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
             int x = disjoint_set_ptr->FindRoot(i);
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
         }
@@ -375,6 +404,7 @@ void Graph::MarkClusterMinEleAsId() {
 }
 
 void Graph::pSCANFourthPhaseClusterNonCore() {
+    // mark cluster label
     noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
@@ -385,6 +415,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
     cout << "4th: marking cluster id cost in cluster-non-core:"
          << duration_cast<milliseconds>(tmp_next_start - tmp_start).count() << " ms\n";
 
+    // cluster non-core 1st phase
     auto thread_num = std::thread::hardware_concurrency();
     {
         ThreadPool pool(thread_num);
@@ -400,15 +431,15 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
             }, my_start, my_end);
         }
     }
-
     auto tmp_end = high_resolution_clock::now();
     cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_next_start).count()
          << " ms\n";
 
+    // cluster non-core 2nd phase
     {
         ThreadPool pool(thread_num);
 
-        auto batch_size = max(32u, static_cast<ui>(cores.size() / thread_num));
+        auto batch_size = 8192u;
         mutex non_core_cluster_mutex;
         for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
             int my_start = v_i;
@@ -420,7 +451,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
                     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
                         auto v = out_edges[j];
                         if (!IsDefiniteCoreVertex(v)) {
-                            auto root_of_u = disjoint_set_ptr->FindRoot(u);
+                            auto root_of_u = disjoint_set_ptr->FindRoot(static_cast<uint32_t>(u));
                             if (min_cn[j] == SIMILAR) {
                                 tmp_cluster.emplace_back(cluster_dict[root_of_u], v);
                             }
@@ -436,7 +467,6 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
             }, my_start, my_end);
         }
     }
-
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";

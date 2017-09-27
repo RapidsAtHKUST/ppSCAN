@@ -5,8 +5,6 @@
 #include <future>
 
 #include "../InputOutput.h"
-//#include "../DisjointSet.h"
-#include "../ThreadSafeDisjointSet.h"
 #include "../Util.h"
 
 using namespace std;
@@ -49,7 +47,6 @@ private:
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
 
     // disjoint-set: used for core-vertex induced connected components
-//    unique_ptr<DisjointSet> disjoint_set_ptr;
     unique_ptr<DisjointSets> disjoint_set_ptr;
 
     vector<int> cores;

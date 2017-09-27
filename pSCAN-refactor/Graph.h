@@ -5,7 +5,6 @@
 #include <future>
 
 #include "InputOutput.h"
-#include "DisjointSet.h"
 #include "Util.h"
 
 using namespace std;
@@ -49,7 +48,7 @@ private:
 
 
     // disjoint-set: used for core-vertex induced connected components
-    unique_ptr<DisjointSet> disjoint_set_ptr;
+    unique_ptr<DisjointSets> disjoint_set_ptr;
 
     vector<int> cores;
 

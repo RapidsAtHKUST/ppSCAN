@@ -440,9 +440,8 @@ void GraphParallelExp::pSCANFourthPhaseClusterNonCore() {
          << duration_cast<milliseconds>(tmp_next_start - tmp_start).count() << " ms\n";
 
     // cluster non-core 1st phase
-    auto thread_num = std::thread::hardware_concurrency();
     {
-        ThreadPool pool(thread_num);
+        ThreadPool pool(thread_num_);
         auto batch_size = 64u;
         for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
             int my_start = v_i;
