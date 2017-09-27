@@ -308,6 +308,7 @@ void GraphParallelExp::pSCANFirstPhasePrune() {
 }
 
 void GraphParallelExp::pSCANSecondPhaseCheckCore() {
+    // check-core 1st phase
     auto find_core_start = high_resolution_clock::now();
     {
         ThreadPool pool(thread_num_);
@@ -334,6 +335,7 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
+    // check-core 2nd phase
     {
         ThreadPool pool(thread_num_);
 
@@ -363,12 +365,11 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
 }
 
 void GraphParallelExp::pSCANThirdPhaseClusterCore() {
+    // prepare data
     auto tmp_start = high_resolution_clock::now();
-
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
     }
-    // prepare data
     auto tmp_end0 = high_resolution_clock::now();
     cout << "3rd: copy time: " << duration_cast<milliseconds>(tmp_end0 - tmp_start).count() << " ms\n";
 
@@ -427,15 +428,21 @@ void GraphParallelExp::MarkClusterMinEleAsId() {
 }
 
 void GraphParallelExp::pSCANFourthPhaseClusterNonCore() {
+    // mark cluster label
     noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
+    auto tmp_start = high_resolution_clock::now();
     MarkClusterMinEleAsId();
 
-    auto tmp_start = high_resolution_clock::now();
-    {
-        ThreadPool pool(thread_num_);
+    auto tmp_next_start = high_resolution_clock::now();
+    cout << "4th: marking cluster id cost in cluster-non-core:"
+         << duration_cast<milliseconds>(tmp_next_start - tmp_start).count() << " ms\n";
 
+    // cluster non-core 1st phase
+    auto thread_num = std::thread::hardware_concurrency();
+    {
+        ThreadPool pool(thread_num);
         auto batch_size = 64u;
         for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
             int my_start = v_i;
@@ -449,13 +456,14 @@ void GraphParallelExp::pSCANFourthPhaseClusterNonCore() {
         }
     }
     auto tmp_end = high_resolution_clock::now();
-    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
+    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_next_start).count()
          << " ms\n";
 
+    // cluster non-core 2nd phase
     {
         ThreadPool pool(thread_num_);
 
-        auto batch_size = max(32u, static_cast<ui>(cores.size() / thread_num_));
+        auto batch_size = 8192u;
         mutex non_core_cluster_mutex;
         for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
             int my_start = v_i;
@@ -483,7 +491,6 @@ void GraphParallelExp::pSCANFourthPhaseClusterNonCore() {
             }, my_start, my_end);
         }
     }
-
     auto all_end = high_resolution_clock::now();
     cout << "4th: non-core clustering time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";

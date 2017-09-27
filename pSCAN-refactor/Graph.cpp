@@ -378,9 +378,13 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
     noncore_cluster = std::vector<pair<int, int>>();
     noncore_cluster.reserve(n);
 
+    auto tmp_start = high_resolution_clock::now();
     MarkClusterMinEleAsId();
 
-    auto tmp_start = high_resolution_clock::now();
+    auto tmp_next_start = high_resolution_clock::now();
+    cout << "4th: marking cluster id cost in cluster-non-core:"
+         << duration_cast<milliseconds>(tmp_next_start - tmp_start).count() << " ms\n";
+
     auto thread_num = std::thread::hardware_concurrency();
     {
         ThreadPool pool(thread_num);
@@ -398,7 +402,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
     }
 
     auto tmp_end = high_resolution_clock::now();
-    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
+    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_next_start).count()
          << " ms\n";
 
     {
