@@ -23,12 +23,12 @@ if __name__ == '__main__':
     data_set_lst = [
         'small_snap_dblp',
         'snap_pokec', 'snap_livejournal', 'snap_orkut',
-        'webgraph_uk', 'webgraph_webbase',
-        'webgraph_twitter', 'snap_friendster'
+        # 'webgraph_uk', 'webgraph_webbase',
+        # 'webgraph_twitter', 'snap_friendster'
     ]
 
-    figure_folder = 'scalability_new2_opt_scheduler'
-    markdown_folder = 'case_studies/figures-case-study9-scalability-differ-eps'
+    figure_folder = 'scalability_new3_all_in_parallel'
+    markdown_folder = 'case_studies/figures-case-study10-scalability-differ-eps'
 
     os.system('mkdir -p ./figures/' + figure_folder)
     min_pts = 5
