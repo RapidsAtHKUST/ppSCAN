@@ -4,7 +4,6 @@
 #include <cassert>
 #include <cmath>
 
-#include <iostream>
 #include <algorithm>
 
 #include "../playground/pretty_print.h"
@@ -40,14 +39,15 @@ GraphParallelExp::GraphParallelExp(const char *dir_string, const char *eps_s, in
     is_non_core_lst = vector<char>(n, FALSE);
 
     // 3rd: disjoint-set, make-set at the beginning
-    disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
+    disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
     auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }
 
 void GraphParallelExp::Output(const char *eps_s, const char *miu) {
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, disjoint_set_ptr->parent);
+    auto parent = disjoint_set_ptr->GetParent();
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, parent);
 }
 
 int GraphParallelExp::ComputeCnLowerBound(int du, int dv) {
@@ -372,13 +372,41 @@ void GraphParallelExp::pSCANThirdPhaseClusterCore() {
     cout << "3rd: copy time: " << duration_cast<milliseconds>(tmp_end0 - tmp_start).count() << " ms\n";
 
     // cluster-core 1st phase
-    for (auto core:cores) { ClusterCoreFirstPhase(core); }
+    {
+        ThreadPool pool(thread_num_);
+
+        auto batch_size = 64u;
+        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) {
+                    auto u = cores[i];
+                    ClusterCoreFirstPhase(u);
+                }
+            }, my_start, my_end);
+        }
+    }
 
     auto tmp_end = high_resolution_clock::now();
     cout << "3rd: prepare time: " << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // cluster-core 2nd phase
-    for (auto core:cores) { ClusterCoreSecondPhase(core); }
+    {
+        ThreadPool pool(thread_num_);
+
+        auto batch_size = 64u;
+        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
+            int my_start = v_i;
+            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
+            pool.enqueue([this](int i_start, int i_end) {
+                for (auto i = i_start; i < i_end; i++) {
+                    auto u = cores[i];
+                    ClusterCoreSecondPhase(u);
+                }
+            }, my_start, my_end);
+        }
+    }
 
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()

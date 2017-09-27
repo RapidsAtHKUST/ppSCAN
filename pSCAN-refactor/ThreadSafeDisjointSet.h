@@ -93,58 +93,6 @@ public:
         return id2;
     }
 
-    /**
-     * Try to lock the a disjoint union identified by one
-     * of its elements (this can occasionally fail when there
-     * are concurrent operations). The parameter 'id' will be
-     * updated to store the current representative ID of the
-     * union
-     */
-    bool try_lock(uint32_t &id) {
-        const uint64_t lock_flag = 1ULL << 63;
-        id = FindRoot(id);
-        uint64_t value = mData[id];
-        if (((value & lock_flag) != 0u) || (uint32_t) value != id)
-            return false;
-        // On IA32/x64, a PAUSE instruction is recommended for CAS busy loops
-#if defined(__i386__) || defined(__amd64__)
-        __asm__ __volatile__ ("pause\n");
-#endif
-        return mData[id].compare_exchange_strong(value, value | lock_flag);
-    }
-
-    void unlock(uint32_t id) {
-        const uint64_t lock_flag = 1ULL << 63;
-        mData[id] &= ~lock_flag;
-    }
-
-    /**
-     * Return the representative index of the set that results from merging
-     * locked disjoint sets 'id1' and 'id2'
-     */
-    uint32_t Union_index_locked(uint32_t id1, uint32_t id2) const {
-        uint32_t r1 = rank(id1), r2 = rank(id2);
-        return (r1 > r2 || (r1 == r2 && id1 < id2)) ? id1 : id2;
-    }
-
-    /**
-     * Atomically Union two locked disjoint sets and unlock them. Assumes
-     * that here are no other concurrent Union() involving the IsSameSet sets
-     */
-    uint32_t Union_unlock(uint32_t id1, uint32_t id2) {
-        uint32_t r1 = rank(id1), r2 = rank(id2);
-
-        if (r1 > r2 || (r1 == r2 && id1 < id2)) {
-            std::swap(r1, r2);
-            std::swap(id1, id2);
-        }
-
-        mData[id1] = ((uint64_t) r1 << 32) | id2;
-        mData[id2] = ((uint64_t) (r2 + ((r1 == r2) ? 1 : 0)) << 32) | id2;
-
-        return id2;
-    }
-
     uint32_t size() const { return (uint32_t) mData.size(); }
 
     uint32_t rank(uint32_t id) const {

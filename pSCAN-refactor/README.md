@@ -58,7 +58,7 @@ see [../pSCAN-refactor/experimental](../pSCAN-refactor/experimental).
 file | utility
 --- | ---
 [MaxPriorityQueue.h](./playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](./playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
-[ThreadSafeDisjointSet.h](./playground/ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
+[ThreadSafeDisjointSet.h](ThreadSafeDisjointSet.h) | not useful after change some codes to make it simpler, deprecated now
 
 * profiling scrips
 

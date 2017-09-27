@@ -11,6 +11,7 @@ find_package(Threads REQUIRED)
 # playgound 0, playgound 1
 add_executable(other_play playground/play.cpp)
 add_executable(io_play playground/graph_io.cpp)
+add_executable(play_union_find_set playground/play_thread_safe_union_find_set.cpp ThreadSafeDisjointSet.h)
 
 # utility 0: converter, transform edge list txt file into b_degree.bin, b_adj.bin
 add_executable(converter converter/EdgeListToBinsConverter.cpp)
