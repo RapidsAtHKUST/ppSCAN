@@ -37,6 +37,11 @@ file | utility
 [ThreadSafeDisjointSet.h](../pSCAN-refactor/ThreadSafeDisjointSet.h) | third-party thread-safe lock-free disjoint-set
 [DisjointSet.h](../pSCAN-refactor/DisjointSet.h), [DisjointSet.cpp](../pSCAN-refactor/DisjointSet.cpp) | see CLRS for detail, for connected componet
 [Graph.h](../pSCAN-refactor/Graph.h), [Graph.cpp](../pSCAN-refactor/Graph.cpp) | graph representation and algorithm  related
+
+* io related
+
+file | utility
+--- | ---
 [InputOutput.h](../pSCAN-refactor/InputOutput.h), [InputOutput.cpp](../pSCAN-refactor/InputOutput.cpp) | read binary degree/adjacent edges utility
 [EdgeListToBinsConverter.cpp](converter/EdgeListToBinsConverter.cpp) | utility converter for processing edge list into binary files
 

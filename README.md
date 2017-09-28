@@ -8,7 +8,7 @@
 
 skeleton:
 
-![ppSCAN skeleton](figures/ppscan-skeleton.png)
+![ppSCAN skeleton](figures/ppscan_skeleton.png)
 
 data to operate with:
 
@@ -35,16 +35,36 @@ Min-max pruning is applied in this phase. Mark definite cores and definite non-c
 * 2.2 CheckCoreSecondPhase(parallel): since the existence of min-max pruning, some vertices can not be determined by two bloom filters, `is_core` and `is_non_core`, thus similarities sourcing from these vertices that are not evaluated 
 are evaluated and relationship is established for reversed edge.
 
-* 3.1 ClusterCoreFirstPhase(serial): without further evaluation of similarities, union similar core-cores.
+* 3.1 ClusterCoreFirstPhase(parallel): without further evaluation of similarities, union similar core-cores.
 
-* 3.2 ClusterCoreSecondPhase(serial): some similarity predicates of core-cores are not know, evaluate them only when they are not in the same tree in the disjoint-set yet, 
+* 3.2 ClusterCoreSecondPhase(parallel): some similarity predicates of core-cores are not know, evaluate them only when they are not in the same tree in the disjoint-set yet, 
 if they are similar, union them.
 
 * Trivial Preparing: Line 11 to 14 is for initializing `cluster_id` for looking up `cluster_id[FindRoot(u)]`.
 
 * 4.1 ClusterNonCoreFirstPhase(parallel): evaluate some unknow similarities among cores and non-co res.
 
-* 4.2 ClusterNonCoreSecondPhase(serial): cluster non-cores when they are similar to cores 
+* 4.2 ClusterNonCoreSecondPhase(parallel): cluster non-cores when they are similar to cores 
+
+## Set-Intersection Improvement
+
+dataset: orkut, `eps:0.2`, `min_pts:5`
+
+previous:
+
+![prev_set_intersection.png](figures/prev_set_intersection.png) 
+
+improved:
+
+![improved-set-intersection.png](figures/improved-set-intersection.png)
+
+reduced number of border checking and element comparison branch statement
+
+type | prev clockticks | improved clockticks
+--- | --- | ---
+border checking |  150 billion | 45 billion 
+element cmp branch statement| 320 billion | 230 billion
+min-max value, offset increment | 150 billion | 140 billion
 
 ## Project 
 

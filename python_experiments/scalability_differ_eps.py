@@ -23,8 +23,8 @@ if __name__ == '__main__':
     data_set_lst = [
         'small_snap_dblp',
         'snap_pokec', 'snap_livejournal', 'snap_orkut',
-        # 'webgraph_uk', 'webgraph_webbase',
-        # 'webgraph_twitter', 'snap_friendster'
+        'webgraph_uk', 'webgraph_webbase',
+        'webgraph_twitter', 'snap_friendster'
     ]
 
     figure_folder = 'scalability_new3_all_in_parallel'

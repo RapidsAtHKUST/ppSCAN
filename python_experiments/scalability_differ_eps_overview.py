@@ -6,8 +6,8 @@ if __name__ == '__main__':
     os.system('mkdir -p ' + markdown_folder)
     all_data_set_lst = [
         'small_snap_dblp', 'snap_pokec', 'snap_livejournal', 'snap_orkut',
-        # 'webgraph_uk', 'webgraph_webbase',
-        # 'webgraph_twitter', 'snap_friendster'
+        'webgraph_uk', 'webgraph_webbase',
+        'webgraph_twitter', 'snap_friendster'
     ]
     all_input_time_lst = [217, 1522, 3453, 9720, 13254, 45982, 47910, 215101]
     all_edge_num_lst = ['2,099,732', '30,282,866', '69,362,378', '234,370,166', '301,136,554', '1,050,026,736',
