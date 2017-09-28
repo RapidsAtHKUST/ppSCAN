@@ -79,6 +79,8 @@ private:
 
     void ClusterNonCoreFirstPhase(int u);
 
+    void ClusterNonCoreSecondPhase(int u, vector<pair<int, int>> &tmp_cluster);
+
 private:
     // computation stages
     void pSCANFirstPhasePrune();

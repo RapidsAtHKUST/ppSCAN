@@ -266,6 +266,18 @@ void GraphParallelExp::ClusterCoreSecondPhase(int u) {
     }
 }
 
+void GraphParallelExp::ClusterNonCoreSecondPhase(int u, vector<pair<int, int>> &tmp_cluster) {
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        auto v = out_edges[j];
+        if (!IsDefiniteCoreVertex(v)) {
+            auto root_of_u = disjoint_set_ptr->FindRoot(static_cast<uint32_t>(u));
+            if (min_cn[j] == SIMILAR) {
+                tmp_cluster.emplace_back(cluster_dict[root_of_u], v);
+            }
+        }
+    }
+}
+
 void GraphParallelExp::ClusterNonCoreFirstPhase(int u) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
@@ -370,6 +382,7 @@ void GraphParallelExp::pSCANThirdPhaseClusterCore() {
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
     }
+    cout << "core size:" << cores.size() << "\n";
     auto tmp_end0 = high_resolution_clock::now();
     cout << "3rd: copy time: " << duration_cast<milliseconds>(tmp_end0 - tmp_start).count() << " ms\n";
 
@@ -377,17 +390,28 @@ void GraphParallelExp::pSCANThirdPhaseClusterCore() {
     {
         ThreadPool pool(thread_num_);
 
-        auto batch_size = 64u;
-        for (auto outer_i = 0; outer_i < cores.size(); outer_i += batch_size) {
-            int my_start = outer_i;
-            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) {
-                    auto u = cores[i];
-                    ClusterCoreFirstPhase(u);
-                }
-            }, my_start, my_end);
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
+            if (deg_sum > 128 * 1024) {
+                deg_sum = 0;
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto i = i_start; i < i_end; i++) {
+                        auto u = cores[i];
+                        ClusterCoreFirstPhase(u);
+                    }
+                }, v_start, core_index + 1);
+                v_start = core_index + 1;
+            }
         }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                auto u = cores[i];
+                ClusterCoreFirstPhase(u);
+            }
+        }, v_start, cores.size());
     }
 
     auto tmp_end = high_resolution_clock::now();
@@ -397,19 +421,29 @@ void GraphParallelExp::pSCANThirdPhaseClusterCore() {
     {
         ThreadPool pool(thread_num_);
 
-        auto batch_size = 64u;
-        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) {
-                    auto u = cores[i];
-                    ClusterCoreSecondPhase(u);
-                }
-            }, my_start, my_end);
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
+            if (deg_sum > 128 * 1024) {
+                deg_sum = 0;
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto i = i_start; i < i_end; i++) {
+                        auto u = cores[i];
+                        ClusterCoreSecondPhase(u);
+                    }
+                }, v_start, core_index + 1);
+                v_start = core_index + 1;
+            }
         }
-    }
 
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                auto u = cores[i];
+                ClusterCoreSecondPhase(u);
+            }
+        }, v_start, cores.size());
+    }
     auto end_core_cluster = high_resolution_clock::now();
     cout << "3rd: core clustering time:" << duration_cast<milliseconds>(end_core_cluster - tmp_start).count()
          << " ms\n";
@@ -442,49 +476,66 @@ void GraphParallelExp::pSCANFourthPhaseClusterNonCore() {
     // cluster non-core 1st phase
     {
         ThreadPool pool(thread_num_);
-        auto batch_size = 64u;
-        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
-            pool.enqueue([this](int i_start, int i_end) {
-                for (auto i = i_start; i < i_end; i++) {
-                    auto u = cores[i];
-                    ClusterNonCoreFirstPhase(u);
-                }
-            }, my_start, my_end);
+
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
+            if (deg_sum > 32 * 1024) {
+                deg_sum = 0;
+                pool.enqueue([this](int i_start, int i_end) {
+                    for (auto i = i_start; i < i_end; i++) {
+                        auto u = cores[i];
+                        ClusterNonCoreFirstPhase(u);
+                    }
+                }, v_start, core_index + 1);
+                v_start = core_index + 1;
+            }
         }
+
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                auto u = cores[i];
+                ClusterNonCoreFirstPhase(u);
+            }
+        }, v_start, cores.size());
     }
     auto tmp_end = high_resolution_clock::now();
     cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_next_start).count()
          << " ms\n";
 
+
     // cluster non-core 2nd phase
     {
         ThreadPool pool(thread_num_);
 
-        auto batch_size = 8192u;
-        vector<future<vector<pair<int, int >>>> future_vec;
-        for (auto v_i = 0; v_i < cores.size(); v_i += batch_size) {
-            int my_start = v_i;
-            int my_end = min(static_cast<ui>(cores.size()), my_start + batch_size);
-            future_vec.emplace_back(
-                    pool.enqueue([this](int i_start, int i_end) -> vector<pair<int, int>> {
-                        auto tmp_cluster = vector<pair<int, int>>();
-                        for (auto i = i_start; i < i_end; i++) {
-                            auto u = cores[i];
-                            for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-                                auto v = out_edges[j];
-                                if (!IsDefiniteCoreVertex(v)) {
-                                    auto root_of_u = disjoint_set_ptr->FindRoot(static_cast<uint32_t>(u));
-                                    if (min_cn[j] == SIMILAR) {
-                                        tmp_cluster.emplace_back(cluster_dict[root_of_u], v);
-                                    }
-                                }
-                            }
-                        }
-                        return tmp_cluster;
-                    }, my_start, my_end));
+        auto v_start = 0;
+        long deg_sum = 0;
+        vector<future<vector<pair<int, int>>>> future_vec;
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
+            if (deg_sum > 32 * 1024) {
+                deg_sum = 0;
+                future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<pair<int, int>> {
+                    auto tmp_cluster = vector<pair<int, int>>();
+                    for (auto i = i_start; i < i_end; i++) {
+                        auto u = cores[i];
+                        ClusterNonCoreSecondPhase(u, tmp_cluster);
+                    }
+                    return tmp_cluster;
+                }, v_start, core_index + 1));
+                v_start = core_index + 1;
+            }
         }
+
+        future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<pair<int, int>> {
+            auto tmp_cluster = vector<pair<int, int>>();
+            for (auto i = i_start; i < i_end; i++) {
+                auto u = cores[i];
+                ClusterNonCoreSecondPhase(u, tmp_cluster);
+            }
+            return tmp_cluster;
+        }, v_start, cores.size()));
 
         for (auto &future: future_vec) {
             for (auto ele:future.get()) {
