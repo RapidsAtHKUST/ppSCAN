@@ -368,8 +368,8 @@ void Graph::pSCANThirdPhaseClusterCore() {
 
         auto v_start = 0;
         long deg_sum = 0;
-        for (auto v_i = 0; v_i < cores.size(); v_i++) {
-            deg_sum += degree[cores[v_i]];
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
             if (deg_sum > 128 * 1024) {
                 deg_sum = 0;
                 pool.enqueue([this](int i_start, int i_end) {
@@ -377,8 +377,8 @@ void Graph::pSCANThirdPhaseClusterCore() {
                         auto u = cores[i];
                         ClusterCoreFirstPhase(u);
                     }
-                }, v_start, v_i + 1);
-                v_start = v_i + 1;
+                }, v_start, core_index + 1);
+                v_start = core_index + 1;
             }
         }
 
@@ -399,8 +399,8 @@ void Graph::pSCANThirdPhaseClusterCore() {
 
         auto v_start = 0;
         long deg_sum = 0;
-        for (auto v_i = 0; v_i < cores.size(); v_i++) {
-            deg_sum += degree[cores[v_i]];
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
             if (deg_sum > 128 * 1024) {
                 deg_sum = 0;
                 pool.enqueue([this](int i_start, int i_end) {
@@ -408,8 +408,8 @@ void Graph::pSCANThirdPhaseClusterCore() {
                         auto u = cores[i];
                         ClusterCoreSecondPhase(u);
                     }
-                }, v_start, v_i + 1);
-                v_start = v_i + 1;
+                }, v_start, core_index + 1);
+                v_start = core_index + 1;
             }
         }
 
@@ -456,8 +456,8 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
 
         auto v_start = 0;
         long deg_sum = 0;
-        for (auto v_i = 0; v_i < cores.size(); v_i++) {
-            deg_sum += degree[cores[v_i]];
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
             if (deg_sum > 32 * 1024) {
                 deg_sum = 0;
                 pool.enqueue([this](int i_start, int i_end) {
@@ -465,8 +465,8 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
                         auto u = cores[i];
                         ClusterNonCoreFirstPhase(u);
                     }
-                }, v_start, v_i + 1);
-                v_start = v_i + 1;
+                }, v_start, core_index + 1);
+                v_start = core_index + 1;
             }
         }
 
@@ -488,9 +488,9 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
 
         auto v_start = 0;
         long deg_sum = 0;
-        vector<future<vector<pair<int, int >>>> future_vec;
-        for (auto v_i = 0; v_i < cores.size(); v_i++) {
-            deg_sum += degree[cores[v_i]];
+        vector<future<vector<pair<int, int>>>> future_vec;
+        for (auto core_index = 0; core_index < cores.size(); core_index++) {
+            deg_sum += degree[cores[core_index]];
             if (deg_sum > 32 * 1024) {
                 deg_sum = 0;
                 future_vec.emplace_back(pool.enqueue([this](int i_start, int i_end) -> vector<pair<int, int>> {
@@ -500,8 +500,8 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
                         ClusterNonCoreSecondPhase(u, tmp_cluster);
                     }
                     return tmp_cluster;
-                }, v_start, v_i + 1));
-                v_start = v_i + 1;
+                }, v_start, core_index + 1));
+                v_start = core_index + 1;
             }
         }
 
