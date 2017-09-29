@@ -67,8 +67,8 @@ target_link_libraries(pSCANParallelExp1 ${CMAKE_THREAD_LIBS_INIT})
 
 # pSCAN for time breakdown
 set(PSCAN_SOURCE_FILES experimental/pscan_experimental/pSCANGraph.cpp experimental/pscan_experimental/pSCANGraph.h
-        experimental/pscan_experimental/main.cpp DisjointSet.cpp
-        experimental/pscan_experimental/Utility.cpp experimental/pscan_experimental/Utility.h)
+        experimental/pscan_experimental/main_exp_pscan.cpp DisjointSet.cpp InputOutput.cpp
+        experimental/pscan_experimental/MaxPriorityQueue.cpp experimental/pscan_experimental/MaxPriorityQueue.h)
 add_executable(pSCANForTimeBreakDown ${PSCAN_SOURCE_FILES})
 target_compile_options(pSCANForTimeBreakDown PRIVATE -O3 -g)
 #target_compile_definitions(pSCANForTimeBreakDown PRIVATE WITHGPERFTOOLS=1)

@@ -1,6 +1,7 @@
+#include <cstring>
+
 #include <chrono>
 
-#include "Utility.h"
 #include "pSCANGraph.h"
 
 #ifdef WITHGPERFTOOLS
@@ -24,17 +25,17 @@ int main(int argc, char *argv[]) {
 
     // load graph
     auto start = high_resolution_clock::now();
-    auto graph = new pSCANGraph(argv[1]);
-    graph->ReadGraph();
+    auto graph = new pSCANGraph(argv[1], argv[2], atoi(argv[3]));
+//    graph->ReadGraph();
     auto end = high_resolution_clock::now();
-    cout << "Total input cost:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
+    cout << "Total input cost:" << duration_cast<milliseconds>(end - start).count() << " ms\n\n";
 
     // computation
 #ifdef WITHGPERFTOOLS
     cout << "with google perf start------------\n";
     ProfilerStart("pscan_algo.log");
 #endif
-    graph->pSCAN(argv[2], atoi(argv[3]));
+    graph->pSCAN();
     auto end2 = high_resolution_clock::now();
     cout << "Total time without IO:" << duration_cast<milliseconds>(end2 - end).count() << " ms\n";
 #ifdef WITHGPERFTOOLS
@@ -45,6 +46,6 @@ int main(int argc, char *argv[]) {
     // output
     if (argc >= 5 && strcmp(argv[4], "output") == 0) graph->Output(argv[2], argv[3]);
     auto end3 = high_resolution_clock::now();
-    cout << "Total output cost:" << duration_cast<milliseconds>(end3 - end2).count() << " ms\n";
+    cout << "\nTotal output cost:" << duration_cast<milliseconds>(end3 - end2).count() << " ms\n";
     return 0;
 }

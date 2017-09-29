@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "Utility.h"
+#include "../../InputOutput.h"
 #include "../../DisjointSet.h"
 
 using namespace std;
@@ -17,61 +17,52 @@ namespace yche {
 
 class pSCANGraph {
 private:
-    string dir;
-    ui n, m;
+    unique_ptr<InputOutput> io_helper_ptr;
+    ui n;
 
     int eps_a2, eps_b2, miu; // eps_a2/eps_b2 = eps^2
 
-    ui *pstart; //offset of neighbors of nodes
-    int *edges; //adjacent ids of edges
+    vector<ui> pstart; //offset of neighbors of nodes
+    vector<int> edges; //adjacent ids of edges
 
-    ui *reverse_link; //the position of reverse edge in edges
-    int *min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
+    vector<ui> reverse_link; //the position of reverse edge in edges
+    vector<int> min_cn; //minimum common neighbor: -2 means not similar; -1 means similar; 0 means not sure; > 0 means the minimum common neighbor
 
+
+    vector<int> degree;
+    vector<int> similar_degree; //number of adjacent edges with similarity no less than epsilon
+    vector<int> effective_degree; //number of adjacent edges not pruned by similarity
+
+    vector<ui> edge_buf;
+    vector<int> cores;
+    vector<int> cid; //cluster id
     unique_ptr<DisjointSet> disjoint_set;
-
-    int *cid; //cluster id
-
-    int *degree;
-    int *similar_degree; //number of adjacent edges with similarity no less than epsilon
-    int *effective_degree; //number of adjacent edges not pruned by similarity
-
     vector<pair<int, int>> noncore_cluster;
 
-    // statistics
-#ifdef STATISTICS
-    long all_cmp0 = 0;
-    long all_cmp1 = 0;
-    long all_cmp2 = 0;
-    long intersection_times = 0;
-    int portion = 0;
-#endif
 public:
-    explicit pSCANGraph(const char *_dir);
+    explicit pSCANGraph(const char *_dir, const char *eps_s, int min_u);
 
-    ~pSCANGraph();
-
-    void ReadGraph();
-
-    void pSCAN(const char *eps_s, int miu);
-
-    //eps_s and miu are the parameters (epsilon, miu) for the SCAN algorithm
-    void ClusterNonCoreVertices(int eps_a2, int eps_b2, int mu);
+    void pSCAN();
 
     void Output(const char *eps_s, const char *miu);
 
 private:
-    ui BinarySearch(const int *array, ui b, ui e, int val);
+    int ComputeMinCommonNeighbor(int u, int v);
 
-    int similar_check_OP(int u, ui idx, int eps_a, int eps_b);
+    ui BinarySearch(vector<int> &array, ui b, ui e, int val);
+
+    int EvalSimilarityWrapper(int u, ui idx);
 
     int EvalSimilarity(int u, int v, int c);
 
-    int ComputeMinCommonNeighbor(int u, int v, int eps_a2, int eps_b2);
+private:
+    void PruneCrossLink();
 
-    void PruneCrossLink(int eps_a2, int eps_b2, int miu, int *cores, int &cores_e);
+    int CheckCore(int u);
 
-    void GetEps(const char *eps_s);
+    void ClusterCore(int u, int early_start_idx);
+
+    void ClusterNonCoreVertices();
 };
 
 #endif

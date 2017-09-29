@@ -61,7 +61,7 @@ see [../pSCAN-refactor/experimental](../pSCAN-refactor/experimental).
 
 file | utility
 --- | ---
-[MaxPriorityQueue.h](./playground/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](./playground/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
+[MaxPriorityQueue.h](experimental/pscan_experimental/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](experimental/pscan_experimental/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
 
 * profiling scrips
 

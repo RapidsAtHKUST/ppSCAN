@@ -100,6 +100,24 @@ pair<int, int> InputOutput::ParseEps(const char *eps_s) {
 }
 
 void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                         vector<int> &sd_lst, vector<int> &cid, vector<int> &parent) {
+    string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
+    ofstream ofs(out_name);
+    ofs << "c/n vertex_id cluster_id\n";
+
+    int miu = atoi(min_u);
+    // observation 2: unique belonging
+    for (auto i = 0; i < n; i++) { if (sd_lst[i] >= miu) { ofs << "c " << i << " " << cid[parent[i]] << "\n"; }}
+
+    // possibly multiple belongings
+    cout << "non core label num:" << noncore_cluster.size() << endl;
+    sort(noncore_cluster.begin(), noncore_cluster.end());
+    auto iter_end = unique(noncore_cluster.begin(), noncore_cluster.end());
+    for_each(noncore_cluster.begin(), iter_end,
+             [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
+}
+
+void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                          vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent) {
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
     ofstream ofs(out_name);
