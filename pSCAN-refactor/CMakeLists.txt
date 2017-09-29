@@ -73,3 +73,10 @@ add_executable(pSCANForTimeBreakDown ${PSCAN_SOURCE_FILES})
 target_compile_options(pSCANForTimeBreakDown PRIVATE -O3 -g)
 #target_compile_definitions(pSCANForTimeBreakDown PRIVATE WITHGPERFTOOLS=1)
 #target_link_libraries(pSCANForTimeBreakDown profiler)
+
+# pSCAN with IMPROVED_SET_INTERSECT
+add_executable(pSCANBetterSetIntersect ${PSCAN_SOURCE_FILES})
+target_compile_options(pSCANBetterSetIntersect PRIVATE -O3 -g)
+target_compile_definitions(pSCANBetterSetIntersect PRIVATE IMPROVED_SET_INTERSECT=1)
+
+
