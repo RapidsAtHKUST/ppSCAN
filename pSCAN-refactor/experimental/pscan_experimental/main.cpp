@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     // load graph
     auto start = high_resolution_clock::now();
     auto graph = new pSCANGraph(argv[1]);
-    graph->read_graph();
+    graph->ReadGraph();
     auto end = high_resolution_clock::now();
     cout << "Total input cost:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     // output
-    if (argc >= 5 && strcmp(argv[4], "output") == 0) graph->output(argv[2], argv[3]);
+    if (argc >= 5 && strcmp(argv[4], "output") == 0) graph->Output(argv[2], argv[3]);
     auto end3 = high_resolution_clock::now();
     cout << "Total output cost:" << duration_cast<milliseconds>(end3 - end2).count() << " ms\n";
     return 0;

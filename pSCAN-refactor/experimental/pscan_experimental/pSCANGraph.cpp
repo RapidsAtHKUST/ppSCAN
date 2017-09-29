@@ -19,9 +19,6 @@ pSCANGraph::pSCANGraph(const char *_dir) {
     degree = nullptr;
     effective_degree = nullptr;
     similar_degree = nullptr;
-
-    pa = nullptr;
-    rank = nullptr;
 }
 
 pSCANGraph::~pSCANGraph() {
@@ -57,17 +54,9 @@ pSCANGraph::~pSCANGraph() {
         delete[] similar_degree;
         similar_degree = nullptr;
     }
-    if (pa != nullptr) {
-        delete[] pa;
-        pa = nullptr;
-    }
-    if (rank != nullptr) {
-        delete[] rank;
-        rank = nullptr;
-    }
 }
 
-void pSCANGraph::read_graph() {
+void pSCANGraph::ReadGraph() {
     FILE *f = open_file((dir + string("/b_degree.bin")).c_str(), "rb");
 
     int tt;
@@ -123,9 +112,10 @@ void pSCANGraph::read_graph() {
             }
         }
     }
+    disjoint_set = yche::make_unique<DisjointSet>(n);
 }
 
-ui pSCANGraph::binary_search(const int *array, ui b, ui e, int val) {
+ui pSCANGraph::BinarySearch(const int *array, ui b, ui e, int val) {
     --e;
     if (array[e] < val) return e + 1;
     while (b < e) {
@@ -136,13 +126,13 @@ ui pSCANGraph::binary_search(const int *array, ui b, ui e, int val) {
     return e;
 }
 
-void pSCANGraph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
+void pSCANGraph::ClusterNonCoreVertices(int eps_a2, int eps_b2, int mu) {
     if (cid == nullptr) cid = new int[n];
     for (ui i = 0; i < n; i++) cid[i] = n;
 
     for (ui i = 0; i < n; i++)
         if (similar_degree[i] >= mu) {
-            int x = find_root(i);
+            int x = disjoint_set->FindRoot(i);
             if (i < cid[x]) cid[x] = i;
         }
 
@@ -162,12 +152,12 @@ void pSCANGraph::cluster_noncore_vertices(int eps_a2, int eps_b2, int mu) {
                         }
                     }
 
-                    if (min_cn[j] == -1) noncore_cluster.pb(mp(cid[pa[i]], edges[j]));
+                    if (min_cn[j] == -1) noncore_cluster.pb(mp(cid[disjoint_set->FindRoot(i)], edges[j]));
                 }
         }
 }
 
-void pSCANGraph::output(const char *eps_s, const char *miu) {
+void pSCANGraph::Output(const char *eps_s, const char *miu) {
     printf("\t*** Start write result into disk!\n");
 
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(miu) + ".txt";
@@ -178,7 +168,7 @@ void pSCANGraph::output(const char *eps_s, const char *miu) {
     int mu = atoi(miu);
     for (ui i = 0; i < n; i++)
         if (similar_degree[i] >= mu) {
-            fprintf(fout, "c %d %d\n", i, cid[pa[i]]);
+            fprintf(fout, "c %d %d\n", i, cid[disjoint_set->FindRoot(i)]);
         }
 
     sort(noncore_cluster.begin(), noncore_cluster.end());
@@ -195,7 +185,7 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
     using namespace chrono;
     auto prune_start = high_resolution_clock::now();
 
-    get_eps(eps_s);
+    GetEps(eps_s);
     miu = _miu;
 
     if (similar_degree == nullptr) similar_degree = new int[n];
@@ -204,17 +194,10 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
     if (effective_degree == nullptr) effective_degree = new int[n];
     for (ui i = 0; i < n; i++) effective_degree[i] = degree[i] - 1;
 
-    if (pa == nullptr) pa = new int[n];
-    if (rank == nullptr) rank = new int[n];
-    for (ui i = 0; i < n; i++) {
-        pa[i] = i;
-        rank[i] = 0;
-    }
-
     auto *edge_buf = new ui[n];
     auto *cores = new int[n];
     int cores_n = 0;
-    prune_and_cross_link(eps_a2, eps_b2, miu, cores, cores_n);
+    PruneCrossLink(eps_a2, eps_b2, miu, cores, cores_n);
     auto prune_end = high_resolution_clock::now();
     cout << "Prune cost:" << duration_cast<milliseconds>(prune_end - prune_start).count() << " ms\n";
 
@@ -261,7 +244,8 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
         for (ui j = pstart[u]; j < pstart[u + 1]; j++) {
             if (min_cn[j] == -2) continue;
 
-            if (similar_degree[u] < miu || find_root(u) != find_root(edges[j])) edge_buf[edge_buf_n++] = j;
+            if (similar_degree[u] < miu || disjoint_set->FindRoot(u) != disjoint_set->FindRoot(edges[j]))
+                edge_buf[edge_buf_n++] = j;
         }
 
         int i = 0;
@@ -293,13 +277,14 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
 
         for (int j = 0; j < edge_buf_n; j++) {
             ui idx = edge_buf[j];
-            if (min_cn[idx] == -1 && similar_degree[edges[idx]] >= miu) my_union(u, edges[idx]);
+            if (min_cn[idx] == -1 && similar_degree[edges[idx]] >= miu)
+                disjoint_set->Union(u, edges[idx]);
         }
 
         while (i < edge_buf_n) {
             ui idx = edge_buf[i];
             int v = edges[idx];
-            if (min_cn[idx] < 0 || similar_degree[v] < miu || find_root(u) == find_root(v)) {
+            if (min_cn[idx] < 0 || similar_degree[v] < miu || disjoint_set->FindRoot(u) == disjoint_set->FindRoot(v)) {
                 ++i;
                 continue;
             }
@@ -314,7 +299,7 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
                 } else --effective_degree[v];
             }
 
-            if (min_cn[idx] == -1) my_union(u, v);
+            if (min_cn[idx] == -1) disjoint_set->Union(u, v);
 
             ++i;
         }
@@ -325,7 +310,7 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
     delete[] bin_head;
     delete[] bin_next;
 
-    cluster_noncore_vertices(eps_a2, eps_b2, miu);
+    ClusterNonCoreVertices(eps_a2, eps_b2, miu);
 #ifdef STATISTICS
     cout << "intersection times:" << intersection_times << "\ncmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
          << "\nequal cmp:" << all_cmp2 << "\n";
@@ -334,7 +319,7 @@ void pSCANGraph::pSCAN(const char *eps_s, int _miu) {
 }
 
 
-int pSCANGraph::check_common_neighbor(int u, int v, int c) {
+int pSCANGraph::EvalSimilarity(int u, int v, int c) {
 #ifdef IMPROVED_SET_INTERSECT
     int cn = 2; // count for self and v, count for self and u
     int du = pstart[u + 1] - pstart[u] + 2, dv =
@@ -417,23 +402,23 @@ int pSCANGraph::similar_check_OP(int u, ui idx, int eps_a2, int eps_b2) {
 
     if (min_cn[idx] == 0) {
         int du = degree[u], dv = degree[v];
-        int c = compute_common_neighbor_lowerbound(du, dv, eps_a2, eps_b2);
+        int c = ComputeMinCommonNeighbor(du, dv, eps_a2, eps_b2);
 
         if (c <= 2) return -1;
 
         min_cn[idx] = min_cn[reverse_link[idx]] = c;
     }
 
-    return check_common_neighbor(u, v, min_cn[idx]);
+    return EvalSimilarity(u, v, min_cn[idx]);
 }
 
-int pSCANGraph::compute_common_neighbor_lowerbound(int du, int dv, int eps_a2, int eps_b2) {
+int pSCANGraph::ComputeMinCommonNeighbor(int du, int dv, int eps_a2, int eps_b2) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) ++c;
     return c;
 }
 
-void pSCANGraph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *cores, int &cores_e) {
+void pSCANGraph::PruneCrossLink(int eps_a2, int eps_b2, int miu, int *cores, int &cores_e) {
     for (ui i = 0; i < n; i++) { //must be iterating from 0 to n-1
         for (ui j = pstart[i]; j < pstart[i + 1]; j++) {
             if (edges[j] < i) {
@@ -451,7 +436,7 @@ void pSCANGraph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *core
                 --effective_degree[i];
                 --effective_degree[v];
             } else {
-                int c = compute_common_neighbor_lowerbound(a, b, eps_a2, eps_b2);
+                int c = ComputeMinCommonNeighbor(a, b, eps_a2, eps_b2);
 
                 if (c <= 2) {
                     min_cn[j] = -1;
@@ -466,7 +451,7 @@ void pSCANGraph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *core
 
             if (min_cn[j] != -2) {
                 //else {
-                ui r_id = binary_search(edges, pstart[v], pstart[v + 1], i);
+                ui r_id = BinarySearch(edges, pstart[v], pstart[v + 1], i);
                 reverse_link[j] = r_id;
                 reverse_link[r_id] = j;
 
@@ -476,34 +461,7 @@ void pSCANGraph::prune_and_cross_link(int eps_a2, int eps_b2, int miu, int *core
     }
 }
 
-int pSCANGraph::find_root(int u) {
-    int x = u;
-    while (pa[x] != x) x = pa[x];
-
-    while (pa[u] != x) {
-        int tmp = pa[u];
-        pa[u] = x;
-        u = tmp;
-    }
-
-    return x;
-}
-
-void pSCANGraph::my_union(int u, int v) {
-    int ru = find_root(u);
-    int rv = find_root(v);
-
-    if (ru == rv) return;
-
-    if (rank[ru] < rank[rv]) pa[ru] = rv;
-    else if (rank[ru] > rank[rv]) pa[rv] = ru;
-    else {
-        pa[rv] = ru;
-        ++rank[ru];
-    }
-}
-
-void pSCANGraph::get_eps(const char *eps_s) {
+void pSCANGraph::GetEps(const char *eps_s) {
     int i = 0, eps_a = 0, eps_b = 1;
     while (eps_s[i] != '\0' && eps_s[i] != '.') {
         eps_a = eps_a * 10 + (eps_s[i] - '0');

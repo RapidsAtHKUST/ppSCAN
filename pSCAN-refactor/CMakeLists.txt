@@ -66,7 +66,9 @@ target_compile_definitions(pSCANParallelExp1 PRIVATE NAIVE_SET_INTERSECTION=1)
 target_link_libraries(pSCANParallelExp1 ${CMAKE_THREAD_LIBS_INIT})
 
 # pSCAN for time breakdown
-set(PSCAN_SOURCE_FILES experimental/pscan_experimental/pSCANGraph.cpp experimental/pscan_experimental/pSCANGraph.h experimental/pscan_experimental/main.cpp experimental/pscan_experimental/Utility.cpp experimental/pscan_experimental/Utility.h)
+set(PSCAN_SOURCE_FILES experimental/pscan_experimental/pSCANGraph.cpp experimental/pscan_experimental/pSCANGraph.h
+        experimental/pscan_experimental/main.cpp DisjointSet.cpp
+        experimental/pscan_experimental/Utility.cpp experimental/pscan_experimental/Utility.h)
 add_executable(pSCANForTimeBreakDown ${PSCAN_SOURCE_FILES})
 target_compile_options(pSCANForTimeBreakDown PRIVATE -O3 -g)
 #target_compile_definitions(pSCANForTimeBreakDown PRIVATE WITHGPERFTOOLS=1)
