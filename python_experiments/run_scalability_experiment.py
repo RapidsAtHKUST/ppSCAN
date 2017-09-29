@@ -67,4 +67,4 @@ if __name__ == '__main__':
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
-                        folder_name='scalability_new3_all_in_parallel')
+                        folder_name='scalability_new4_all_in_parallel_deg_scheduler')

@@ -24,13 +24,15 @@ if __name__ == '__main__':
         'small_snap_dblp',
         'snap_pokec', 'snap_livejournal', 'snap_orkut',
         'webgraph_uk', 'webgraph_webbase',
-        'webgraph_twitter', 'snap_friendster'
+        'webgraph_twitter',
+        # 'snap_friendster'
     ]
 
-    figure_folder = 'scalability_new3_all_in_parallel'
-    markdown_folder = 'case_studies/figures-case-study10-scalability-differ-eps'
+    figure_folder = 'scalability_new4_all_in_parallel_deg_scheduler'
+    markdown_folder = 'case_studies/figures-case-study11-scalability-differ-eps'
 
     os.system('mkdir -p ./figures/' + figure_folder)
+    os.system('mkdir -p ' + markdown_folder)
     min_pts = 5
     eps_lst = [float(i + 1) / 10 for i in xrange(9)]
 

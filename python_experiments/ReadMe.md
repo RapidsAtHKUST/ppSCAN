@@ -26,6 +26,7 @@ scalability: new work-efficient but not balanced | see [case-study6-scalability-
 scalability: new better pruning but not balanced | see [case-study8](case_studies/figures-case-study8-scalability-differ-eps-improved-prune), parameter setting: `min_pts:5`.
 scalability: vertex-degree base scheduling | see [case-study9](case_studies/figures-case-study9-scalability-differ-eps), parameter setting: `min_pts:5`.
 scalability: all phase in parallel | see [case-study10](case_studies/figures-case-study10-scalability-differ-eps), parameter setting: `min_pts:5`.
+scalability: all phase in parallel, deg-scheduler | see [case-study11](case_studies/figures-case-study11-scalability-differ-eps), parameter setting: `min_pts:5`.
 
 ### Workload
 

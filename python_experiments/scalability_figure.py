@@ -160,7 +160,7 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('speedup', fontdict=font)
-    plt.ylim([0, 28.5])
+    plt.ylim([0, 35.0])
 
     # show the whole runtime/speedup figure
     plt.savefig(

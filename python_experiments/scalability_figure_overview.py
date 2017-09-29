@@ -127,7 +127,7 @@ class ScalabilityFigureDrawer:
         plt.ylabel('speedup', fontdict=font)
         plt.legend(['parallel pscan+ speedup over serial pscan'])
 
-        plt.ylim([0.0, 32.0])
+        plt.ylim([0.0, 40.0])
         plt.savefig('./figures/' + self.overview_figure_folder + os.sep + title_append_txt.replace(' ', '')
                     + '-' + 'runtime-speedup.png', bbox_inches='tight', pad_inches=0, transparent=True)
         # plt.show()
