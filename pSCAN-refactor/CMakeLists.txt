@@ -3,9 +3,6 @@ project(pSCAN)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
-        DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h)
-
 find_package(Threads REQUIRED)
 
 # playgound 0, playgound 1
@@ -25,7 +22,7 @@ target_compile_options(binary_file_checker PRIVATE -O3 -g)
 target_compile_definitions(binary_file_checker PRIVATE WITHGPERFTOOLS=1)
 target_link_libraries(binary_file_checker profiler)
 
-# pSCAN release 0: serial
+# ppSCAN release 0: serial
 set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/GraphSeqExp.cpp InputOutput.cpp DisjointSet.cpp)
 add_executable(pSCANSerial ${SERIAL_SOURCE_FILES})
 #target_compile_definitions(pSCANSerial PRIVATE WITHGPERFTOOLS=1 SERIAL=1)
@@ -33,7 +30,9 @@ target_compile_definitions(pSCANSerial PRIVATE SERIAL=1)
 target_compile_options(pSCANSerial PRIVATE -O3 -g)
 #target_link_libraries(pSCANSerial profiler)
 
-# pSCAN release 1: parallel
+# ppSCAN release 1: parallel
+set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
+        DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h)
 add_executable(pSCANParallel ${SOURCE_FILES})
 #target_compile_definitions(pSCANParallel PRIVATE WITHGPERFTOOLS=1)
 target_compile_definitions(pSCANParallel PRIVATE)
@@ -41,27 +40,34 @@ target_compile_options(pSCANParallel PRIVATE -O3 -g)
 target_link_libraries(pSCANParallel ${CMAKE_THREAD_LIBS_INIT})
 #target_link_libraries(pSCANParallel profiler)
 
-# pSCAN serial experimental 0: statistics 0
+# ppSCAN serial experimental 0: statistics 0
 add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANStatistics0 PRIVATE WITHGPERFTOOLS=1 SERIAL=1 STATISTICS=1)
 target_compile_options(pSCANStatistics0 PRIVATE -O3 -g)
 target_link_libraries(pSCANStatistics0 profiler)
 
-# pSCAN serial experimental 1: naive-set-intersection
+# ppSCAN serial experimental 1: naive-set-intersection
 add_executable(pSCANSerialNaive ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANSerialNaive PRIVATE SERIAL=1 NAIVE_SET_INTERSECTION=1)
 target_compile_options(pSCANSerialNaive PRIVATE -O3 -g)
 #target_link_libraries(pSCANSerialNaive profiler)
 
-# pSCAN parallel experimental 0
+# ppSCAN parallel experimental 0
 set(EXP_FILES experimental/main_exp_parallel.cpp experimental/GraphParallelExp.cpp experimental/GraphParallelExp.h
         InputOutput.cpp InputOutput.h DisjointSet.cpp DisjointSet.h ThreadPool.h)
 add_executable(pSCANParallelExp0 ${EXP_FILES})
 target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g)
 target_link_libraries(pSCANParallelExp0 ${CMAKE_THREAD_LIBS_INIT})
 
-# pSCAN parallel experimental 1: naive-set-intersection
+# ppSCAN parallel experimental 1: naive-set-intersection
 add_executable(pSCANParallelExp1 ${EXP_FILES})
 target_compile_options(pSCANParallelExp1 PRIVATE -O3 -g)
 target_compile_definitions(pSCANParallelExp1 PRIVATE NAIVE_SET_INTERSECTION=1)
 target_link_libraries(pSCANParallelExp1 ${CMAKE_THREAD_LIBS_INIT})
+
+# pSCAN for time breakdown
+set(PSCAN_SOURCE_FILES experimental/pscan_experimental/pSCANGraph.cpp experimental/pscan_experimental/pSCANGraph.h experimental/pscan_experimental/main.cpp experimental/pscan_experimental/Utility.cpp experimental/pscan_experimental/Utility.h)
+add_executable(pSCANForTimeBreakDown ${PSCAN_SOURCE_FILES})
+target_compile_options(pSCANForTimeBreakDown PRIVATE -O3 -g)
+#target_compile_definitions(pSCANForTimeBreakDown PRIVATE WITHGPERFTOOLS=1)
+#target_link_libraries(pSCANForTimeBreakDown profiler)
