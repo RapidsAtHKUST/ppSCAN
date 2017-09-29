@@ -10,6 +10,7 @@
 #include "ThreadPool.h"
 
 using namespace std::chrono;
+using namespace yche;
 
 Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     io_helper_ptr = yche::make_unique<InputOutput>(dir_string);

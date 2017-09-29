@@ -3,15 +3,14 @@
 //
 
 #include "InputOutput.h"
-#include "ThreadSafeDisjointSet.h"
 
-#include <iostream>
 #include <algorithm>
 #include <chrono>
 
 InputOutput::InputOutput(const string &dir) : dir(dir) {}
 
 using namespace std::chrono;
+using namespace yche;
 
 void InputOutput::ReadDegree() {
     auto start = high_resolution_clock::now();

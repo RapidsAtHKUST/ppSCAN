@@ -10,6 +10,7 @@
 #include "../ThreadPool.h"
 
 using namespace std::chrono;
+using namespace yche;
 
 GraphParallelExp::GraphParallelExp(const char *dir_string, const char *eps_s, int min_u, ui thread_num) {
     thread_num_ = thread_num;

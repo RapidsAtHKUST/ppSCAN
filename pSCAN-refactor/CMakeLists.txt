@@ -73,6 +73,6 @@ target_compile_definitions(pSCANBetterSetIntersect PRIVATE IMPROVED_SET_INTERSEC
 
 # original SCAN
 add_executable(SCANOrigin experimental/scan_origin/main_exp_scan.cpp experimental/scan_origin/SCANGraph.cpp
-        experimental/scan_origin/SCANGraph.h)
-
+        experimental/scan_origin/SCANGraph.h InputOutput.cpp)
+target_compile_options(SCANOrigin PRIVATE -O3 -g)
 
