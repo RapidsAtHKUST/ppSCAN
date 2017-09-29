@@ -53,15 +53,7 @@ file | utility
 [graph_io.cpp](../pSCAN-refactor/playground/graph_io.cpp) | play ground about i/o
 [play.cpp](../pSCAN-refactor/playground/play.cpp) | play ground others
 
-* experimental(parallel version with adjustable thread num)
-
-see [../pSCAN-refactor/experimental](../pSCAN-refactor/experimental).
-
-* deprecated
-
-file | utility
---- | ---
-[MaxPriorityQueue.h](experimental/pscan_experimental/MaxPriorityQueue.h)，[MaxPriorityQueue.cpp](experimental/pscan_experimental/MaxPriorityQueue.cpp) | not useful for pruning, deprecated now
+* experimental, see [../pSCAN-refactor/experimental](../pSCAN-refactor/experimental).
 
 * profiling scrips
 

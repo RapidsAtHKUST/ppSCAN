@@ -26,7 +26,6 @@ int main(int argc, char *argv[]) {
     // load graph
     auto start = high_resolution_clock::now();
     auto graph = new pSCANGraph(argv[1], argv[2], atoi(argv[3]));
-//    graph->ReadGraph();
     auto end = high_resolution_clock::now();
     cout << "Total input cost:" << duration_cast<milliseconds>(end - start).count() << " ms\n\n";
 
