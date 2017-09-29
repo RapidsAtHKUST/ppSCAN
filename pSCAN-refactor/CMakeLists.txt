@@ -5,22 +5,14 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(Threads REQUIRED)
 
-# playgound 0, playgound 1
-add_executable(other_play playground/play.cpp)
-add_executable(io_play playground/graph_io.cpp)
-add_executable(play_union_find_set playground/play_thread_safe_union_find_set.cpp ThreadSafeDisjointSet.h)
+# playground and utility 1: check binary file
+add_subdirectory(playground)
 
 # utility 0: converter, transform edge list txt file into b_degree.bin, b_adj.bin
 add_executable(converter converter/EdgeListToBinsConverter.cpp)
 target_compile_options(converter PRIVATE -O3 -g)
 target_compile_definitions(converter PRIVATE WITHGPERFTOOLS=1)
 target_link_libraries(converter profiler)
-
-# utility 1: binary_file_checker, check b_degree.bin, b_adj.bin
-add_executable(binary_file_checker playground/check_binary_files.cpp InputOutput.cpp)
-target_compile_options(binary_file_checker PRIVATE -O3 -g)
-target_compile_definitions(binary_file_checker PRIVATE WITHGPERFTOOLS=1)
-target_link_libraries(binary_file_checker profiler)
 
 # ppSCAN release 0: serial
 set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/GraphSeqExp.cpp InputOutput.cpp DisjointSet.cpp)
@@ -78,5 +70,9 @@ target_compile_options(pSCANForTimeBreakDown PRIVATE -O3 -g)
 add_executable(pSCANBetterSetIntersect ${PSCAN_SOURCE_FILES})
 target_compile_options(pSCANBetterSetIntersect PRIVATE -O3 -g)
 target_compile_definitions(pSCANBetterSetIntersect PRIVATE IMPROVED_SET_INTERSECT=1)
+
+# original SCAN
+add_executable(SCANOrigin experimental/scan_origin/main_exp_scan.cpp experimental/scan_origin/SCANGraph.cpp
+        experimental/scan_origin/SCANGraph.h)
 
 
