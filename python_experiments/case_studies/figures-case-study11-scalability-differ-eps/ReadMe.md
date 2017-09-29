@@ -7,6 +7,7 @@ snap_orkut | [snap_orkut.md](snap_orkut.md)
 webgraph_uk | [webgraph_uk.md](webgraph_uk.md)
 webgraph_webbase | [webgraph_webbase.md](webgraph_webbase.md)
 webgraph_twitter | [webgraph_twitter.md](webgraph_twitter.md)
+snap_friendster | [snap_friendster.md](snap_friendster.md)
 
 ## eps:0.1
 
@@ -19,7 +20,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.1-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.1-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[24, 40, 40, 40, 40, 40, 40]
+best performance thread_num_lst:[24, 40, 40, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -31,6 +32,7 @@ snap_orkut | 234,370,166 | 149.207s | 32.642 | 32.642 | 40
 webgraph_uk | 301,136,554 | 37.3s | 17.967 | 17.967 | 40
 webgraph_webbase | 1,050,026,736 | 129.071s | 15.071 | 15.071 | 40
 webgraph_twitter | 1,369,000,750 | 2223.316s | 40.751 | 40.751 | 40
+snap_friendster | 3,612,134,270 | 4959.734s | 33.785 | 33.785 | 40
 
 ## eps:0.2
 
@@ -43,7 +45,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.2-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.2-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[24, 32, 40, 40, 40, 40, 40]
+best performance thread_num_lst:[24, 32, 40, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -55,6 +57,7 @@ snap_orkut | 234,370,166 | 179.55s | 27.196 | 27.196 | 40
 webgraph_uk | 301,136,554 | 26.048s | 13.276 | 13.276 | 40
 webgraph_webbase | 1,050,026,736 | 81.475s | 13.326 | 13.326 | 40
 webgraph_twitter | 1,369,000,750 | 2973.869s | 33.900 | 33.900 | 40
+snap_friendster | 3,612,134,270 | 4673.88s | 30.961 | 30.961 | 40
 
 ## eps:0.3
 
@@ -67,7 +70,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.3-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.3-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[24, 32, 40, 40, 40, 40, 40]
+best performance thread_num_lst:[24, 32, 40, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -79,6 +82,7 @@ snap_orkut | 234,370,166 | 164.248s | 30.293 | 30.293 | 40
 webgraph_uk | 301,136,554 | 18.498s | 12.234 | 12.234 | 40
 webgraph_webbase | 1,050,026,736 | 63.705s | 11.279 | 11.279 | 40
 webgraph_twitter | 1,369,000,750 | 2487.317s | 32.185 | 32.185 | 40
+snap_friendster | 3,612,134,270 | 3726.302s | 31.504 | 31.504 | 40
 
 ## eps:0.4
 
@@ -91,7 +95,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.4-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.4-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[32, 40, 40, 32, 40, 40, 40]
+best performance thread_num_lst:[32, 40, 40, 32, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -103,6 +107,7 @@ snap_orkut | 234,370,166 | 135.772s | 25.350 | 25.497 | 32
 webgraph_uk | 301,136,554 | 14.356s | 9.127 | 9.127 | 40
 webgraph_webbase | 1,050,026,736 | 52.978s | 11.415 | 11.415 | 40
 webgraph_twitter | 1,369,000,750 | 1712.815s | 31.727 | 31.727 | 40
+snap_friendster | 3,612,134,270 | 2801.607s | 31.007 | 31.007 | 40
 
 ## eps:0.5
 
@@ -115,7 +120,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.5-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.5-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[24, 40, 40, 40, 40, 40, 40]
+best performance thread_num_lst:[24, 40, 40, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -127,6 +132,7 @@ snap_orkut | 234,370,166 | 105.36s | 25.122 | 25.122 | 40
 webgraph_uk | 301,136,554 | 11.721s | 10.001 | 10.001 | 40
 webgraph_webbase | 1,050,026,736 | 45.006s | 10.071 | 10.071 | 40
 webgraph_twitter | 1,369,000,750 | 1112.027s | 31.627 | 31.627 | 40
+snap_friendster | 3,612,134,270 | 2019.334s | 30.969 | 30.969 | 40
 
 ## eps:0.6
 
@@ -139,7 +145,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.6-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.6-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[24, 40, 32, 40, 40, 40, 40]
+best performance thread_num_lst:[24, 40, 32, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -151,6 +157,7 @@ snap_orkut | 234,370,166 | 73.887s | 25.365 | 25.365 | 40
 webgraph_uk | 301,136,554 | 9.737s | 7.496 | 7.496 | 40
 webgraph_webbase | 1,050,026,736 | 37.624s | 11.353 | 11.353 | 40
 webgraph_twitter | 1,369,000,750 | 671.103s | 31.200 | 31.200 | 40
+snap_friendster | 3,612,134,270 | 1382.493s | 27.556 | 27.556 | 40
 
 ## eps:0.7
 
@@ -163,7 +170,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.7-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.7-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[24, 40, 40, 40, 40, 40, 40]
+best performance thread_num_lst:[24, 40, 40, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -175,6 +182,7 @@ snap_orkut | 234,370,166 | 48.46s | 19.951 | 19.951 | 40
 webgraph_uk | 301,136,554 | 8.152s | 7.647 | 7.647 | 40
 webgraph_webbase | 1,050,026,736 | 31.675s | 9.538 | 9.538 | 40
 webgraph_twitter | 1,369,000,750 | 378.662s | 29.459 | 29.459 | 40
+snap_friendster | 3,612,134,270 | 881.861s | 26.261 | 26.261 | 40
 
 ## eps:0.8
 
@@ -187,7 +195,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.8-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.8-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[32, 40, 40, 40, 40, 40, 40]
+best performance thread_num_lst:[32, 40, 40, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -199,6 +207,7 @@ snap_orkut | 234,370,166 | 27.708s | 17.762 | 17.762 | 40
 webgraph_uk | 301,136,554 | 7.054s | 6.525 | 6.525 | 40
 webgraph_webbase | 1,050,026,736 | 25.399s | 7.915 | 7.915 | 40
 webgraph_twitter | 1,369,000,750 | 183.012s | 26.352 | 26.352 | 40
+snap_friendster | 3,612,134,270 | 509.733s | 25.396 | 25.396 | 40
 
 ## eps:0.9
 
@@ -211,7 +220,7 @@ with 40 full logical threads | with best thread num
 ![with full logical threads-withalllogicalcores-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.9-min_pts:5-withalllogicalcores-runtime-speedup.png) | ![with best thread num-withbestlogicalthreadnum-runtime-speedup](../../figures/scalability_new4_all_in_parallel_deg_scheduler/eps:0.9-min_pts:5-withbestlogicalthreadnum-runtime-speedup.png)
 
 ```zsh
-best performance thread_num_lst:[16, 40, 32, 40, 40, 40, 40]
+best performance thread_num_lst:[16, 40, 32, 40, 40, 40, 40, 40]
 ```
 
 dataset | edge num | pscan runtime | pscan+ 40 logical-core full speedup | pscan+ best thread_num speedup | thread_num choice
@@ -223,4 +232,5 @@ snap_orkut | 234,370,166 | 12.535s | 14.678 | 14.678 | 40
 webgraph_uk | 301,136,554 | 5.814s | 6.660 | 6.660 | 40
 webgraph_webbase | 1,050,026,736 | 20.091s | 7.271 | 7.271 | 40
 webgraph_twitter | 1,369,000,750 | 61.578s | 20.249 | 20.249 | 40
+snap_friendster | 3,612,134,270 | 245.702s | 19.017 | 19.017 | 40
 
