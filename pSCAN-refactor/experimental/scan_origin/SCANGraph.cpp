@@ -136,10 +136,22 @@ ui SCANGraph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int
 
 bool SCANGraph::CheckCore(int u) {
     auto sd = 0;
+#ifdef MIN_MAX_PRUNE
+    auto ed = degree[u] - 1;
+#endif
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         if (EvalSimilarity(u, j) == SIMILAR) {
             sd++;
         }
+#ifdef MIN_MAX_PRUNE
+        else {
+            ed--;
+            if (ed < min_u) {
+                is_non_core_lst[u] = true;
+                return false;
+            }
+        }
+#endif
     }
     if (sd >= min_u) {
         is_core_lst[u] = true;

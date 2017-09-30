@@ -76,7 +76,10 @@ set(SCAN_FILES experimental/scan_origin/main_exp_scan.cpp experimental/scan_orig
         experimental/scan_origin/SCANGraph.h InputOutput.cpp)
 add_executable(SCANOrigin ${SCAN_FILES})
 target_compile_options(SCANOrigin PRIVATE -O3 -g)
+#target_compile_definitions(SCANOrigin PRIVATE NAIVE_SET_INTERSECTION=1 MIN_MAX_PRUNE=1)
 target_compile_definitions(SCANOrigin PRIVATE NAIVE_SET_INTERSECTION=1)
 
 add_executable(SCANOriginBetterSetIntersec ${SCAN_FILES})
 target_compile_options(SCANOriginBetterSetIntersec PRIVATE -O3 -g)
+#target_compile_definitions(SCANOrigin PRIVATE NAIVE_SET_INTERSECTION=1 MIN_MAX_PRUNE=1)
+target_compile_definitions(SCANOrigin PRIVATE NAIVE_SET_INTERSECTION=1)
