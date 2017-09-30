@@ -98,6 +98,7 @@ pair<int, int> InputOutput::ParseEps(const char *eps_s) {
     return make_pair(eps_numerator * eps_numerator, eps_denominator * eps_denominator);
 }
 
+// possible duplicates in noncore_cluster, sd_lst need to be checked with a cmp
 void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                          vector<int> &sd_lst, vector<int> &cid, vector<int> &parent) {
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
@@ -132,6 +133,7 @@ void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, 
              [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }
 
+// unique: noncore_cluster_set
 void InputOutput::Output(const char *eps_s, const char *min_u, unordered_set<pair<int, int>> &noncore_cluster_set,
                          vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent) {
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";
@@ -189,6 +191,7 @@ void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, 
              [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }
 
+// cid has all core-induced cluster info
 void InputOutput::Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                          vector<bool> &is_core_lst, vector<int> &cid) {
     string out_name = dir + "/result-" + string(eps_s) + "-" + string(min_u) + ".txt";

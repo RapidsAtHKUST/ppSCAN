@@ -43,21 +43,25 @@ public:
 
     pair<int, int> ParseEps(const char *eps_s);
 
+    // possible duplicates in noncore_cluster, sd_lst need to be checked with a cmp
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<int> &sd_lst, vector<int> &cid, vector<int> &parent);
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
 
+    // unique: noncore_cluster_set
     void Output(const char *eps_s, const char *min_u, unordered_set<pair<int, int>> &noncore_cluster_set,
                 vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<char> &is_core_lst, vector<int> &cid, vector<int> &parent);
 
+    // accept disjoint sets directly
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<char> &is_core_lst, vector<int> &cid, DisjointSets &disjoint_sets);
 
+    // cid has all core-induced cluster info
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<bool> &is_core_lst, vector<int> &cid);
 };
