@@ -27,7 +27,8 @@ int main(int argc, char *argv[]) {
         Usage();
         return 0;
     }
-    cout << "**** Graph Clustering (Release): " << argv[1] << ", " << argv[2] << ", " << argv[3] << " *** \n";
+    cout << "**** original SCAN with easy-comp/cross-link: " << argv[1] << ", " << argv[2] << ", " << argv[3]
+         << " *** \n";
 
     // load graph
     auto start = high_resolution_clock::now();
