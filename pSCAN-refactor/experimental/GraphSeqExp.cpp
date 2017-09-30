@@ -148,7 +148,7 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
 #endif
 }
 
-int GraphSeqExp::EvalReachable(int u, ui edge_idx) {
+int GraphSeqExp::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
 }
@@ -224,7 +224,7 @@ void GraphSeqExp::CheckCoreFirstBSP(int u) {
 #ifdef STATISTICS
             first_bsp_intersection_times++;
 #endif
-            min_cn[edge_idx] = EvalReachable(u, edge_idx);
+            min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
             min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
             if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
@@ -269,7 +269,7 @@ void GraphSeqExp::CheckCoreSecondBSP(int u) {
 #ifdef STATISTICS
                 second_bsp_intersection_times++;
 #endif
-                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
@@ -307,7 +307,7 @@ void GraphSeqExp::ClusterCoreSecondPhase(int u) {
 #ifdef STATISTICS
                 serial_intersection_times++;
 #endif
-                min_cn[edge_idx] = EvalReachable(u, edge_idx);
+                min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 if (min_cn[edge_idx] == SIMILAR) {
                     disjoint_set_ptr->Union(u, v);
                 }
@@ -345,7 +345,7 @@ void GraphSeqExp::ClusterNonCores() {
 #ifdef STATISTICS
                         core_non_core_intersection_times++;
 #endif
-                        min_cn[j] = EvalReachable(i, j);
+                        min_cn[j] = EvalSimilarity(i, j);
                     }
                 }
             }

@@ -61,7 +61,7 @@ private:
     // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
-    int EvalReachable(int u, ui edge_idx);
+    int EvalSimilarity(int u, ui edge_idx);
 
     // optimization: find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
