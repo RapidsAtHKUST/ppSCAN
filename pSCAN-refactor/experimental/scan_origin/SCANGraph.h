@@ -6,6 +6,7 @@
 #define PSCAN_SCANGRAPH_H
 
 #include <memory>
+
 #include "../../InputOutput.h"
 
 class SCANGraph {

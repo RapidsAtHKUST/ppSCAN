@@ -6,9 +6,6 @@
 #include <cmath>
 #include <chrono>
 #include <queue>
-#include <cassert>
-
-#include "../../playground/pretty_print.h"
 
 using namespace std;
 using namespace chrono;
@@ -128,7 +125,6 @@ int SCANGraph::EvalSimilarity(int u, ui edge_idx) {
         min_cn[edge_idx] = IntersectNeighborSets(u, v, min_cn[edge_idx]);
         min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
     }
-    assert(min_cn[edge_idx] == SIMILAR || min_cn[edge_idx] == NOT_SIMILAR);
     return min_cn[edge_idx];
 }
 
