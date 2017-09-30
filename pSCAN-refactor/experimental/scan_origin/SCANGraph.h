@@ -40,17 +40,21 @@ private:
     // density-eval related
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
-    int EvalReachable(int u, ui edge_idx);
+    int EvalSimilarity(int u, ui edge_idx);
 
     // optimization: find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
-    bool CorePredicate(int u);
+    bool IsCorePredicate(int u);
+
+    void CheckCoreAndCluster();
 
 public:
     explicit SCANGraph(const char *dir_string, const char *eps_s, int min_u);
 
-    void SCANAlgorithm();
+    void SCAN();
+
+    void Output(const char *eps_s, const char *miu);
 };
 
 #endif //PSCAN_SCANGRAPH_H

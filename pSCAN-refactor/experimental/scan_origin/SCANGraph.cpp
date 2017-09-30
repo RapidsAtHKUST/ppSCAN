@@ -5,6 +5,10 @@
 
 #include <cmath>
 #include <chrono>
+#include <queue>
+#include <cassert>
+
+#include "../../playground/pretty_print.h"
 
 using namespace std;
 using namespace chrono;
@@ -102,12 +106,13 @@ int SCANGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 #endif
 }
 
-int SCANGraph::EvalReachable(int u, ui edge_idx) {
-    // already know from cross link
+int SCANGraph::EvalSimilarity(int u, ui edge_idx) {
+    // 1st case : already know from reversed link via binary-search
     if (min_cn[edge_idx] < 0) {
         return min_cn[edge_idx];
     }
 
+    // 2nd case: similarity not known
     int v = out_edges[edge_idx];
 
     // compute min_cn_val
@@ -117,13 +122,15 @@ int SCANGraph::EvalReachable(int u, ui edge_idx) {
         min_cn[edge_idx] = NOT_SIMILAR;
     } else {
         int c = ComputeCnLowerBound(deg_a, deg_b);
-        auto is_similar_flag = c <= 2;
-        min_cn[edge_idx] = is_similar_flag ? SIMILAR : c;
+        min_cn[edge_idx] = c <= 2 ? SIMILAR : c;
     }
 
-
-    min_cn[edge_idx] = IntersectNeighborSets(u, v, min_cn[edge_idx]);
-    min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
+    // 3rd case: do computation when easy computation can not determine similarity
+    if (min_cn[edge_idx] >= 0) {
+        min_cn[edge_idx] = IntersectNeighborSets(u, v, min_cn[edge_idx]);
+        min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
+    }
+    assert(min_cn[edge_idx] == SIMILAR || min_cn[edge_idx] == NOT_SIMILAR);
     return min_cn[edge_idx];
 }
 
@@ -133,12 +140,104 @@ ui SCANGraph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int
     return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
 
-bool SCANGraph::CorePredicate(int u) {
-    return false;
+bool SCANGraph::IsCorePredicate(int u) {
+    auto sd = 0;
+    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+        if (EvalSimilarity(u, j) == SIMILAR) {
+            sd++;
+        }
+    }
+    return sd >= min_u;
 }
 
-void SCANGraph::SCANAlgorithm() {
+void SCANGraph::CheckCoreAndCluster() {
+    cluster_dict.resize(n, n);
 
+    auto expansion_queue = queue<int>();
+
+    auto is_non_core_added = vector<bool>(n);
+    auto non_core_vertices = vector<int>();
+    non_core_vertices.reserve(n);
+
+    auto core_vertices = vector<int>();
+    core_vertices.reserve(n);
+
+    for (auto i = 0; i < n; i++) {
+        if (i == 15090) {
+            cout << "debug" << endl;
+        }
+        if (!is_core_lst[i] && !is_non_core_lst[i]) { // not visited by core-predicate-checking
+            if (IsCorePredicate(i)) {
+                // prepare data 1st
+                non_core_vertices.clear();
+                core_vertices.clear();
+                is_non_core_added.assign(is_non_core_added.size(), false);
+
+                // prepare data 2nd
+                is_core_lst[i] = true;
+                core_vertices.emplace_back(i);
+                expansion_queue.emplace(i);
+                int cluster_min_ele = i;
+
+                // 1st: clustering using bfs exploration order
+                while (!expansion_queue.empty()) {
+                    auto u = expansion_queue.back();
+                    expansion_queue.pop();
+
+                    // iterate through similar neighbors of u
+                    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                        // already evaluated
+                        if (min_cn[j] == SIMILAR) {
+                            auto v = out_edges[j];
+                            if (is_non_core_lst[v]) {
+                                // avoid redundant adding of non-cores
+                                if (!is_non_core_added[v]) {
+                                    non_core_vertices.emplace_back(v);
+                                    is_non_core_added[v] = true;
+                                }
+                            } else if (!is_core_lst[v]) { // avoid redundant adding of cores
+                                if (IsCorePredicate(v)) {
+                                    is_core_lst[v] = true;
+                                    core_vertices.emplace_back(v);
+                                    expansion_queue.emplace(v);
+                                    if (v < cluster_min_ele) { cluster_min_ele = v; }
+                                } else {
+                                    is_non_core_lst[v] = true;
+                                    // avoid redundant adding of non-cores
+                                    if (!is_non_core_added[v]) {
+                                        non_core_vertices.emplace_back(v);
+                                        is_non_core_added[v] = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 2nd: assign labels for cores and non-cores in the current cluster
+                if (i == 15090) {
+                    cout << core_vertices << endl;
+                }
+                for (auto v_id: core_vertices) {
+                    if (cluster_dict[v_id] != n) {
+                        cout << "err " << v_id << endl;
+                    }
+                    cluster_dict[v_id] = cluster_min_ele;
+                }
+                for (auto v_id: non_core_vertices) {
+                    noncore_cluster.emplace_back(cluster_min_ele, v_id);
+                }
+            } else {
+                is_non_core_lst[i] = true;
+            }
+        }
+    }
 }
 
+void SCANGraph::SCAN() {
+    CheckCoreAndCluster();
+}
 
+void SCANGraph::Output(const char *eps_s, const char *miu) {
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict);
+}

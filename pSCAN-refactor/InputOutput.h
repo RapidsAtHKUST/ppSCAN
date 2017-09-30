@@ -44,7 +44,7 @@ public:
     pair<int, int> ParseEps(const char *eps_s);
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
-                             vector<int> &sd_lst, vector<int> &cid, vector<int> &parent);
+                vector<int> &sd_lst, vector<int> &cid, vector<int> &parent);
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<bool> &is_core_lst, vector<int> &cid, vector<int> &parent);
@@ -57,6 +57,9 @@ public:
 
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<char> &is_core_lst, vector<int> &cid, DisjointSets &disjoint_sets);
+
+    void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                vector<bool> &is_core_lst, vector<int> &cid);
 };
 
 #endif //PSCAN_INPUTOUTPUT_H
