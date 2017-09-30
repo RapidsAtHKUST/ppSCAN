@@ -107,10 +107,11 @@ int SCANGraph::EvalSimilarity(int u, ui edge_idx) {
         return min_cn[edge_idx];
     }
 
-    // 2nd case: similarity not known
+    // 2nd case: similarity not known, first commit easy-comp for pruning and
+    // initialize min_cn[edge_idx] for set-intersection if required
     int v = out_edges[edge_idx];
 
-    // compute min_cn_val
+    // compute min_cn_val, easy-comp for pruning expensive `IntersectNeighborSets(u, v, min_cn[edge_idx])`
     int deg_a = degree[u], deg_b = degree[v];
     if (deg_a > deg_b) { swap(deg_a, deg_b); }
     if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
