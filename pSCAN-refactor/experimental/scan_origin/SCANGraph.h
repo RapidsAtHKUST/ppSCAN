@@ -45,7 +45,7 @@ private:
     // optimization: find reverse edge index, e.g, (i,j) index know, compute (j,i) index
     ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
 
-    bool IsCorePredicate(int u);
+    bool CheckCore(int u);
 
     void CheckCoreAndCluster();
 

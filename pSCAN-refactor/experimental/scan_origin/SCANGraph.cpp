@@ -140,14 +140,20 @@ ui SCANGraph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int
     return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
 
-bool SCANGraph::IsCorePredicate(int u) {
+bool SCANGraph::CheckCore(int u) {
     auto sd = 0;
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         if (EvalSimilarity(u, j) == SIMILAR) {
             sd++;
         }
     }
-    return sd >= min_u;
+    if (sd >= min_u) {
+        is_core_lst[u] = true;
+        return true;
+    } else {
+        is_non_core_lst[u] = true;
+        return false;
+    }
 }
 
 void SCANGraph::CheckCoreAndCluster() {
@@ -163,25 +169,21 @@ void SCANGraph::CheckCoreAndCluster() {
     core_vertices.reserve(n);
 
     for (auto i = 0; i < n; i++) {
-        if (i == 15090) {
-            cout << "debug" << endl;
-        }
         if (!is_core_lst[i] && !is_non_core_lst[i]) { // not visited by core-predicate-checking
-            if (IsCorePredicate(i)) {
+            if (CheckCore(i)) {
                 // prepare data 1st
                 non_core_vertices.clear();
                 core_vertices.clear();
                 is_non_core_added.assign(is_non_core_added.size(), false);
 
                 // prepare data 2nd
-                is_core_lst[i] = true;
                 core_vertices.emplace_back(i);
                 expansion_queue.emplace(i);
                 int cluster_min_ele = i;
 
                 // 1st: clustering using bfs exploration order
                 while (!expansion_queue.empty()) {
-                    auto u = expansion_queue.back();
+                    auto u = expansion_queue.front();
                     expansion_queue.pop();
 
                     // iterate through similar neighbors of u
@@ -196,13 +198,11 @@ void SCANGraph::CheckCoreAndCluster() {
                                     is_non_core_added[v] = true;
                                 }
                             } else if (!is_core_lst[v]) { // avoid redundant adding of cores
-                                if (IsCorePredicate(v)) {
-                                    is_core_lst[v] = true;
+                                if (CheckCore(v)) {
                                     core_vertices.emplace_back(v);
                                     expansion_queue.emplace(v);
                                     if (v < cluster_min_ele) { cluster_min_ele = v; }
                                 } else {
-                                    is_non_core_lst[v] = true;
                                     // avoid redundant adding of non-cores
                                     if (!is_non_core_added[v]) {
                                         non_core_vertices.emplace_back(v);
@@ -215,9 +215,6 @@ void SCANGraph::CheckCoreAndCluster() {
                 }
 
                 // 2nd: assign labels for cores and non-cores in the current cluster
-                if (i == 15090) {
-                    cout << core_vertices << endl;
-                }
                 for (auto v_id: core_vertices) {
                     if (cluster_dict[v_id] != n) {
                         cout << "err " << v_id << endl;
@@ -227,8 +224,6 @@ void SCANGraph::CheckCoreAndCluster() {
                 for (auto v_id: non_core_vertices) {
                     noncore_cluster.emplace_back(cluster_min_ele, v_id);
                 }
-            } else {
-                is_non_core_lst[i] = true;
             }
         }
     }
