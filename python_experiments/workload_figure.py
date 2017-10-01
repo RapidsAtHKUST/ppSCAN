@@ -185,12 +185,11 @@ def case_study0():
     print
 
 
-def case_study1():
+def case_study1(min_pts=5, file_name='ReadMe.md'):
     # case study 1
-    min_pts = 5
     root_dir_path = server_folder
 
-    with open(markdown_folder + os.sep + 'ReadMe.md', 'w') as ofs:
+    with open(markdown_folder + os.sep + file_name, 'w') as ofs:
         parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
         for data_set in data_set_lst:
             statistics_lst = map(lambda eps: get_workload_statistics(data_set, eps, min_pts, root_dir_path),
@@ -217,18 +216,20 @@ def case_study1():
 
 
 if __name__ == '__main__':
-    server_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/workload-work-efficient-1'
+    server_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/workload-work-efficient-2'
     local_folder = './figures/' + 'workload-efficient'
-    markdown_folder = 'case_studies/figures-case-study7-workload-efficient-1'
+    markdown_folder = 'case_studies/figures-case-study12-workload-efficient-2'
     os.system('mkdir -p ' + local_folder)
     os.system('mkdir -p ' + markdown_folder)
 
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster',
-                    '10million_avgdeg15_maxdeg50_Cdefault'
-                    ]
+                    # 'webgraph_twitter', 'snap_friendster',
+                    '10million_avgdeg15_maxdeg50_Cdefault']
 
     case_study0()
-    case_study1()
+
+    min_pts_lst = [2, 5, 10, 15]
+    for min_pts in min_pts_lst:
+        case_study1(min_pts=min_pts, file_name='ReadMe' + '-' + str(min_pts) + '.md')

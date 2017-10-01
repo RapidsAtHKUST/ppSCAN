@@ -36,6 +36,7 @@ workload: prune/eval, serial-runtime experiment | see [case-study1](case_studies
 workload: avg cmp/eval portion experiment | see [case-study4](case_studies/case-study4-workload), varying `min_pts` and varying `eps`
 work-efficient: prune/eval, serial-runtime experiment | see [case-study5](case_studies/figures-case-study5-workload-efficient), parameter setting: `min_pts:5`
 work-efficient-opt: with lock-free opt | see [case-study7](case_studies/figures-case-study7-workload-efficient-1), parameter setting: `min_pts:5`
+work-efficient-opt with differ min_pts | see [case-study12](case_studies/figures-case-study12-workload-efficient-2), parameter setting: `min_pts:2,5,10,15`
 
 ### Synthetic Graphs
 

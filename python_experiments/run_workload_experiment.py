@@ -8,12 +8,11 @@ if __name__ == '__main__':
                     'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
                     'webgraph_uk', 'webgraph_webbase',
                     'webgraph_twitter', 'snap_friendster']
-    parameter_eps_lst = [0.3]
-    parameter_min_pts_lst = [5]
+    # parameter_eps_lst = [0.3]
+    # parameter_min_pts_lst = [5]
 
-    # data_set_lst = ['small_snap_dblp']
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
-    # parameter_min_pts_lst = [2, 5, 10, 15]
+    parameter_min_pts_lst = [2, 5, 10, 15]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
 
@@ -30,7 +29,8 @@ if __name__ == '__main__':
                 data_set_name = data_set_path.split(os.sep)[-1]
                 statistics_dir = os.sep.join(
                     map(str,
-                        ['.', 'workload-work-efficient-1', data_set_name, 'eps-' + str(eps), 'min_pts-' + str(min_pts)]))
+                        ['.', 'workload-work-efficient-2', data_set_name, 'eps-' + str(eps),
+                         'min_pts-' + str(min_pts)]))
                 os.system('mkdir -p ' + statistics_dir)
                 statistics_file_path = statistics_dir + os.sep + '-'.join(
                     map(str, ['output', data_set_name, eps, min_pts])) + '.txt'

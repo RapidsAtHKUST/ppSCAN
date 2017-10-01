@@ -20,7 +20,7 @@ data | type | functionality
 `disjoint-set` | union-find set | inside two arrays, `parent` and `rank`, union-by-rank, compress-in-find-root, each tree represent a set
 `cluster_id` | vertex property array | for looking up min core vertex id in this cluster represented by root. in other words, `cluster_id[FindRoot(u)]` is this cluster id
 
-parallel-execution takes most workloads(over 90%)
+all phases are executed in parallel where disjoint-sets adopts lock-free design and other parts do not incur data race.
 
 intentions in each phase:
 
