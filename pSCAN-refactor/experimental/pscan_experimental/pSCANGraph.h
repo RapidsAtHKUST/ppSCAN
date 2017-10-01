@@ -32,6 +32,17 @@ private:
     unique_ptr<DisjointSet> disjoint_set;
     vector<pair<int, int>> noncore_cluster;
 
+#ifdef STATISTICS
+    long prune0 = 0;
+    long prune1 = 0;
+    long max_cmp = 0;
+    int single_max_cmp = 0;
+    long all_cmp0 = 0;
+    long all_cmp1 = 0;
+    long all_cmp2 = 0;
+    long intersection_times = 0;
+    int portion = 0;
+#endif
 public:
     explicit pSCANGraph(const char *_dir, const char *eps_s, int min_u);
 

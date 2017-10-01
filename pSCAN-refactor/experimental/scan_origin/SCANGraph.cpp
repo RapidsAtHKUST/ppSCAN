@@ -73,30 +73,68 @@ int SCANGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
             out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+#ifdef STATISTICS
+    intersection_times++;
+    max_cmp += du - 2 + dv - 2;
+    auto tmp0 = 0;
+    auto tmp1 = 0;
+#endif
 
     auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
     // correctness guaranteed by two pruning previously in computing min_cn
     while (cn < min_cn_num) {
         while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+#ifdef STATISTICS
+            ++all_cmp0;
+            ++tmp0;
+#endif
             --du;
             if (du < min_cn_num) {
+#ifdef STATISTICS
+                int max_val = max(tmp0, tmp1);
+                int min_val = min(tmp0, tmp1);
+                int local_portion = min_val == 0 ? max_val : max_val / min_val;
+                portion = max(portion, local_portion);
+#endif
                 return NOT_SIMILAR;
             }
             ++offset_nei_u;
         }
         while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+#ifdef STATISTICS
+            ++all_cmp1;
+            ++tmp1;
+#endif
             --dv;
             if (dv < min_cn_num) {
+#ifdef STATISTICS
+                int max_val = max(tmp0, tmp1);
+                int min_val = min(tmp0, tmp1);
+                int local_portion = min_val == 0 ? max_val : max_val / min_val;
+                portion = max(portion, local_portion);
+#endif
                 return NOT_SIMILAR;
             }
             ++offset_nei_v;
         }
         if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+#ifdef STATISTICS
+            ++all_cmp2;
+            ++tmp0;
+            ++tmp1;
+#endif
             ++cn;
             ++offset_nei_u;
             ++offset_nei_v;
         }
     }
+#ifdef STATISTICS
+    int max_val = max(tmp0, tmp1);
+    int min_val = min(tmp0, tmp1);
+    int local_portion = min_val == 0 ? max_val : max_val / min_val;
+    portion = max(portion, local_portion);
+    single_max_cmp = max(single_max_cmp, tmp0 + tmp1);
+#endif
     return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 #endif
 }
@@ -115,10 +153,23 @@ int SCANGraph::EvalSimilarity(int u, ui edge_idx) {
     int deg_a = degree[u], deg_b = degree[v];
     if (deg_a > deg_b) { swap(deg_a, deg_b); }
     if (((long long) deg_a) * eps_b2 < ((long long) deg_b) * eps_a2) {
+#ifdef STATISTICS
+        if (u <= v) {
+            ++prune0;
+        }
+#endif
         min_cn[edge_idx] = NOT_SIMILAR;
     } else {
+
         int c = ComputeCnLowerBound(deg_a, deg_b);
         min_cn[edge_idx] = c <= 2 ? SIMILAR : c;
+#ifdef STATISTICS
+        if (c<=2) {
+            if (u <= v) {
+                ++prune1;
+            }
+        }
+#endif
     }
 
     // 3rd case: do computation when easy computation can not determine similarity
@@ -126,6 +177,7 @@ int SCANGraph::EvalSimilarity(int u, ui edge_idx) {
         min_cn[edge_idx] = IntersectNeighborSets(u, v, min_cn[edge_idx]);
         min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[edge_idx];
     }
+
     return min_cn[edge_idx];
 }
 
@@ -238,6 +290,23 @@ void SCANGraph::CheckCoreAndCluster() {
 
 void SCANGraph::SCAN() {
     CheckCoreAndCluster();
+    // output statistics
+#ifdef STATISTICS
+    cout << "\nprune0 definitely not reachable:" << prune0 << "\nprune1 definitely reachable:" << prune1 << "\n";
+    cout << "absolute intersect portion:" << static_cast<double >(intersection_times) / (min_cn.size() / 2) << "\n";
+    cout << "filtered intersect portion:"
+         << static_cast<double >(intersection_times) / (min_cn.size() / 2 - prune0 - prune1) << "\n\n";
+
+    cout << "intersection times:" << intersection_times << "\n\n";
+
+    cout << "single max cmp:" << single_max_cmp << "\n";
+    cout << "cmp0:" << all_cmp0 << "\ncmp1:" << all_cmp1
+         << "\nequal cmp:" << all_cmp2 << "\n";
+    cout << "total:" << (all_cmp0 + all_cmp1 + all_cmp2) << " ,max:" << max_cmp << " ,portion:"
+         << (static_cast<double >(all_cmp0 + all_cmp1 + all_cmp2) / max_cmp) << " ,avg eval:"
+         << (static_cast<double >(all_cmp0 + all_cmp1 + all_cmp2) / intersection_times) << "\n";
+    cout << "max portion:" << portion << "\n" << endl;
+#endif
 }
 
 void SCANGraph::Output(const char *eps_s, const char *miu) {
