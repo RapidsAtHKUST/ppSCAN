@@ -2,8 +2,8 @@
 // Created by yche on 8/4/17.
 //
 
-#ifndef PSCAN_INPUTOUTPUT_H
-#define PSCAN_INPUTOUTPUT_H
+#ifndef PPSCAN_INPUTOUTPUT_H
+#define PPSCAN_INPUTOUTPUT_H
 
 #include <fstream>
 #include <vector>
@@ -66,4 +66,4 @@ public:
                 vector<bool> &is_core_lst, vector<int> &cid);
 };
 
-#endif //PSCAN_INPUTOUTPUT_H
+#endif //PPSCAN_INPUTOUTPUT_H

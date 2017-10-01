@@ -2,8 +2,8 @@
 // Created by yche on 8/6/17.
 //
 
-#ifndef PSCAN_DISJOINTSET_H
-#define PSCAN_DISJOINTSET_H
+#ifndef PPSCAN_DISJOINTSET_H
+#define PPSCAN_DISJOINTSET_H
 
 #include <vector>
 
@@ -27,4 +27,4 @@ public:
     bool IsSameSet(int u, int v);
 };
 
-#endif //PSCAN_DISJOINTSET_H
+#endif //PPSCAN_DISJOINTSET_H

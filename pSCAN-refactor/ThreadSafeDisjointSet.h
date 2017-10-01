@@ -2,11 +2,8 @@
 // Created by yche on 8/10/17.
 //
 
-#ifndef PSCAN_THREADSAFEDISJOINTSET_H
-#define PSCAN_THREADSAFEDISJOINTSET_H
-
-#if !defined(__UNIONFIND_H)
-#define __UNIONFIND_H
+#ifndef PPSCAN_THREADSAFE_DISJOINTSET_H
+#define PPSCAN_THREADSAFE_DISJOINTSET_H
 
 #include <vector>
 #include <atomic>
@@ -112,6 +109,4 @@ public:
     mutable std::vector<std::atomic<uint64_t>> mData;
 };
 
-#endif /* __UNIONFIND_H */
-
-#endif //PSCAN_THREADSAFEDISJOINTSET_H
+#endif //PPSCAN_THREADSAFE_DISJOINTSET_H

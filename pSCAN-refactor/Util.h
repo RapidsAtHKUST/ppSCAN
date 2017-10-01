@@ -2,8 +2,8 @@
 // Created by yche on 9/5/17.
 //
 
-#ifndef PSCAN_DATA_STRUCTURE_UTIL_H
-#define PSCAN_DATA_STRUCTURE_UTIL_H
+#ifndef PPSCAN_DATA_STRUCTURE_UTIL_H
+#define PPSCAN_DATA_STRUCTURE_UTIL_H
 
 #include <memory>
 
@@ -31,4 +31,4 @@ namespace std {
 }
 
 
-#endif //PSCAN_DATA_STRUCTURE_UTIL_H
+#endif //PPSCAN_DATA_STRUCTURE_UTIL_H

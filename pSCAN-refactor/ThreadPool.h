@@ -1,5 +1,5 @@
-#ifndef THREAD_POOL_H
-#define THREAD_POOL_H
+#ifndef PPSCAN_THREAD_POOL_H
+#define PPSCAN_THREAD_POOL_H
 
 #include <vector>
 #include <queue>

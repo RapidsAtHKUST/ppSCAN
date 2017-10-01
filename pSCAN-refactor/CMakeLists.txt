@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(pSCAN)
+project(ppSCAN)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -21,7 +21,7 @@ target_compile_options(pSCANSerial PRIVATE -O3 -g)
 
 ## ppSCAN release 1: parallel
 set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
-        DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h)
+        DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h ThreadSafeDisjointSet.h)
 add_executable(pSCANParallel ${SOURCE_FILES})
 #target_compile_definitions(pSCANParallel PRIVATE WITHGPERFTOOLS=1)
 target_compile_definitions(pSCANParallel PRIVATE)

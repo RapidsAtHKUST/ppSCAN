@@ -1,5 +1,5 @@
-#ifndef _GRAPH_H_
-#define _GRAPH_H_
+#ifndef PPSCAN_GRAPH_H_
+#define PPSCAN_GRAPH_H_
 
 #include <memory>
 #include <future>
