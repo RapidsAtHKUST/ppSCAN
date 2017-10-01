@@ -1,5 +1,5 @@
-#ifndef _GraphParallelExp_H_
-#define _GraphParallelExp_H_
+#ifndef PPSCAN_GRAPH_PARALLEL_EXP_H
+#define PPSCAN_GRAPH_PARALLEL_EXP_H
 
 #include <memory>
 #include <future>

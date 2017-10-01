@@ -2,8 +2,8 @@
 // Created by yche on 9/29/17.
 //
 
-#ifndef PSCAN_SCANGRAPH_H
-#define PSCAN_SCANGRAPH_H
+#ifndef PPSCAN_SCANGRAPH_H
+#define PPSCAN_SCANGRAPH_H
 
 #include <memory>
 
@@ -70,4 +70,4 @@ public:
     void Output(const char *eps_s, const char *miu);
 };
 
-#endif //PSCAN_SCANGRAPH_H
+#endif //PPSCAN_SCANGRAPH_H
