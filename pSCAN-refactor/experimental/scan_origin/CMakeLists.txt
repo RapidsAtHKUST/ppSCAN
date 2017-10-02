@@ -12,3 +12,8 @@ target_compile_definitions(SCANOriginBetterSetIntersec PRIVATE MIN_MAX_PRUNE=1)
 add_executable(SCANOriginBetterSetStat ${SCAN_FILES})
 target_compile_options(SCANOriginBetterSetStat PRIVATE -O3 -g)
 target_compile_definitions(SCANOriginBetterSetStat PRIVATE STATISTICS=1 MIN_MAX_PRUNE=1)
+
+# super naive original SCAN with no optimization
+set(SCAN_SUPER_NAIVE_FILES ./main_super_naive_scan.cpp ./SCANSuperNaiveGraph.cpp ./SCANSuperNaiveGraph.h ../../InputOutput.cpp)
+add_executable(SCANSuperNaive ${SCAN_SUPER_NAIVE_FILES})
+target_compile_options(SCANSuperNaive PRIVATE -O3 -g)
