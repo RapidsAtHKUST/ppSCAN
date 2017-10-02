@@ -49,12 +49,17 @@ int SCANSuperNaiveGraph::ComputeCnLowerBound(int du, int dv) {
 
 int SCANSuperNaiveGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
 
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] && cn < min_cn_num;) {
+         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
+         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
         if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
             ++offset_nei_u;
         } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
             ++offset_nei_v;
         } else {
             ++cn;
@@ -68,7 +73,6 @@ int SCANSuperNaiveGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 int SCANSuperNaiveGraph::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
 
-    // compute min_cn_val, easy-comp for pruning expensive `IntersectNeighborSets(u, v, min_cn[edge_idx])`
     int deg_a = degree[u], deg_b = degree[v];
     int c = ComputeCnLowerBound(deg_a, deg_b);
     min_cn[edge_idx] = IntersectNeighborSets(u, v, c);
