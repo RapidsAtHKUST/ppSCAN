@@ -58,3 +58,6 @@ add_subdirectory(experimental/pscan_experimental)
 
 ## original scan: reimplementation
 add_subdirectory(experimental/scan_origin)
+
+## anySCAN
+add_subdirectory(experimental/anyscan)
