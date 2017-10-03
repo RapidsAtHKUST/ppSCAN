@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "../../InputOutput.h"
+#include "../../DisjointSet.h"
 
 namespace anySCAN {
     constexpr char UN_TOUCHED = 0;
@@ -25,6 +26,7 @@ private:
     // parameter1: e.g eps: 0.13, eps_a:13, eps_b:100;
     // parameter2: min_u: 5, 5 nearest neighbor as threshold
     int eps_a2, eps_b2, min_u;
+    int alpha_block_size, beta_block_size;
 
     // compressed spare row graph
     ui n;
@@ -39,6 +41,9 @@ private:
 
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;
+
+    unique_ptr<DisjointSet> disjoint_set_ptr;
+
 private:
     int ComputeCnLowerBound(int du, int dv);
 
@@ -46,6 +51,7 @@ private:
 
     int EvalSimilarity(int u, ui edge_idx);
 
+    void Summarize();
 public:
     explicit AnySCANGraph(const char *dir_string, const char *eps_s, int min_u);
 
