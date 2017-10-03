@@ -94,6 +94,22 @@ pscan+ eval number | 0.403 | 0.392 | 0.334 | 0.267 | 0.211 | 0.159 | 0.117 | 0.0
 serial pscan runtime | 203.836 | 91.456 | 60.776 | 45.936 | 37.262 | 30.218 | 25.514 | 20.725 | 17.475
 serial pscan+ runtime | 97.456 | 57.767 | 44.651 | 37.172 | 31.783 | 26.847 | 23.828 | 19.366 | 16.331
 
+## webgraph_twitter
+
+workload | runtime
+--- | ---
+![webgraph_twitter-workload](../../figures/workload-efficient/webgraph_twitter-min_pts:15-workload.png) | ![webgraph_twitter-runtime](../../figures/workload-efficient/webgraph_twitter-min_pts:15-runtime.png)
+
+tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
+--- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+prune0 definitely not reachable | 0.251 | 0.395 | 0.506 | 0.599 | 0.679 | 0.754 | 0.821 | 0.885 | 0.944
+prune1 definitely reachable | 0.041 | 0.016 | 0.007 | 0.004 | 0.002 | 0.001 | 0.000 | 0.000 | 0.000
+max eval number | 0.708 | 0.590 | 0.487 | 0.398 | 0.319 | 0.246 | 0.178 | 0.115 | 0.056
+pscan eval number | 0.571 | 0.507 | 0.406 | 0.319 | 0.246 | 0.183 | 0.128 | 0.078 | 0.033
+pscan+ eval number | 0.534 | 0.507 | 0.407 | 0.319 | 0.245 | 0.182 | 0.127 | 0.077 | 0.033
+serial pscan runtime | 2659.911 | 3169.537 | 2510.802 | 1703.747 | 1101.959 | 660.862 | 367.460 | 177.049 | 57.398
+serial pscan+ runtime | 1354.199 | 2165.519 | 1834.482 | 1277.353 | 823.327 | 495.069 | 273.645 | 132.593 | 45.254
+
 ## 10million_avgdeg15_maxdeg50_Cdefault
 
 workload | runtime
