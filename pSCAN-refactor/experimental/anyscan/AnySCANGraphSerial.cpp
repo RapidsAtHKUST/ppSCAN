@@ -38,6 +38,7 @@ AnySCANGraph::AnySCANGraph(const char *dir_string, const char *eps_s, int min_u)
 
     alpha_block_size = 32768;
     beta_block_size = 32768;
+    checking_lst.reserve(n);
     auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
@@ -85,13 +86,18 @@ int AnySCANGraph::EvalSimilarity(int u, ui edge_idx) {
     }
 }
 
+bool AnySCANGraph::IsDefiniteCore(int u) {
+    return u == anySCAN::UNPROCESSED_CORE || u == anySCAN::PROCESSED_CORE;
+}
+
+// get complete core-induced clusters, but requiring further merging. further expansion obeys to connectivity
 void AnySCANGraph::Summarize() {
     for (auto v_beg = 0, v_cur = 0, untouched_num = 0; v_cur < n; v_cur++) {
         if (vertex_status[v_cur] == untouched_num) {
             untouched_num++;
         }
-        if (untouched_num >= n || v_cur == n - 1) {
-            // 1.1 summary first phase
+        if (untouched_num >= alpha_block_size || v_cur == n - 1) {
+            // 1.1 examining all untouched vertices
             for (auto u = v_beg; u < v_cur + 1; u++) {
                 // compute eps-neighborhood for u
                 auto sd = 0;
@@ -102,14 +108,15 @@ void AnySCANGraph::Summarize() {
                         sd++;
                     }
                 }
+                // check core status from sd
                 if (sd >= min_u) {
-                    vertex_status[u] = anySCAN::PROCESSED_CORE;
+                    vertex_status[u] = anySCAN::PROCESSED_CORE; // definite core, eps-neighborhood known
                 } else {
-                    vertex_status[u] = anySCAN::UNPROCESSED_NOISE;
+                    vertex_status[u] = anySCAN::UNPROCESSED_NOISE; // definite non-core, eps-neighborhood known
                 }
             }
 
-            // 1.2 summary second phase
+            // 1.2 update eps-neighborhood status and property
             for (auto u = v_beg; u < v_cur + 1; u++) {
                 bool is_core = vertex_status[u] == anySCAN::PROCESSED_CORE;
                 for (auto w: eps_neighborhood[u]) {
@@ -120,28 +127,46 @@ void AnySCANGraph::Summarize() {
                 }
             }
 
-            // 1.3 summary third phase
+            // 1.3 merge core-induced clusters related to vertices in the current block
             for (auto u = v_beg; u < v_cur + 1; u++) {
+                // u is either anySCAN::PROCESSED_CORE or UNPROCESSED_NOISE
                 if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
                     for (auto w: eps_neighborhood[u]) {
-                        if (vertex_status[w] == anySCAN::PROCESSED_CORE) {
+                        if (vertex_status[w] != anySCAN::PROCESSED_CORE && eps_neighbor_num[w] >= min_u) {
+                            vertex_status[w] = anySCAN::UNPROCESSED_CORE;
+                        }
+                        if (IsDefiniteCore(w)) {
                             disjoint_set_ptr->Union(u, w);
                         }
                     }
                 }
             }
+
+            v_beg = v_cur + 1;
         }
     }
 }
 
-void AnySCANGraph::anySCAN() {
+void AnySCANGraph::MergeStronglyRelatedCluster() {
 
+}
+
+void AnySCANGraph::MergeWeaklyRelatedCluster() {
+    checking_lst.clear();
+}
+
+// eval similarity for unprocessed core/non-core, to produce complete results for non-cores, i.e, assign labels
+void AnySCANGraph::PostProcessing() {
+
+}
+
+void AnySCANGraph::anySCAN() {
+    Summarize();
+    MergeStronglyRelatedCluster();
+    MergeWeaklyRelatedCluster();
+    PostProcessing();
 }
 
 void AnySCANGraph::Output(const char *eps_s, const char *miu) {
 
 }
-
-
-
-
