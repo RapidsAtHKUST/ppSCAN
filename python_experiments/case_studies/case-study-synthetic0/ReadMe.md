@@ -46,3 +46,30 @@ def generate_different_coefficient(vertex_num):
         os.system('mkdir -p ' + dir_name)
         os.system('mv *.dat ' + dir_name)
 ```
+
+## ROLL Graph
+
+clone and build
+
+```zsh
+git clone https://github.com/alihadian/ROLL.git
+cd ROLL
+mvn package
+```
+
+usage, `-s` should specify `roll-tree` which is the fastest model, other models are orders of magnitude slower
+
+parameter tag | meaning
+--- | ---
+`-n` | number of nodes
+`-m` | number of edges per node, i.e. the average degree (default = 2)
+`-o` | output file name (default: no output)
+`-s` | sampling mode (simple, roll-bucket, roll-tree, SA)
+`-m0` | number of initial nodes. Note that m0 >= m (default: =m)
+`-d` | only for ROLL-tree: path to save the degree distribution file.
+
+```zsh
+java -jar target/ROLL-0.3-SNAPSHOT-jar-with-dependencies.jar -n 1000000 -m 30 -o ~/GitRepos/ScanOptimizing/dataset/roll_graph0/roll.edges -s roll-tree
+```
+
+please check the original https://github.com/alihadian/ROLL.git for further information
