@@ -112,29 +112,39 @@ void AnySCANGraph::Summarize() {
                 if (sd >= min_u) {
                     vertex_status[u] = anySCAN::PROCESSED_CORE; // definite core, eps-neighborhood known
                 } else {
-                    vertex_status[u] = anySCAN::UNPROCESSED_NOISE; // definite non-core, eps-neighborhood known
+                    vertex_status[u] = anySCAN::PROCESSED_NOISE; // definite non-core, eps-neighborhood known
                 }
             }
 
-            // 1.2 update eps-neighborhood status and property
+            // 1.2 update eps-neighborhood property, update vertex_status
             for (auto u = v_beg; u < v_cur + 1; u++) {
-                bool is_core = vertex_status[u] == anySCAN::PROCESSED_CORE;
-                for (auto w: eps_neighborhood[u]) {
-                    if (is_core && vertex_status[w] == anySCAN::UN_TOUCHED) {
-                        vertex_status[w] = anySCAN::UNPROCESSED_BORDER;
+                if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
+                    for (auto w: eps_neighborhood[u]) {
+                        eps_neighbor_num[w]++;
                     }
-                    eps_neighbor_num[w]++;
+                }
+            }
+            for (auto u = v_beg; u < v_cur + 1; u++) {
+                if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
+                    for (auto w: eps_neighborhood[u]) {
+                        if (vertex_status[w] == anySCAN::PROCESSED_NOISE) {
+                            vertex_status[w] = anySCAN::PROCESSED_BORDER;
+                        } else if (vertex_status[w] != anySCAN::PROCESSED_CORE) {
+
+                        } else if (vertex_status[w] == anySCAN::UN_TOUCHED) {
+                            if (eps_neighbor_num[w] >= min_u) {
+                                vertex_status[w] = anySCAN::UNPROCESSED_CORE;
+                            }
+                        }
+                    }
                 }
             }
 
             // 1.3 merge core-induced clusters related to vertices in the current block
             for (auto u = v_beg; u < v_cur + 1; u++) {
-                // u is either anySCAN::PROCESSED_CORE or UNPROCESSED_NOISE
+                // u is either anySCAN::PROCESSED_CORE or PROCESSED_NOISE
                 if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
                     for (auto w: eps_neighborhood[u]) {
-                        if (vertex_status[w] != anySCAN::PROCESSED_CORE && eps_neighbor_num[w] >= min_u) {
-                            vertex_status[w] = anySCAN::UNPROCESSED_CORE;
-                        }
                         if (IsDefiniteCore(w)) {
                             disjoint_set_ptr->Union(u, w);
                         }
