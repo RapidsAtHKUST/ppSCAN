@@ -41,3 +41,23 @@ parameter tag | meaning
 ```zsh
 java -jar target/ROLL-0.3-SNAPSHOT-jar-with-dependencies.jar -n 1000000 -m 30 -o ~/GitRepos/ScanOptimizing/dataset/roll_graph0/roll.edges -s roll-tree
 ```
+
+## Experimental Parameters
+
+### LFR
+
+parameters | values
+--- | ---
+`k` | 30
+`-maxk` | 50, 100, 1000, 10000, 100000
+`mu` | mixing parameter: 0.2, 0.4, 0.6, 0.8
+`-C` | coefficient: 0.2, 0.4, 0.6, 0.8
+
+### ROLL
+
+parameters | values
+--- | ---
+`-n` | 1m/10m/100m
+`-m` | 15
+`-s`  | `roll-tree`
+`-m0` |  have a try for different values
