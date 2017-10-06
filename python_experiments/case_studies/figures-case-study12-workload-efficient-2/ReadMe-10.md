@@ -110,6 +110,22 @@ pscan+ eval number | 0.513 | 0.519 | 0.424 | 0.335 | 0.260 | 0.194 | 0.136 | 0.0
 serial pscan runtime | 2496.162 | 3102.021 | 2505.708 | 1709.792 | 1111.877 | 665.625 | 370.735 | 178.761 | 58.856
 serial pscan+ runtime | 1241.059 | 2102.837 | 1828.919 | 1278.996 | 827.329 | 496.229 | 275.167 | 134.680 | 46.480
 
+## snap_friendster
+
+workload | runtime
+--- | ---
+![snap_friendster-workload](../../figures/workload-efficient/snap_friendster-min_pts:10-workload.png) | ![snap_friendster-runtime](../../figures/workload-efficient/snap_friendster-min_pts:10-runtime.png)
+
+tag | eps-0.1 | eps-0.2 | eps-0.3 | eps-0.4 | eps-0.5 | eps-0.6 | eps-0.7 | eps-0.8 | eps-0.9
+--- | --- | --- | --- | --- | --- | --- | --- | --- | ---
+prune0 definitely not reachable | 0.007 | 0.047 | 0.121 | 0.223 | 0.346 | 0.481 | 0.619 | 0.754 | 0.882
+prune1 definitely reachable | 0.024 | 0.007 | 0.003 | 0.002 | 0.001 | 0.000 | 0.000 | 0.000 | 0.000
+max eval number | 0.969 | 0.946 | 0.876 | 0.775 | 0.653 | 0.518 | 0.381 | 0.245 | 0.118
+pscan eval number | 0.853 | 0.901 | 0.826 | 0.726 | 0.607 | 0.476 | 0.340 | 0.207 | 0.084
+pscan+ eval number | 0.766 | 0.898 | 0.822 | 0.718 | 0.598 | 0.466 | 0.331 | 0.200 | 0.080
+serial pscan runtime | 5282.049 | 4679.658 | 3687.915 | 2788.635 | 2000.328 | 1354.731 | 863.778 | 486.023 | 230.492
+serial pscan+ runtime | 3431.670 | 3291.382 | 2605.923 | 1968.284 | 1414.988 | 951.416 | 600.978 | 342.110 | 170.117
+
 ## 10million_avgdeg15_maxdeg50_Cdefault
 
 workload | runtime
