@@ -31,9 +31,10 @@ target_link_libraries(pSCANParallel ${CMAKE_THREAD_LIBS_INIT})
 
 ## ppSCAN serial experimental 0: statistics 0
 add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
-target_compile_definitions(pSCANStatistics0 PRIVATE WITHGPERFTOOLS=1 SERIAL=1 STATISTICS=1)
+target_compile_definitions(pSCANStatistics0 PRIVATE SERIAL=1 STATISTICS=1)
+#target_compile_definitions(pSCANStatistics0 PRIVATE WITHGPERFTOOLS=1 SERIAL=1 STATISTICS=1)
 target_compile_options(pSCANStatistics0 PRIVATE -O3 -g)
-target_link_libraries(pSCANStatistics0 profiler)
+#target_link_libraries(pSCANStatistics0 profiler)
 
 ## ppSCAN serial experimental 1: naive-set-intersection
 add_executable(pSCANSerialNaive ${SERIAL_SOURCE_FILES})

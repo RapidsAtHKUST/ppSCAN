@@ -48,6 +48,7 @@ private:
     // disjoint-sets represent core-induced clusters, eps_neighborhood has one-hop information
     unique_ptr<DisjointSet> disjoint_set_ptr;
     vector<vector<int>> eps_neighborhood;
+    vector<pair<int, int>> noncore_cluster;
 
     // used for computation data initialization
     vector<int> checking_lst;
