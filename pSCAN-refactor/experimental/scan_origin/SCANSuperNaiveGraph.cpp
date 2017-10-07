@@ -155,9 +155,6 @@ void SCANSuperNaiveGraph::CheckCoreAndCluster() {
 
                 // 2nd: assign labels for cores and non-cores in the current cluster
                 for (auto v_id: core_vertices) {
-                    if (cluster_dict[v_id] != n) {
-                        cout << "err " << v_id << endl;
-                    }
                     cluster_dict[v_id] = cluster_min_ele;
                 }
                 for (auto v_id: non_core_vertices) {
