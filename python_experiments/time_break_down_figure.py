@@ -26,11 +26,18 @@ def display_time_division(filtered_lst, algorithm_name_lst, dataset_name):
 
 
 if __name__ == '__main__':
-    lst_lst = [[6.28, 5.24, 5.01, 7.94, 6.08, 4.33, 4.26, 4.26],
-               [0.00, 0.68, 0.67, 4.13, 4.06, 0.70, 0.70, 0.70],
-               [38.41, 20.17, 15.02, 17.79, 15.25, 14.64, 11.65, 11.65]]
-    display_time_division(recal_for_bar_char(lst_lst),
-                          ['SCAN\n$\\epsilon$: 0.2', 'SCAN\n$\\epsilon$: 0.4', 'SCAN\n$\\epsilon$: 0.6',
-                           'SCAN\n$\\epsilon$: 0.8',
-                           'pSCAN\n$\\epsilon$: 0.2', 'pSCAN\n$\\epsilon$: 0.4', 'pSCAN\n$\\epsilon$: 0.6',
-                           'pSCAN\n$\\epsilon$: 0.8'], dataset_name='livejournal')
+    with open('../statistics/breadown_time_gpu23.md') as ifs:
+        all_data = map(lambda my_str:
+                       map(float, list(reversed(my_str.split('|')[1:4]))),
+                       filter(lambda line: 'SCAN' in line, ifs.readlines()))
+        my_data_lst = [all_data[0:8], all_data[8:16], all_data[16:24]]
+        dataset_name_lst = ['livejournal', 'orkut', 'twitter']
+
+        for idx, lst_lst in enumerate(my_data_lst):
+            lst_lst = [map(lambda my_tuple: my_tuple[0], lst_lst), map(lambda my_tuple: my_tuple[1], lst_lst),
+                       map(lambda my_tuple: my_tuple[2], lst_lst)]
+            display_time_division(recal_for_bar_char(lst_lst),
+                                  ['SCAN\n$\\epsilon$: 0.2', 'SCAN\n$\\epsilon$: 0.4', 'SCAN\n$\\epsilon$: 0.6',
+                                   'SCAN\n$\\epsilon$: 0.8', 'pSCAN\n$\\epsilon$: 0.2', 'pSCAN\n$\\epsilon$: 0.4',
+                                   'pSCAN\n$\\epsilon$: 0.6', 'pSCAN\n$\\epsilon$: 0.8'],
+                                  dataset_name=dataset_name_lst[idx])

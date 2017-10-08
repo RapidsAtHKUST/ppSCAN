@@ -92,6 +92,14 @@ bool AnySCANGraph::IsDefiniteCore(int u) {
 
 // get complete core-induced clusters, but requiring further merging. further expansion obeys to connectivity
 void AnySCANGraph::Summarize() {
+    // mark unprocessed noise
+    for (auto v_cur = 0; v_cur < n; v_cur++) {
+        if (out_edge_start[v_cur + 1] - out_edge_start[v_cur] < min_u) {
+            vertex_status[v_cur] = anySCAN::UNPROCESSED_NOISE;
+        }
+    }
+
+    // summarize and mark status
     for (auto v_beg = 0, v_cur = 0, untouched_num = 0; v_cur < n; v_cur++) {
         if (vertex_status[v_cur] == untouched_num) {
             untouched_num++;
@@ -128,12 +136,12 @@ void AnySCANGraph::Summarize() {
                 if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
                     for (auto w: eps_neighborhood[u]) {
                         if (vertex_status[w] == anySCAN::PROCESSED_NOISE) {
-                            vertex_status[w] = anySCAN::PROCESSED_BORDER;
+                            vertex_status[w] = anySCAN::PROCESSED_BORDER;   // in a cluster
                         } else if (vertex_status[w] != anySCAN::PROCESSED_CORE) {
-
-                        } else if (vertex_status[w] == anySCAN::UN_TOUCHED) {
                             if (eps_neighbor_num[w] >= min_u) {
                                 vertex_status[w] = anySCAN::UNPROCESSED_CORE;
+                            } else {
+                                vertex_status[w] = anySCAN::UNPROCESSED_BORDER;
                             }
                         }
                     }
