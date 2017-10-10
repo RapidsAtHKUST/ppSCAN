@@ -38,8 +38,8 @@ AnySCANGraph::AnySCANGraph(const char *dir_string, const char *eps_s, int min_u)
 
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 
-    alpha_block_size = 32768;
-    beta_block_size = 32768;
+    alpha_block_size = 8192;
+    beta_block_size = 8192;
     checking_lst.reserve(n);
     auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
@@ -92,27 +92,30 @@ int AnySCANGraph::EvalSimilarity(int u, ui edge_idx) {
 
 // get complete core-induced clusters, but requiring further merging. further expansion obeys to connectivity
 void AnySCANGraph::Summarize() {
+    auto tmp_start = high_resolution_clock::now();
     // mark unprocessed noise
     for (auto v_cur = 0; v_cur < n; v_cur++) {
-        if (out_edge_start[v_cur + 1] - out_edge_start[v_cur] < min_u) {
+        if (degree[v_cur] < min_u) {
             vertex_status[v_cur] = anySCAN::UNPROCESSED_NOISE;
         }
     }
+    auto tmp_end = high_resolution_clock::now();
+    cout << "1. mark unprocessed noise cost:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // summarize and mark status
     for (auto v_beg = 0, v_cur = 0, untouched_num = 0; v_cur < n; v_cur++) {
-        if (vertex_status[v_cur] == untouched_num) {
+        if (vertex_status[v_cur] == anySCAN::UN_TOUCHED) {
             untouched_num++;
         }
         if (untouched_num >= alpha_block_size || v_cur == n - 1) {
+            untouched_num = 0;
             // 1.1 examining all untouched vertices
             for (auto u = v_beg; u < v_cur + 1; u++) {
                 // compute eps-neighborhood for u
                 auto sd = 0;
                 for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-                    auto &eps_neighborhood_vec = eps_neighborhood[u];
                     if (EvalSimilarity(u, j) == SIMILAR) {
-                        eps_neighborhood_vec.emplace_back(out_edges[j]);
+                        eps_neighborhood[u].emplace_back(out_edges[j]);
                         sd++;
                     }
                 }
@@ -162,9 +165,12 @@ void AnySCANGraph::Summarize() {
             v_beg = v_cur + 1;
         }
     }
+    auto tmp_end2 = high_resolution_clock::now();
+    cout << "1. summarize cost:" << duration_cast<milliseconds>(tmp_end2 - tmp_end).count() << " ms\n";
 }
 
 void AnySCANGraph::MergeStronglyRelatedCluster() {
+    auto tmp_start = high_resolution_clock::now();
     // 1st: init information for finding super nodes of unprocessed-borders
     for (auto u = 0; u < n; u++) {
         if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
@@ -183,8 +189,11 @@ void AnySCANGraph::MergeStronglyRelatedCluster() {
     sort(begin(checking_lst), end(checking_lst), [this](int u, int v) -> bool {
         return candidate_super_nodes[u].size() > candidate_super_nodes[v].size();
     });
+    auto tmp_end = high_resolution_clock::now();
+    cout << "2. init check list cost:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // 2nd: check core and conditionally cluster core
+    cout << "check list size:" << checking_lst.size() << "\n";
     for (auto i = 0; i < checking_lst.size(); i += beta_block_size) {
         for (auto cur = i, end = min(static_cast<int>(checking_lst.size()), i + beta_block_size); cur < end; cur++) {
             auto u = checking_lst[cur];
@@ -225,10 +234,14 @@ void AnySCANGraph::MergeStronglyRelatedCluster() {
             }
         }
     }
+    auto tmp_end2 = high_resolution_clock::now();
+    cout << "2. exam check list for strongly related cluster cost:"
+         << duration_cast<milliseconds>(tmp_end2 - tmp_end).count() << " ms\n";
 }
 
 void AnySCANGraph::MergeWeaklyRelatedCluster() {
     // 1st: init checking list of possible cores and definite cores
+    auto tmp_start = high_resolution_clock::now();
     checking_lst.clear();
     for (auto u = 0; u < n; u++) {
         if (vertex_status[u] == anySCAN::UNPROCESSED_BORDER || vertex_status[u] == anySCAN::UNPROCESSED_CORE ||
@@ -239,6 +252,9 @@ void AnySCANGraph::MergeWeaklyRelatedCluster() {
     sort(begin(checking_lst), end(checking_lst), [this](int u, int v) -> bool {
         return degree[u] > degree[v];
     });
+    auto tmp_end = high_resolution_clock::now();
+    cout << "3. init check list cost:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
+    cout << "check list size:" << checking_lst.size() << "\n";
 
     // 2nd: check core and conditionally cluster core
     for (auto i = 0; i < checking_lst.size(); i += beta_block_size) {
@@ -285,6 +301,9 @@ void AnySCANGraph::MergeWeaklyRelatedCluster() {
             }
         }
     }
+    auto tmp_end2 = high_resolution_clock::now();
+    cout << "3. exam check list for weakly related cluster cost:"
+         << duration_cast<milliseconds>(tmp_end2 - tmp_end).count() << " ms\n";
 }
 
 void AnySCANGraph::MarkClusterMinEleAsId() {
@@ -324,10 +343,15 @@ void AnySCANGraph::ClusterNonCore() {
 
 void AnySCANGraph::PostProcessing() {
     // 1st: get min core element in a cluster
+    auto tmp_start = high_resolution_clock::now();
     MarkClusterMinEleAsId();
+    auto tmp_end = high_resolution_clock::now();
+    cout << "4. mark cost:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 
     // 2nd: cluster non-core
     ClusterNonCore();
+    auto tmp_end2 = high_resolution_clock::now();
+    cout << "4. cluster non-core cost:" << duration_cast<milliseconds>(tmp_end - tmp_start).count() << " ms\n";
 }
 
 void AnySCANGraph::anySCAN() {
