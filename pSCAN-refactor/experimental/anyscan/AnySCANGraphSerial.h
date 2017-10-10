@@ -48,8 +48,6 @@ private:
 
     int EvalSimilarity(int u, ui edge_idx);
 
-    bool IsDefiniteCore(int u);
-
     void Summarize();
 
     void MergeStronglyRelatedCluster();

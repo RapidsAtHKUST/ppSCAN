@@ -88,10 +88,6 @@ int AnySCANGraph::EvalSimilarity(int u, ui edge_idx) {
     }
 }
 
-bool AnySCANGraph::IsDefiniteCore(int u) {
-    return u == anySCAN::UNPROCESSED_CORE || u == anySCAN::PROCESSED_CORE;
-}
-
 // get complete core-induced clusters, but requiring further merging. further expansion obeys to connectivity
 void AnySCANGraph::Summarize() {
     // mark unprocessed noise
@@ -153,7 +149,8 @@ void AnySCANGraph::Summarize() {
                 // u is either anySCAN::PROCESSED_CORE or PROCESSED_NOISE
                 if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
                     for (auto w: eps_neighborhood[u]) {
-                        if (IsDefiniteCore(w)) {
+                        if (vertex_status[w] == anySCAN::PROCESSED_CORE ||
+                            vertex_status[w] == anySCAN::UNPROCESSED_CORE) {
                             disjoint_set_ptr->Union(u, w);
                         }
                     }

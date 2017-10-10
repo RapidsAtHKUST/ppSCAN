@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         Usage();
         return 0;
     }
-    cout << "**** original SCAN with easy-comp/cross-link: " << argv[1] << ", " << argv[2] << ", " << argv[3]
+    cout << "**** original anySCAN with easy-comp: " << argv[1] << ", " << argv[2] << ", " << argv[3]
          << " *** \n";
 
     // load graph
