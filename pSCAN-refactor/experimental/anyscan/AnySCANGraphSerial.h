@@ -10,20 +10,6 @@
 #include "../../InputOutput.h"
 #include "../../DisjointSet.h"
 
-namespace anySCAN {
-    constexpr char UN_TOUCHED = 0;
-
-    // eps-neighborhood unknown
-    constexpr char UNPROCESSED_CORE = 1;
-    // eps-neighborhood known
-    constexpr char PROCESSED_CORE = 2;
-
-    constexpr char UNPROCESSED_BORDER = 3;
-    constexpr char PROCESSED_BORDER = 4;
-    constexpr char UNPROCESSED_NOISE = 5;
-    constexpr char PROCESSED_NOISE = 6;
-}
-
 class AnySCANGraph {
 private:
     unique_ptr<InputOutput> io_helper_ptr;
@@ -48,6 +34,9 @@ private:
     // disjoint-sets represent core-induced clusters, eps_neighborhood has one-hop information
     unique_ptr<DisjointSet> disjoint_set_ptr;
     vector<vector<int>> eps_neighborhood;
+    vector<vector<int>> candidate_super_nodes;
+
+    // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster;
 
     // used for computation data initialization
@@ -66,6 +55,10 @@ private:
     void MergeStronglyRelatedCluster();
 
     void MergeWeaklyRelatedCluster();
+
+    void MarkClusterMinEleAsId();
+
+    void ClusterNonCore();
 
     void PostProcessing();
 

@@ -7,6 +7,7 @@
 #include <cmath>
 #include <chrono>
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 using namespace chrono;
@@ -33,6 +34,7 @@ AnySCANGraph::AnySCANGraph(const char *dir_string, const char *eps_s, int min_u)
     vertex_status = vector<char>(n, anySCAN::UN_TOUCHED);
     eps_neighbor_num = vector<int>(n, 0);
     eps_neighborhood = vector<vector<int>>(n);
+    candidate_super_nodes = vector<vector<int>>(n);
 
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 
@@ -116,7 +118,7 @@ void AnySCANGraph::Summarize() {
                         sd++;
                     }
                 }
-                // check core status from sd
+                // check core status
                 if (sd >= min_u) {
                     vertex_status[u] = anySCAN::PROCESSED_CORE; // definite core, eps-neighborhood known
                 } else {
@@ -126,10 +128,8 @@ void AnySCANGraph::Summarize() {
 
             // 1.2 update eps-neighborhood property, update vertex_status
             for (auto u = v_beg; u < v_cur + 1; u++) {
-                if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
-                    for (auto w: eps_neighborhood[u]) {
-                        eps_neighbor_num[w]++;
-                    }
+                for (auto w: eps_neighborhood[u]) {
+                    eps_neighbor_num[w]++;
                 }
             }
             for (auto u = v_beg; u < v_cur + 1; u++) {
@@ -166,16 +166,169 @@ void AnySCANGraph::Summarize() {
 }
 
 void AnySCANGraph::MergeStronglyRelatedCluster() {
+    // 1st: init information for finding super nodes of unprocessed-borders
+    for (auto u = 0; u < n; u++) {
+        if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
+            for (auto w: eps_neighborhood[u]) {
+                if (w == anySCAN::UNPROCESSED_BORDER) {
+                    candidate_super_nodes[w].emplace_back(u);
+                }
+            }
+        }
+    }
+    for (auto u = 0; u < n; u++) {
+        if (vertex_status[u] == anySCAN::UNPROCESSED_BORDER && candidate_super_nodes[u].size() >= 2) {
+            checking_lst.emplace_back(u);
+        }
+    }
+    sort(begin(checking_lst), end(checking_lst), [this](int u, int v) -> bool {
+        return candidate_super_nodes[u].size() > candidate_super_nodes[v].size();
+    });
 
+    // 2nd: check core and conditionally cluster core
+    for (auto i = 0; i < checking_lst.size(); i += beta_block_size) {
+        for (auto cur = i, end = min(static_cast<int>(checking_lst.size()), i + beta_block_size); cur < end; cur++) {
+            auto u = checking_lst[cur];
+            // all-same prune
+            auto first_v = candidate_super_nodes[u][0];
+            auto is_same = true;
+            for (auto j = 1; j < candidate_super_nodes[u].size(); j++) {
+                if (!disjoint_set_ptr->IsSameSet(first_v, candidate_super_nodes[u][j])) {
+                    is_same = false;
+                    break;
+                }
+            }
+            if (eps_neighbor_num[u] >= min_u) {            // easy to determine core
+                vertex_status[u] = anySCAN::UNPROCESSED_CORE;
+            } else {
+                // check core
+                auto sd = 0;
+                for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                    auto &eps_neighborhood_vec = eps_neighborhood[u];
+                    if (EvalSimilarity(u, j) == SIMILAR) {
+                        eps_neighborhood_vec.emplace_back(out_edges[j]);
+                        sd++;
+                    }
+                }
+                // check core status
+                if (sd >= min_u) {
+                    vertex_status[u] = anySCAN::PROCESSED_CORE;
+                } else {
+                    vertex_status[u] = anySCAN::PROCESSED_BORDER;
+                }
+            }
+
+            if (!is_same && vertex_status[u] == anySCAN::UNPROCESSED_CORE) {
+                // cluster cores
+                for (auto v: candidate_super_nodes[u]) {
+                    disjoint_set_ptr->Union(u, v);
+                }
+            }
+        }
+    }
 }
 
 void AnySCANGraph::MergeWeaklyRelatedCluster() {
+    // 1st: init checking list of possible cores and definite cores
     checking_lst.clear();
+    for (auto u = 0; u < n; u++) {
+        if (vertex_status[u] == anySCAN::UNPROCESSED_BORDER || vertex_status[u] == anySCAN::UNPROCESSED_CORE ||
+            vertex_status[u] == anySCAN::PROCESSED_CORE) {
+            checking_lst.emplace_back(u);
+        }
+    }
+    sort(begin(checking_lst), end(checking_lst), [this](int u, int v) -> bool {
+        return degree[u] > degree[v];
+    });
+
+    // 2nd: check core and conditionally cluster core
+    for (auto i = 0; i < checking_lst.size(); i += beta_block_size) {
+        for (auto cur = i, end = min(static_cast<int>(checking_lst.size()), i + beta_block_size); cur < end; cur++) {
+            auto u = checking_lst[cur];
+            // check core if unknown
+            if (vertex_status[u] == anySCAN::UNPROCESSED_BORDER) {
+                if (eps_neighbor_num[u] >= min_u) {
+                    vertex_status[u] = anySCAN::UNPROCESSED_CORE;
+                } else {
+                    auto sd = 0;
+                    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                        auto &eps_neighborhood_vec = eps_neighborhood[u];
+                        if (EvalSimilarity(u, j) == SIMILAR) {
+                            eps_neighborhood_vec.emplace_back(out_edges[j]);
+                            sd++;
+                        }
+                    }
+                    // check core status
+                    if (sd >= min_u) {
+                        vertex_status[u] = anySCAN::PROCESSED_CORE;
+                    } else {
+                        vertex_status[u] = anySCAN::PROCESSED_BORDER;
+                    }
+                }
+            }
+            if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
+                for (auto v: eps_neighborhood[u]) {
+                    if (vertex_status[v] == anySCAN::PROCESSED_CORE || vertex_status[v] == anySCAN::UNPROCESSED_CORE) {
+                        disjoint_set_ptr->Union(u, v);
+                    }
+                }
+            } else if (vertex_status[u] == anySCAN::UNPROCESSED_CORE) {
+                for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                    auto v = out_edges[j];
+                    if (vertex_status[v] == anySCAN::PROCESSED_CORE || vertex_status[v] == anySCAN::UNPROCESSED_CORE) {
+                        if (!disjoint_set_ptr->IsSameSet(u, v)) {
+                            if (EvalSimilarity(u, j) == SIMILAR) {
+                                disjoint_set_ptr->Union(u, v);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
-// eval similarity for unprocessed core/non-core, to produce complete results for non-cores, i.e, assign labels
-void AnySCANGraph::PostProcessing() {
+void AnySCANGraph::MarkClusterMinEleAsId() {
+    cluster_dict = vector<int>(n);
+    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
+    for (auto i = 0u; i < n; i++) {
+        if (vertex_status[i] == anySCAN::PROCESSED_CORE || vertex_status[i] == anySCAN::UNPROCESSED_CORE) {
+            int x = disjoint_set_ptr->FindRoot(i);
+            if (i < cluster_dict[x]) { cluster_dict[x] = i; }
+        }
+    }
+}
+
+void AnySCANGraph::ClusterNonCore() {
+    for (auto u = 0; u < n; u++) {
+        if (vertex_status[u] == anySCAN::PROCESSED_CORE) {
+            auto cluster_id = cluster_dict[disjoint_set_ptr->FindRoot(u)];
+            for (auto v: eps_neighborhood[u]) {
+                if (vertex_status[v] != anySCAN::PROCESSED_CORE && vertex_status[u] != anySCAN::UNPROCESSED_CORE) {
+                    noncore_cluster.emplace_back(cluster_id, v);
+                }
+            }
+        } else if (vertex_status[u] == anySCAN::UNPROCESSED_CORE) {
+            auto cluster_id = cluster_dict[disjoint_set_ptr->FindRoot(u)];
+            for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
+                auto v = out_edges[j];
+                if (vertex_status[v] != anySCAN::PROCESSED_CORE && vertex_status[u] != anySCAN::UNPROCESSED_CORE) {
+                    if (EvalSimilarity(u, j) == SIMILAR) {
+                        noncore_cluster.emplace_back(cluster_id, v);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void AnySCANGraph::PostProcessing() {
+    // 1st: get min core element in a cluster
+    MarkClusterMinEleAsId();
+
+    // 2nd: cluster non-core
+    ClusterNonCore();
 }
 
 void AnySCANGraph::anySCAN() {
@@ -186,5 +339,5 @@ void AnySCANGraph::anySCAN() {
 }
 
 void AnySCANGraph::Output(const char *eps_s, const char *miu) {
-//    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, *disjoint_set_ptr);
+    io_helper_ptr->OutputAnySCAN(eps_s, miu, noncore_cluster, vertex_status, cluster_dict, disjoint_set_ptr->parent);
 }
