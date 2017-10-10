@@ -56,7 +56,9 @@ int AnySCANGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
             out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
-
+#ifdef STATISTICS
+    intersection_times++;
+#endif
     // correctness guaranteed by two pruning previously in computing min_cn
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
@@ -333,6 +335,9 @@ void AnySCANGraph::anySCAN() {
     MergeStronglyRelatedCluster();
     MergeWeaklyRelatedCluster();
     PostProcessing();
+#ifdef STATISTICS
+    cout << "intersection times:" << intersection_times << "\n\n";
+#endif
 }
 
 void AnySCANGraph::Output(const char *eps_s, const char *miu) {

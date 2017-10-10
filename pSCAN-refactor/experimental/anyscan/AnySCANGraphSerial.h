@@ -41,6 +41,19 @@ private:
 
     // used for computation data initialization
     vector<int> checking_lst;
+
+    // statistics
+#ifdef STATISTICS
+    long prune0 = 0;
+    long prune1 = 0;
+    long max_cmp = 0;
+    int single_max_cmp = 0;
+    long all_cmp0 = 0;
+    long all_cmp1 = 0;
+    long all_cmp2 = 0;
+    long intersection_times = 0;
+    int portion = 0;
+#endif
 private:
     int ComputeCnLowerBound(int du, int dv);
 
