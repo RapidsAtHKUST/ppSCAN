@@ -12,7 +12,8 @@ if __name__ == '__main__':
     # parameter_min_pts_lst = [5]
 
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
-    parameter_min_pts_lst = [2, 5, 10, 15]
+    # parameter_min_pts_lst = [2, 5, 10, 15]
+    parameter_min_pts_lst = [25, 50]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
 

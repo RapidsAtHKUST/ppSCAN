@@ -225,11 +225,13 @@ if __name__ == '__main__':
     data_set_lst = ['small_snap_dblp',
                     'snap_pokec', 'snap_livejournal', 'snap_orkut',
                     'webgraph_uk', 'webgraph_webbase',
-                    'webgraph_twitter', 'snap_friendster',
-                    '10million_avgdeg15_maxdeg50_Cdefault']
+                    'webgraph_twitter',
+                    #  'snap_friendster',
+                    '10million_avgdeg15_maxdeg50_Cdefault'
+                    ]
 
     case_study0()
 
-    min_pts_lst = [2, 5, 10, 15]
+    min_pts_lst = [25, 50]
     for min_pts in min_pts_lst:
         case_study1(min_pts=min_pts, file_name='ReadMe' + '-' + str(min_pts) + '.md')

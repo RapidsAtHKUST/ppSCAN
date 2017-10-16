@@ -10,8 +10,10 @@ def display_time_division(filtered_lst, algorithm_name_lst, dataset_name):
     cur_shape_color_idx = 0
     for portion_lst in filtered_lst:
         print portion_lst
+        # plt.bar(range(1, len(algorithm_name_lst) + 1), portion_lst, color=shape_color_lst[cur_shape_color_idx],
+        #         hatch=hatch_lst[cur_shape_color_idx], alpha=1)
         plt.bar(range(1, len(algorithm_name_lst) + 1), portion_lst, color=shape_color_lst[cur_shape_color_idx],
-                hatch=hatch_lst[cur_shape_color_idx])
+                hatch=hatch_lst[cur_shape_color_idx], alpha=1)
         cur_shape_color_idx += 1
 
     plt.ylim([0.0, max(map(max, filtered_lst)) * 1.1])
@@ -20,7 +22,7 @@ def display_time_division(filtered_lst, algorithm_name_lst, dataset_name):
     plt.ylabel('Breakdown Time (s)', fontdict=font, color='black')
     plt.legend(['other', 'workload reduction computation', 'similarity evaluation'], fontsize=12)
     # plt.show()
-    plt.savefig('../statistics/break-down-time-' + dataset_name + '.png', bbox_inches='tight', pad_inches=0,
+    plt.savefig('../statistics/break-down-time-' + dataset_name + '.pdf', bbox_inches='tight', pad_inches=0,
                 transparent=True)
     plt.close()
 

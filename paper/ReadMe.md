@@ -15,3 +15,10 @@ and min-max and disjoint-set pruning) and
 my contributions(set-intersection improvement and non-trivial parallel extension)
 
 done, by summarizing my three contributions at the beginning of techniques, the second and third, my observations and parallel extension analysis
+
+## Evaluation
+
+### Arguments
+
+
+### Experimental Cases
