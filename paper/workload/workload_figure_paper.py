@@ -15,7 +15,7 @@ def get_exp_data(input_file_path):
         return tuple_lst
 
 
-def first_exp_fix_orkut_vary_u(suffx_str='pdf'):
+def first_exp_fix_orkut_vary_u(suffix_str='pdf'):
     data_lst = get_exp_data('exp1_fix_okrut.md')
     exp1_figure, ax_tuple = plt.subplots(1, 4, sharey=True, sharex=True, figsize=(16, 3))
     x_lst = [float(i + 1) / 10 for i in range(9)]
@@ -39,11 +39,11 @@ def first_exp_fix_orkut_vary_u(suffx_str='pdf'):
 
     exp1_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('workload_exp_fix_orkut.' + suffx_str, dpi=1200)
+    plt.savefig('workload_exp_fix_orkut.' + suffix_str, dpi=1200)
     exp1_figure.show()
 
 
-def second_exp_fix_u_vary_datasets(suffx_str='pdf'):
+def second_exp_fix_u_vary_datasets(suffix_str='pdf'):
     data_lst = get_exp_data('exp2_fix_u.md')
     exp2_figure, ax_tuple = plt.subplots(1, 4, sharey=True, sharex=True, figsize=(16, 3))
     x_lst = [float(i + 1) / 10 for i in range(9)]
@@ -73,7 +73,7 @@ def second_exp_fix_u_vary_datasets(suffx_str='pdf'):
 
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('workload_exp_fix_u_10.' + suffx_str, dpi=1200)
+    plt.savefig('workload_exp_fix_u_10.' + suffix_str, dpi=1200)
     exp2_figure.show()
 
 

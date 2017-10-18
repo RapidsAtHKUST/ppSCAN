@@ -2,8 +2,8 @@ from scalability_figure import *
 
 
 def display_time_division(filtered_lst, algorithm_name_lst, dataset_name):
-    shape_color_lst = ['w', 'w', 'w', 'w']
-    hatch_lst = ['////', '----', '||||', '\\\\\\']
+    # shape_color_lst = ['w', 'w', 'w', 'w']
+    hatch_lst = ['//', '||', '--']
 
     plt.figure(figsize=(8, 4))
 
@@ -12,7 +12,7 @@ def display_time_division(filtered_lst, algorithm_name_lst, dataset_name):
         print portion_lst
         # plt.bar(range(1, len(algorithm_name_lst) + 1), portion_lst, color=shape_color_lst[cur_shape_color_idx],
         #         hatch=hatch_lst[cur_shape_color_idx], alpha=1)
-        plt.bar(range(1, len(algorithm_name_lst) + 1), portion_lst, color=shape_color_lst[cur_shape_color_idx],
+        plt.bar(range(1, len(algorithm_name_lst) + 1), portion_lst, color='w',
                 hatch=hatch_lst[cur_shape_color_idx], alpha=1)
         cur_shape_color_idx += 1
 

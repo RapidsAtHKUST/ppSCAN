@@ -2,6 +2,6 @@
 
 ![exp1](workload_exp_fix_orkut.png)
 
-## Exp1: Fix u, Varying Datasets 
+## Exp2: Fix u, Varying Datasets 
 
 ![exp2](workload_exp_fix_u_10.png)
