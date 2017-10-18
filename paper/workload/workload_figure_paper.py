@@ -15,14 +15,14 @@ def get_exp_data(input_file_path):
         return tuple_lst
 
 
-def first_exp_fix_orkut_vary_u():
+def first_exp_fix_orkut_vary_u(suffx_str='pdf'):
     data_lst = get_exp_data('exp1_fix_okrut.md')
     exp1_figure, ax_tuple = plt.subplots(1, 4, sharey=True, sharex=True, figsize=(16, 3))
     x_lst = [float(i + 1) / 10 for i in range(9)]
     print x_lst
     print data_lst
     print len(data_lst)
-    ax_title_lst = ['(a) $\\mu$ = 2', '(b) $\\mu$ = 10', '(c) $\\mu$ = 15', '(d) $\\mu$ = 25']
+    ax_title_lst = ['(a) $\\mu$ = 2', '(b) $\\mu$ = 5', '(c) $\\mu$ = 15', '(d) $\\mu$ = 25']
     for idx, ax in enumerate(ax_tuple):
         print data_lst[idx]
         ax.plot(x_lst, data_lst[idx][0], 'o-', label='pSCAN-Naive', linewidth=1.0, markersize=10,
@@ -39,11 +39,11 @@ def first_exp_fix_orkut_vary_u():
 
     exp1_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('workload_exp_fix_orkut.pdf', dpi=1200)
+    plt.savefig('workload_exp_fix_orkut.' + suffx_str, dpi=1200)
     exp1_figure.show()
 
 
-def second_exp_fix_u_vary_datasets():
+def second_exp_fix_u_vary_datasets(suffx_str='pdf'):
     data_lst = get_exp_data('exp2_fix_u.md')
     exp2_figure, ax_tuple = plt.subplots(1, 4, sharey=True, sharex=True, figsize=(16, 3))
     x_lst = [float(i + 1) / 10 for i in range(9)]
@@ -73,10 +73,13 @@ def second_exp_fix_u_vary_datasets():
 
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('workload_exp_fix_u_5.pdf', dpi=1200)
+    plt.savefig('workload_exp_fix_u_10.' + suffx_str, dpi=1200)
     exp2_figure.show()
 
 
 if __name__ == '__main__':
     first_exp_fix_orkut_vary_u()
     second_exp_fix_u_vary_datasets()
+
+    first_exp_fix_orkut_vary_u('png')
+    second_exp_fix_u_vary_datasets('png')
