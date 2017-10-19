@@ -11,8 +11,8 @@ from scalability_figure import *
 
 
 def display_time_division(filtered_lst, algorithm_name_lst, title, ax):
-    hatch_lst = ['//', '||', '--']
-    color_lst = ['b', 'orange', 'g']
+    hatch_lst = ['///', '||', '--']
+    color_lst = ['g', 'b', 'orange']
     cur_shape_color_idx = 0
     for portion_lst in filtered_lst:
         print portion_lst

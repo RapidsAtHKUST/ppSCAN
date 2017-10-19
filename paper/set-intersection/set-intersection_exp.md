@@ -1,3 +1,6 @@
+### 
+### Statistics
+
 check core first phase, (with improved set-intersection and w/o)
 
 * different datasets, each item notation: ppSCAN0(better set-intersection), ppSCAN1 runtime and speedup
