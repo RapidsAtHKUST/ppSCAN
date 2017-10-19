@@ -23,7 +23,7 @@ def display_time_division(filtered_lst, algorithm_name_lst, title, ax):
     ax.set_ylim([0.0, max(map(max, filtered_lst)) * 1.2])
     ax.set_xticks(range(1, len(xtick_label_lst) + 1))
     ax.set_xticklabels(xtick_label_lst, rotation=30)
-    ax.set_title(title)
+    ax.set_title(title, fontsize=12)
     ax.legend(['other computation', 'workload reduction computation', 'similarity evaluation'])
 
 

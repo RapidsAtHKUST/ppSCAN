@@ -81,11 +81,11 @@ def first_scalability_exp_differ_thread_num(suffix_str='pdf'):
             cur_shape_color_idx += 1
         ax.set_xticks(thread_lst)
         ax.set_xticklabels(thread_str_lst)
-        ax.set_title(ax_title_lst[idx])
+        ax.set_title(ax_title_lst[idx], fontsize=12)
         ax.legend(('pSCAN', 'ppSCAN pruning', 'ppSCAN checking core', 'ppSCAN clustering core',
                    'ppSCAN clustering non-core'))
 
-    ax_tuple[0][0].set_ylabel('Runtime (s)')
+    ax_tuple[0][0].set_ylabel('Runtime (s)', fontsize=12)
 
     tuple_lst = get_exp1_data()
     # for idx, data in enumerate(tuple_lst):
@@ -111,7 +111,7 @@ def first_scalability_exp_differ_thread_num(suffix_str='pdf'):
         ax.grid(True)
         ax.legend(('ppSCAN over pSCAN', 'ppSCAN self', 'checking core stage', 'other stage'))
 
-    ax_tuple[1][0].set_ylabel('Speedup')
+    ax_tuple[1][0].set_ylabel('Speedup', fontsize=12)
 
     exp1_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
