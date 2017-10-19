@@ -74,10 +74,13 @@ def first_scalability_exp_differ_thread_num(suffix_str='pdf'):
 
         # print 'runtime figure:', data
         hatch_lst = ['\\\\\\', '////', '----', '||||']
+        color_lst = ['b', 'orange', 'g', 'm']
+
         cur_shape_color_idx = 0
         ax.plot(thread_lst, [pscan_runtime_lst[idx] for _ in xrange(len(thread_lst))], 'k--')
         for time_lst in data:
-            ax.bar(thread_lst, time_lst, hatch=hatch_lst[cur_shape_color_idx], color='w', alpha=1, width=1.2)
+            ax.bar(thread_lst, time_lst, hatch=hatch_lst[cur_shape_color_idx], edgecolor=color_lst[cur_shape_color_idx],
+                   color='w', alpha=1, width=1.4)
             cur_shape_color_idx += 1
         ax.set_xticks(thread_lst)
         ax.set_xticklabels(thread_str_lst)

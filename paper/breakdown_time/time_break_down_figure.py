@@ -11,13 +11,13 @@ from scalability_figure import *
 
 
 def display_time_division(filtered_lst, algorithm_name_lst, title, ax):
-    hatch_lst = ['///', '|||', '---']
-
+    hatch_lst = ['//', '||', '--']
+    color_lst = ['b', 'orange', 'g']
     cur_shape_color_idx = 0
     for portion_lst in filtered_lst:
         print portion_lst
         ax.bar(range(1, len(algorithm_name_lst) + 1), portion_lst, color='w',
-               hatch=hatch_lst[cur_shape_color_idx], alpha=1)
+               hatch=hatch_lst[cur_shape_color_idx], alpha=1, edgecolor=color_lst[cur_shape_color_idx])
         cur_shape_color_idx += 1
 
     ax.set_ylim([0.0, max(map(max, filtered_lst)) * 1.2])
