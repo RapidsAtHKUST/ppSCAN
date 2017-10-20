@@ -119,7 +119,7 @@ if __name__ == '__main__':
         my_ax.set_ylabel(y_label[idx], fontsize=12)
         my_ax.set_xlabel('$\\epsilon = $')
         my_ax.xaxis.set_label_coords(0.00, -0.045)
-
+        my_ax.grid(True)
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
     plt.savefig('scalability_exp2_varying_everything.' + 'pdf', dpi=1200)
