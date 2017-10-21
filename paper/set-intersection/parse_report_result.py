@@ -77,9 +77,10 @@ def get_bound_info(dataset):
 
     def get_bound_info_single_eps(eps, exec_path):
         exec_path_ge_dict = get_my_dict(dataset, eps, exec_path, ge_tag)
-        return [exec_path_ge_dict[front_end_bound_tag], exec_path_ge_dict[bad_speculation_tag],
-                exec_path_ge_dict[back_end_core_bound_tag], exec_path_ge_dict[back_end_mem_bound_tag],
-                exec_path_ge_dict[retire_tag]]
+        return map(lambda ele: format_str(ele / 100),
+                   map(float, [exec_path_ge_dict[front_end_bound_tag], exec_path_ge_dict[bad_speculation_tag],
+                               exec_path_ge_dict[back_end_core_bound_tag], exec_path_ge_dict[back_end_mem_bound_tag],
+                               exec_path_ge_dict[retire_tag]]))
 
     for eps in eps_lst:
         ppscan0_bound_lst.append(get_bound_info_single_eps(eps, ppscan0_path))
