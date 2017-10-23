@@ -1,0 +1,11 @@
+2e925005ee76dc183462811ca9022292  n50_m20_1billion_edge/b_adj.bin
+56831c32dd18356d003f042c93feafbd  n50_m20_1billion_edge/b_degree.bin
+
+78e65fa2d4d34ced06c3ec8cdead575b  projects/graph_generator_roll/n25_m40_1billion_edge/b_adj.bin
+23f9ca7b8cb9232c56feb4901d5c678c  projects/graph_generator_roll/n25_m40_1billion_edge/b_degree.bin
+
+7116f0625a585d92bafa845347bdb079  projects/graph_generator_roll/n16dot7_m60_1billion_edge/b_adj.bin
+0e95f719b8156254fa0f7bb4187df9a8  projects/graph_generator_roll/n16dot7_m60_1billion_edge/b_degree.bin
+
+f7735f52f9365fb56b25c75164a2c83c  projects/graph_generator_roll/n12dot5_m80_1billion_edge/b_adj.bin
+3045e85a2123cdf4c7a936b73a92c816  projects/graph_generator_roll/n12dot5_m80_1billion_edge/b_degree.bin
