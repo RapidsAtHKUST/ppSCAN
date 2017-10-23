@@ -77,7 +77,7 @@ if __name__ == '__main__':
     friendster_tag = '(a) dataset = friendster'
     twitter_tag = '(b) dataset = twitter'
     y_label = [ppscan_runtime_tag, ppscan_speedup_tag, ppscan_runtime_tag, ppscan_speedup_tag]
-    sub_titles = [friendster_tag, friendster_tag, twitter_tag, twitter_tag]
+    sub_titles = [friendster_tag, 'dataset = friendster', twitter_tag, 'dataset = twitter']
 
     exp2_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3))
 

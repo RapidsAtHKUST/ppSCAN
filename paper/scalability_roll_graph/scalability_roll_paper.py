@@ -26,7 +26,7 @@ if __name__ == '__main__':
     eps_lst = [float(i + 1) / 10 for i in range(8)]
 
     exp2_figure, ax_tuple = plt.subplots(1, 2, sharex=True, figsize=(8, 3))
-    legend_lst = ['avg deg:40', 'avg deg:80', 'avg deg:120', 'avg deg:160']
+    legend_lst = ['avg deg = 40', 'avg deg = 80', 'avg deg = 120', 'avg deg = 160']
 
     ax = ax_tuple[0]
     shape_lst = ['o-', 's-', '^-', 'x-']
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         ax.plot(eps_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
     ax.legend(legend_lst)
     ax.set_ylim(0, max(map(max, ppscan_runtime_lst_lst)) * 1.1)
-    ax.set_ylabel('Runtime (s)')
+    ax.set_ylabel('Runtime (s)', fontsize=12)
     ax.grid(True)
 
     ax = ax_tuple[1]
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         ax.plot(eps_lst, speedup_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
     ax.legend(legend_lst)
     ax.set_ylim(0, max(map(max, ppscan_speedup_lst_lst)) * 1.1)
-    ax.set_ylabel('Speedup over pSCAN')
+    ax.set_ylabel('Speedup over pSCAN', fontsize=12)
     ax.grid(True)
 
     exp2_figure.subplots_adjust(wspace=0)
