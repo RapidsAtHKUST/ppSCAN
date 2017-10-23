@@ -2,12 +2,13 @@ import os
 import time
 
 if __name__ == '__main__':
-    data_set_lst = [
-        # 'n3000000_k80_C0dot1_bin'
+    lfr_data_set_lst = ['n6000000_k40_C0dot3_Bin', 'n4000000_k60_C0dot3_Bin',
+                        'n3000000_k80_C0dot3_Bin', 'n2400000_k100_C0dot3_Bin']
+    roll_graph_data_set_lst = [
         'n50_m20_1billion_edge', 'n25_m40_1billion_edge',
-        'n16dot7_m60_1billion_edge', 'n12dot5_m80_1billion_edge'
-    ]
+        'n16dot7_m60_1billion_edge', 'n12dot5_m80_1billion_edge']
 
+    data_set_lst = lfr_data_set_lst
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     parameter_min_pts_lst = [5]
     thread_num = 40

@@ -14,8 +14,10 @@ def process_dataset(dataset):
 if __name__ == '__main__':
     ppscan_runtime_lst_lst = []
     ppscan_speedup_lst_lst = []
-    for dataset in ['n50_m20_1billion_edge', 'n25_m40_1billion_edge', 'n16dot7_m60_1billion_edge',
-                    'n12dot5_m80_1billion_edge']:
+    lfr_data_set_lst = ['n6000000_k40_C0dot3_Bin', 'n4000000_k60_C0dot3_Bin',
+                        'n3000000_k80_C0dot3_Bin', 'n2400000_k100_C0dot3_Bin']
+
+    for dataset in lfr_data_set_lst:
         print dataset
         ppscan_runtime_lst, ppcan_speedup_lst = process_dataset(dataset)
         ppscan_runtime_lst_lst.append(ppscan_runtime_lst)
@@ -26,7 +28,7 @@ if __name__ == '__main__':
     eps_lst = [float(i + 1) / 10 for i in range(8)]
 
     exp2_figure, ax_tuple = plt.subplots(1, 2, sharex=True, figsize=(8, 3))
-    legend_lst = ['avg deg = 40', 'avg deg = 80', 'avg deg = 120', 'avg deg = 160']
+    legend_lst = ['avg deg = 40', 'avg deg = 60', 'avg deg = 80', 'avg deg = 100']
 
     ax = ax_tuple[0]
     shape_lst = ['o-', 's-', '^-', 'x-']
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     ax.legend(legend_lst)
     ax.set_ylim(0, max(map(max, ppscan_runtime_lst_lst)) * 1.1)
     ax.set_ylabel('Runtime (s)', fontsize=12)
-    ax.set_title('undirected edge number = 1 billion', fontsize=12)
+    ax.set_title('undirected edge number = 0.12 billion', fontsize=12)
     ax.set_xlabel('$\\epsilon = $')
     ax.xaxis.set_label_coords(0.00, -0.045)
     ax.grid(True)
@@ -47,12 +49,13 @@ if __name__ == '__main__':
     ax.legend(legend_lst)
     ax.set_ylim(0, max(map(max, ppscan_speedup_lst_lst)) * 1.1)
     ax.set_ylabel('Speedup over pSCAN', fontsize=12)
-    ax.set_title('undirected edge number = 1 billion', fontsize=12)
+    ax.set_title('undirected edge number = 0.12 billion', fontsize=12)
     ax.set_xlabel('$\\epsilon = $')
     ax.xaxis.set_label_coords(0.00, -0.045)
     ax.grid(True)
 
+
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('scalability_roll_graph.' + 'pdf', dpi=1200)
+    plt.savefig('scalability_lfr_graph.' + 'pdf', dpi=1200)
     exp2_figure.show()
