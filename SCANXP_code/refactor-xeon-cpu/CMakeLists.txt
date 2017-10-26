@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.6)
 project(refactor_xeon_cpu)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -15,4 +15,4 @@ endif ()
 set(SOURCE_FILES scanxp.cpp scanxp.h unionfind.h graph.cpp graph.h)
 
 add_executable(scan-xp-cpu ${SOURCE_FILES})
-target_compile_options(scan-xp-cpu PRIVATE -mavx2 -O3 -march=native)
+target_compile_options(scan-xp-cpu PRIVATE -march=core-avx2 -O3)
