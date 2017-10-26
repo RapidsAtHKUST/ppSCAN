@@ -1,6 +1,10 @@
 #include "Graph.h"
 
+#if defined(__INTEL_COMPILER)
+#include <malloc.h>
+#else
 #include <mm_malloc.h>
+#endif // defined(__GNUC__)
 #include <cassert>
 #include <cmath>
 

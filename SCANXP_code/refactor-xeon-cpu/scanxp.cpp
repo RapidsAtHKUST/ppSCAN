@@ -25,9 +25,8 @@ int main(int argc, char *argv[]) {
 
     NUMT = atoi(argv[4]);
 
-
     GRAPH g(argv[1]);
-    cout << "graph_name" << argv[1] << endl;
+    cout << "graph dir" << argv[1] << endl;
 
     UnionFind uf(g.nodemax);
 
@@ -79,7 +78,6 @@ int main(int argc, char *argv[]) {
 
                 } while (!__sync_bool_compare_and_swap(&(uf.data[rx]), rx, ry));
             }
-
         }
     }
 
@@ -122,7 +120,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
 //    ofstream ofs_result("result.txt", ios::app);
 //    for (int i = 0; i < g.nodemax; i++) {
 //        if (g.label[i] == CMEMBER) {
@@ -145,9 +142,9 @@ int main(int argc, char *argv[]) {
 
 /*
 Step1 'core_detection' detects all core nodes in graph.
-Firstly, this method calclates set intersection of all edges.
-Next, this method calclates stractural similarity based on result of set intersection.
-Finaly, this method determines whether all nodes are core or not.
+Firstly, this method calculates set intersection of all edges.
+Next, this method calculates structural similarity based on result of set intersection.
+Finally, this method determines whether all nodes are core or not.
 */
 inline void core_detection(GRAPH *g) {
     int countplus[PARA] = {1, 1, 1, 1, 1, 1, 1, 1};
@@ -180,7 +177,6 @@ inline void core_detection(GRAPH *g) {
         size1 = (t2 - t) / (j2 - j);
 
         if (size1 > 2) {
-
             __m256i jnode = _mm256_set1_epi32(g->edge[j]);
             __m256i tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
             __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));
@@ -240,9 +236,7 @@ inline void core_detection(GRAPH *g) {
             int jsize = ((j2 - j) / 2) * 2 + j;
             int tsize = ((t2 - t) / 4) * 4 + t;
 
-
             __m256i jnode, tnode;
-
 
             jnode = _mm256_loadu_si256((__m256i *) (g->edge + j));
             tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
@@ -286,7 +280,6 @@ inline void core_detection(GRAPH *g) {
             }
 
             while (j < j2 && t < t2) {
-
                 if (g->edge[j] == g->edge[t]) {
                     g->common_node[i]++;
                     j++;
@@ -319,7 +312,6 @@ inline void core_detection(GRAPH *g) {
         } else {
             g->similarity[i] = false;
         }
-
     }
 
 
