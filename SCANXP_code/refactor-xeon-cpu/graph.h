@@ -9,19 +9,19 @@
 
 using namespace std;
 
-struct GRAPH {
+struct Graph {
     int nodemax;
     int edgemax;
 
     // csr representation
-    int *node;
-    int *edge;
+    int *node_off;
+    int *edge_dst;
 
-    // edge property
-    int *edgef;
+    // edge_dst property
+    int *edge_src;
     bool *similarity;
-    int *common_node;
-    double *ss;
+    int *common_node_num;
+    double *sim_values;
 
     // vertex property
     bool *core;
@@ -32,7 +32,7 @@ struct GRAPH {
     vector<int> degree;
     string dir;
 
-    explicit GRAPH(char *dir_cstr);
+    explicit Graph(char *dir_cstr);
 
     void ReadDegree();
 

@@ -1,5 +1,5 @@
 /*
-Xeon (AVX2)
+Xeon (AVX2) by http://www.kde.cs.tsukuba.ac.jp/~shihakata
 */
 
 #include "scanxp.h"
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 
     NUMT = atoi(argv[4]);
 
-    GRAPH g(argv[1]);
+    Graph g(argv[1]);
     cout << "graph dir" << argv[1] << endl;
 
     UnionFind uf(g.nodemax);
@@ -35,9 +35,9 @@ int main(int argc, char *argv[]) {
         g.core_count[i] = 0;
         g.label[i] = UNCLASSIFIED;
         g.core[i] = false;
-        for (int n = g.node[i]; n < g.node[i + 1]; n++) {
-            g.edgef[n] = i;
-            g.common_node[n] = 2;
+        for (int n = g.node_off[i]; n < g.node_off[i + 1]; n++) {
+            g.edge_src[n] = i;
+            g.common_node_num[n] = 2;
         }
     }
 
@@ -61,13 +61,13 @@ int main(int argc, char *argv[]) {
         int rx, ry, index;
         if (g.core[i]) {
             g.label[i] = CMEMBER;
-            for (int n = g.node[i]; n < g.node[i + 1]; n++) {
+            for (int n = g.node_off[i]; n < g.node_off[i + 1]; n++) {
                 if (!g.similarity[n])continue;
-                g.label[g.edge[n]] = CMEMBER;
+                g.label[g.edge_dst[n]] = CMEMBER;
 
                 do {
                     rx = uf.root(i);
-                    ry = uf.root(g.edge[n]);
+                    ry = uf.root(g.edge_dst[n]);
                     if (rx < ry) {
                         index = rx;
                         rx = ry;
@@ -146,7 +146,7 @@ Firstly, this method calculates set intersection of all edges.
 Next, this method calculates structural similarity based on result of set intersection.
 Finally, this method determines whether all nodes are core or not.
 */
-inline void core_detection(GRAPH *g) {
+inline void core_detection(Graph *g) {
     int countplus[PARA] = {1, 1, 1, 1, 1, 1, 1, 1};
     __m256i ssecountplus = _mm256_load_si256((__m256i *) (countplus));
     __m256i sj = _mm256_set_epi32(1, 1, 1, 1, 0, 0, 0, 0);
@@ -160,118 +160,105 @@ inline void core_detection(GRAPH *g) {
         __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));
         int j, t, j2, t2;
 
-        if (g->node[g->edgef[i] + 1] - g->node[g->edgef[i]] <
-            g->node[g->edge[i] + 1] - g->node[g->edge[i]]) {
-            j = g->node[g->edgef[i]];
-            t = g->node[g->edge[i]];
-            j2 = g->node[g->edgef[i] + 1];
-            t2 = g->node[g->edge[i] + 1];
+        if (g->node_off[g->edge_src[i] + 1] - g->node_off[g->edge_src[i]] <
+            g->node_off[g->edge_dst[i] + 1] - g->node_off[g->edge_dst[i]]) {
+            j = g->node_off[g->edge_src[i]];
+            t = g->node_off[g->edge_dst[i]];
+            j2 = g->node_off[g->edge_src[i] + 1];
+            t2 = g->node_off[g->edge_dst[i] + 1];
         } else {
-            t = g->node[g->edgef[i]];
-            j = g->node[g->edge[i]];
-            t2 = g->node[g->edgef[i] + 1];
-            j2 = g->node[g->edge[i] + 1];
+            t = g->node_off[g->edge_src[i]];
+            j = g->node_off[g->edge_dst[i]];
+            t2 = g->node_off[g->edge_src[i] + 1];
+            j2 = g->node_off[g->edge_dst[i] + 1];
         }
 
-        int size1;
-        size1 = (t2 - t) / (j2 - j);
+        int size_ratio;
+        size_ratio = (t2 - t) / (j2 - j);
 
-        if (size1 > 2) {
-            __m256i jnode = _mm256_set1_epi32(g->edge[j]);
-            __m256i tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
+        if (size_ratio > 2) {
+            __m256i jnode = _mm256_set1_epi32(g->edge_dst[j]);
+            __m256i tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
             __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));
 
             int vsize = ((t2 - t) / PARA) * PARA;
             int to = t;
 
             while (j < j2 && t < to + vsize) {
-
                 __m256i mask = _mm256_cmpeq_epi32(jnode, tnode);
                 mask = _mm256_and_si256(ssecountplus, mask);
                 ssecnv = _mm256_add_epi32(ssecnv, mask);
 
-
-                if (g->edge[j] > g->edge[t + 7]) {
+                if (g->edge_dst[j] > g->edge_dst[t + 7]) {
                     t += PARA;
-                    tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
-
-
+                    tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
                 } else {
                     j++;
-                    jnode = _mm256_set1_epi32(g->edge[j]);
+                    jnode = _mm256_set1_epi32(g->edge_dst[j]);
                 }
-
-
             }
             _mm256_store_si256((__m256i *) cnv, ssecnv);
 
             for (int cnvplus : cnv) {
-                g->common_node[i] += cnvplus;
+                g->common_node_num[i] += cnvplus;
             }
 
             t = (to + vsize);
 
             while (j < j2 && t < t2) {
-
-                if (g->edge[j] == g->edge[t]) {
-                    g->common_node[i]++;
+                if (g->edge_dst[j] == g->edge_dst[t]) {
+                    g->common_node_num[i]++;
                     j++;
                     t++;
-                } else if (g->edge[j] > g->edge[t]) {
+                } else if (g->edge_dst[j] > g->edge_dst[t]) {
                     t++;
                 } else {
                     j++;
                 }
             }
-
-
         } else {
-
             if (t2 - t < j2 - j) {
-                j = g->node[g->edge[i]];
-                t = g->node[g->edgef[i]];
-                j2 = g->node[g->edge[i] + 1];
-                t2 = g->node[g->edgef[i] + 1];
+                j = g->node_off[g->edge_dst[i]];
+                t = g->node_off[g->edge_src[i]];
+                j2 = g->node_off[g->edge_dst[i] + 1];
+                t2 = g->node_off[g->edge_src[i] + 1];
             }
             int jsize = ((j2 - j) / 2) * 2 + j;
             int tsize = ((t2 - t) / 4) * 4 + t;
 
             __m256i jnode, tnode;
 
-            jnode = _mm256_loadu_si256((__m256i *) (g->edge + j));
-            tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
+            jnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + j));
+            tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
 
-            __mmask16 mask;
             while (j < jsize && t < tsize) {
-
                 __m256i jnodeA = _mm256_permutevar8x32_epi32(jnode, sj);
                 __m256i tnodeA = _mm256_permutevar8x32_epi32(tnode, st);
                 __m256i mask = _mm256_cmpeq_epi32(jnodeA, tnodeA);
                 mask = _mm256_and_si256(ssecountplus, mask);
                 ssecnv = _mm256_add_epi32(ssecnv, mask);
 
-                if (g->edge[j + 1] == g->edge[t + 3]) {
+                if (g->edge_dst[j + 1] == g->edge_dst[t + 3]) {
                     j += 2;
                     t += 4;
-                    jnode = _mm256_loadu_si256((__m256i *) (g->edge + j));
-                    tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
-                } else if (g->edge[j + 1] > g->edge[t + 3]) {
+                    jnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + j));
+                    tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
+                } else if (g->edge_dst[j + 1] > g->edge_dst[t + 3]) {
                     t += 4;
 
-                    tnode = _mm256_loadu_si256((__m256i *) (g->edge + t));
-                    tnodeA = _mm256_permutevar8x32_epi32(tnode, st);
+                    tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
+                    _mm256_permutevar8x32_epi32(tnode, st);
                 } else {
                     j += 2;
-                    jnode = _mm256_loadu_si256((__m256i *) (g->edge + j));
+                    jnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + j));
                 }
             }
 
             _mm256_store_si256((__m256i *) cnv, ssecnv);
 
             for (int cnvplus : cnv) {
-                g->common_node[i] += cnvplus;
+                g->common_node_num[i] += cnvplus;
             }
-
 
             if (j >= jsize) {
                 j = jsize;
@@ -280,34 +267,32 @@ inline void core_detection(GRAPH *g) {
             }
 
             while (j < j2 && t < t2) {
-                if (g->edge[j] == g->edge[t]) {
-                    g->common_node[i]++;
+                if (g->edge_dst[j] == g->edge_dst[t]) {
+                    g->common_node_num[i]++;
                     j++;
                     t++;
-                } else if (g->edge[j] > g->edge[t]) {
+                } else if (g->edge_dst[j] > g->edge_dst[t]) {
                     t++;
 
                 } else {
                     j++;
-
                 }
             }
         }
-
-    }
-
-
-#pragma omp parallel for num_threads(NUMT)
-    for (int i = 0; i < g->edgemax; i++) {
-        g->ss[i] = g->common_node[i] / sqrt(((g->node[g->edgef[i] + 1] - g->node[g->edgef[i]]) + 1) *
-                                            ((g->node[(g->edge[i] + 1)] - g->node[g->edge[i]]) + 1));
     }
 
 #pragma omp parallel for num_threads(NUMT)
     for (int i = 0; i < g->edgemax; i++) {
+        g->sim_values[i] =
+                g->common_node_num[i] / sqrt(((g->node_off[g->edge_src[i] + 1] - g->node_off[g->edge_src[i]]) + 1) *
+                                             ((g->node_off[(g->edge_dst[i] + 1)] - g->node_off[g->edge_dst[i]]) + 1));
+    }
 
-        if (g->ss[i] >= EPSILON) {
-            g->core_count[g->edgef[i]]++;
+#pragma omp parallel for num_threads(NUMT)
+    for (int i = 0; i < g->edgemax; i++) {
+
+        if (g->sim_values[i] >= EPSILON) {
+            g->core_count[g->edge_src[i]]++;
             g->similarity[i] = true;
         } else {
             g->similarity[i] = false;
@@ -321,15 +306,13 @@ inline void core_detection(GRAPH *g) {
     }
 }
 
-inline bool hub_check_uf(GRAPH *g, UnionFind *uf, int a) {
-    int counter = 0;
+inline bool hub_check_uf(Graph *g, UnionFind *uf, int a) {
     set<int> c;
     bool q;
 
-    for (int i = g->node[a]; i < g->node[a + 1]; i++) {
-
-        if (g->label[g->edge[i]] != CMEMBER)continue;
-        c.insert((*uf).root(g->edge[i]));
+    for (int i = g->node_off[a]; i < g->node_off[a + 1]; i++) {
+        if (g->label[g->edge_dst[i]] != CMEMBER)continue;
+        c.insert((*uf).root(g->edge_dst[i]));
     }
 
     q = c.size() >= 2;

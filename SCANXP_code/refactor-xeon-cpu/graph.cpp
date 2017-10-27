@@ -1,11 +1,12 @@
 #include"graph.h"
+
 #include <chrono>
 
 #define UNCLASSIFIED 0
 
 using namespace chrono;
 
-GRAPH::GRAPH(char *dir_cstr) {
+Graph::Graph(char *dir_cstr) {
     dir = string(dir_cstr);
 
     ReadDegree();
@@ -17,14 +18,14 @@ GRAPH::GRAPH(char *dir_cstr) {
     core = new bool[nodemax];
     core_count = new int[nodemax];
 
-    // edge property
-    edgef = new int[edgemax];
-    common_node = new int[edgemax];
-    ss = new double[edgemax];
+    // edge_dst property
+    edge_src = new int[edgemax];
+    common_node_num = new int[edgemax];
+    sim_values = new double[edgemax];
     similarity = new bool[edgemax];
 }
 
-void GRAPH::ReadDegree() {
+void Graph::ReadDegree() {
     auto start = high_resolution_clock::now();
 
     ifstream deg_file(dir + string("/b_degree.bin"), ios::binary);
@@ -43,19 +44,19 @@ void GRAPH::ReadDegree() {
     cout << "read degree file time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 }
 
-void GRAPH::ReadAdjacencyList() {
+void Graph::ReadAdjacencyList() {
     auto start = high_resolution_clock::now();
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
 
     // csr representation
-    node = new int[nodemax + 1];
-    edge = new int[edgemax];
+    node_off = new int[nodemax + 1];
+    edge_dst = new int[edgemax];
 
-    node[0] = 0;
-    for (auto i = 0; i < nodemax; i++) { node[i + 1] = node[i] + degree[i]; }
+    node_off[0] = 0;
+    for (auto i = 0; i < nodemax; i++) { node_off[i + 1] = node_off[i] + degree[i]; }
     for (auto i = 0; i < nodemax; i++) {
         if (degree[i] > 0) {
-            adj_file.read(reinterpret_cast<char *>(&edge[node[i]]), degree[i] * sizeof(int));
+            adj_file.read(reinterpret_cast<char *>(&edge_dst[node_off[i]]), degree[i] * sizeof(int));
         }
         // inclusive
         degree[i]++;
@@ -65,16 +66,16 @@ void GRAPH::ReadAdjacencyList() {
     cout << "read adjacency list file time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
 }
 
-void GRAPH::CheckInputGraph() {
+void Graph::CheckInputGraph() {
     auto start = high_resolution_clock::now();
 
     for (auto i = 0; i < nodemax; i++) {
-        for (auto j = node[i]; j < node[i + 1]; j++) {
-            if (edge[j] == i) {
+        for (auto j = node_off[i]; j < node_off[i + 1]; j++) {
+            if (edge_dst[j] == i) {
                 cout << "Self loop\n";
                 exit(1);
             }
-            if (j > node[i] && edge[j] <= edge[j - 1]) {
+            if (j > node_off[i] && edge_dst[j] <= edge_dst[j - 1]) {
                 cout << "Edges not sorted in increasing id order!\nThe program may not run properly!\n";
                 exit(1);
             }

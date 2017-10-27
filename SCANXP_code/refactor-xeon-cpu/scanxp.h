@@ -18,19 +18,17 @@
 #include <omp.h> //OpenMP
 
 #define UNCLASSIFIED 0
-#define NONMEMBER -1
 #define CMEMBER 1 //Member of cluster
 #define HUB 2
-#define OUTLIER 3
 
 #define PARA 8
 
 #define EPSILON 0.1 //\epsilon
 #define MYU 2 //\mu
 
-inline void core_detection(GRAPH *g);
+inline void core_detection(Graph *g);
 
-inline bool hub_check_uf(GRAPH *g, UnionFind *uf, int a);
+inline bool hub_check_uf(Graph *g, UnionFind *uf, int a);
 
 static int NUMT;
 

@@ -15,4 +15,4 @@ endif ()
 set(SOURCE_FILES scanxp.cpp scanxp.h unionfind.h graph.cpp graph.h)
 
 add_executable(scan-xp-cpu ${SOURCE_FILES})
-target_compile_options(scan-xp-cpu PRIVATE -march=core-avx2 -O3)
+target_compile_options(scan-xp-cpu PRIVATE -march=core-avx2 -O3 -g)
