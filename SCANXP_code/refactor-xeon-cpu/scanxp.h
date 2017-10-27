@@ -14,16 +14,16 @@
 
 #include"graph.h"
 #include"unionfind.h"
-
-#define UNCLASSIFIED 0
-#define CORE 1 //Member of cluster
-#define HUB 2
+//#include "ThreadSafeDisjointSet.h"
 
 #define PARA 8
 
 inline void core_detection(Graph *g);
 
 inline bool hub_check_uf(Graph *g, UnionFind *uf, int a);
+//inline bool hub_check_uf(Graph *g, DisjointSets *uf, int a);
+
+inline int compute_cn(Graph *g, int edge_idx);
 
 static int NUMT;
 

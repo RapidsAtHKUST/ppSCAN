@@ -1,6 +1,7 @@
 #include"graph.h"
 
 #include <chrono>
+#include <algorithm>
 
 #define UNCLASSIFIED 0
 
@@ -15,7 +16,7 @@ Graph::Graph(char *dir_cstr) {
 
     // vertex property
     label = new int[nodemax];
-    core = new bool[nodemax];
+//    core = new bool[nodemax];
     core_count = new int[nodemax];
 
     // edge_dst property
@@ -83,5 +84,36 @@ void Graph::CheckInputGraph() {
     }
     auto end = high_resolution_clock::now();
     cout << "check input graph file time:" << duration_cast<milliseconds>(end - start).count() << " ms\n";
+}
+
+void Graph::MarkClusterMinEleAsId(UnionFind *union_find_ptr) {
+    cluster_dict = vector<int>(nodemax);
+    std::fill(cluster_dict.begin(), cluster_dict.end(), nodemax);
+
+    for (auto i = 0u; i < nodemax; i++) {
+        if (label[i] == CORE) {
+            int x = union_find_ptr->root(i);
+            if (i < cluster_dict[x]) { cluster_dict[x] = i; }
+        }
+    }
+}
+
+void Graph::Output(const char *eps_s, const char *min_u, UnionFind *union_find_ptr) {
+    string out_name = dir + "/scanxp-result-" + string(eps_s) + "-" + string(min_u) + ".txt";
+    ofstream ofs(out_name);
+    ofs << "c/n vertex_id cluster_id\n";
+
+    // observation 2: unique belonging
+    for (auto i = 0; i < nodemax; i++) {
+        if (label[i] == CORE) {
+            ofs << "c " << i << " " << cluster_dict[union_find_ptr->root(i)] << "\n";
+        }
+    }
+
+    // possibly multiple belongings
+    sort(noncore_cluster.begin(), noncore_cluster.end());
+    auto iter_end = unique(noncore_cluster.begin(), noncore_cluster.end());
+    for_each(noncore_cluster.begin(), iter_end,
+             [&ofs](pair<int, int> my_pair) { ofs << "n " << my_pair.second << " " << my_pair.first << "\n"; });
 }
 

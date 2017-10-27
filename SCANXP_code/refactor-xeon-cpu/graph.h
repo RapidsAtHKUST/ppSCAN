@@ -6,8 +6,13 @@
 #include<string>
 #include<vector>
 #include<sstream>
+#include "unionfind.h"
 
 using namespace std;
+
+#define UNCLASSIFIED 0
+#define CORE 1 //Member of cluster
+#define HUB 2
 
 struct Graph {
     int nodemax;
@@ -24,12 +29,19 @@ struct Graph {
     double *sim_values;
 
     // vertex property
-    bool *core;
+//    bool *core;
     int *core_count;
     int *label;
 
     // other
     vector<int> degree;
+
+    // clusters: core and non-core(hubs)
+    vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
+
+    // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
+    vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
+
     string dir;
 
     explicit Graph(char *dir_cstr);
@@ -39,4 +51,8 @@ struct Graph {
     void CheckInputGraph();
 
     void ReadAdjacencyList();
+
+    void MarkClusterMinEleAsId(UnionFind *union_find_ptr);
+
+    void Output(const char *eps_s, const char *min_u, UnionFind *union_find_ptr);
 };
