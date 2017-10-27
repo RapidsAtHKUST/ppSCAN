@@ -1,0 +1,1 @@
+icpc -std=c++11 -o scan-xp -march=core-avx2 -O3 graph.cpp scanxp.cpp -qopenmp
