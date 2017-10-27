@@ -3,12 +3,17 @@ Xeon (AVX2) by http://www.kde.cs.tsukuba.ac.jp/~shihakata
 */
 
 #include "scanxp.h"
+
 #include <chrono>
+#include <atomic>
 
 void Usage() {
     cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold "
             "[4]density-threshold [5 thread_num] [6 optional]output\n";
 }
+
+static double EPSILON;
+static int MY_U;
 
 int main(int argc, char *argv[]) {
     using namespace chrono;
@@ -23,13 +28,16 @@ int main(int argc, char *argv[]) {
     int hub_num = 0;
     int out_num = 0;
 
-    NUMT = atoi(argv[4]);
-
-    Graph g(argv[1]);
+    // parse parameters
     cout << "graph dir" << argv[1] << endl;
+    Graph g(argv[1]);
+    EPSILON = strtod(argv[2], nullptr);
+    MY_U = atoi(argv[3]);
+    NUMT = atoi(argv[4]);
 
     UnionFind uf(g.nodemax);
 
+    // pre-processing
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 100000)
     for (int i = 0; i < g.nodemax; i++) {
         g.core_count[i] = 0;
@@ -57,14 +65,15 @@ int main(int argc, char *argv[]) {
     double s2 = omp_get_wtime();
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 2000)
     for (int i = 0; i < g.nodemax; i++) {
-
         int rx, ry, index;
         if (g.core[i]) {
-            g.label[i] = CMEMBER;
+            g.label[i] = CORE;
             for (int n = g.node_off[i]; n < g.node_off[i + 1]; n++) {
                 if (!g.similarity[n])continue;
-                g.label[g.edge_dst[n]] = CMEMBER;
+                // yche: fix bug, only union when g.edge_dst[n] is a core vertex
+                if (!g.core[g.edge_dst[n]])continue;
 
+                g.label[g.edge_dst[n]] = CORE;
                 do {
                     rx = uf.root(i);
                     ry = uf.root(g.edge_dst[n]);
@@ -80,36 +89,33 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-
-
     double e2 = omp_get_wtime();
-    cout << "STEP3" << endl;
-
-    double s3 = omp_get_wtime();
 
     //STEP3 Hub Outlier detection
+    cout << "STEP3" << endl;
+    double s3 = omp_get_wtime();
+    atomic_int core_num(0);
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 1000)
     for (int i = 0; i < g.nodemax; i++) {
-
-        if (g.label[i] == CMEMBER)continue;
+        if (g.label[i] == CORE) {
+            core_num++;
+            continue;
+        }
 
         if (hub_check_uf(&g, &uf, i)) {
             g.label[i] = HUB;
         }
     }
-
     double e3 = omp_get_wtime();
 
-    //Result output
+    // post-processing
     set<int> c;
     for (int i = 0; i < g.nodemax; i++) {
-        if (g.label[i] == CMEMBER) {
-            c.insert(uf.root(i));
-
+        if (g.label[i] == CORE) {
+            c.emplace(uf.root(i));
         }
     }
-
-    cluster_num = c.size();
+    cluster_num = static_cast<int>(c.size());
 
 #pragma omp parallel for num_threads(NUMT) reduction(+:hub_num, out_num)
     for (int i = 0; i < g.nodemax; i++) {
@@ -120,24 +126,16 @@ int main(int argc, char *argv[]) {
         }
     }
 
-//    ofstream ofs_result("result.txt", ios::app);
-//    for (int i = 0; i < g.nodemax; i++) {
-//        if (g.label[i] == CMEMBER) {
-//            ofs_result << i << "\t" << uf.root(i) << endl;
-//        } else {
-//            ofs_result << i << endl;
-//        }
-//    }
-
-    cout << "Detect_cluster: " << cluster_num << endl;
-    cout << "Hub: " << hub_num << endl;
-    cout << "Outlier: " << out_num << endl;
-    cout << "STEP1_core_detection:" << (double) (e1 - s1) << endl;
-    cout << "STEP2_cluster_construction:" << (double) (e2 - s2) << endl;
-    cout << "STEP3_hub_and_outlier_detection:" << (double) (e3 - s3) << endl;
     cout << "Number_of_threads" << NUMT << endl;
     cout << g.nodemax << endl;
     cout << g.edgemax << endl;
+    cout << "Detect_cluster: " << cluster_num << endl;
+    cout << "Core:" << core_num << endl;
+    cout << "Hub: " << hub_num << endl;
+    cout << "Outlier: " << out_num << endl;
+    cout << "STEP1, core_detection:" << e1 - s1 << endl;
+    cout << "STEP2, cluster_construction:" << e2 - s2 << endl;
+    cout << "STEP3, hub_and_outlier_detection:" << e3 - s3 << endl;
 }
 
 /*
@@ -148,16 +146,15 @@ Finally, this method determines whether all nodes are core or not.
 */
 inline void core_detection(Graph *g) {
     int countplus[PARA] = {1, 1, 1, 1, 1, 1, 1, 1};
-    __m256i ssecountplus = _mm256_load_si256((__m256i *) (countplus));
+    __m256i sse_countplus = _mm256_load_si256((__m256i *) (countplus));
     __m256i sj = _mm256_set_epi32(1, 1, 1, 1, 0, 0, 0, 0);
     __m256i st = _mm256_set_epi32(3, 2, 1, 0, 3, 2, 1, 0);
 
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 6000)
     for (int i = 0; i < g->edgemax; i++) {
         int cnv[PARA] = {0, 0, 0, 0, 0, 0, 0, 0};
-        int to, jo;
 
-        __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));
+        __m256i sse_cnv = _mm256_load_si256((__m256i *) (cnv));
         int j, t, j2, t2;
 
         if (g->node_off[g->edge_src[i] + 1] - g->node_off[g->edge_src[i]] <
@@ -186,7 +183,7 @@ inline void core_detection(Graph *g) {
 
             while (j < j2 && t < to + vsize) {
                 __m256i mask = _mm256_cmpeq_epi32(jnode, tnode);
-                mask = _mm256_and_si256(ssecountplus, mask);
+                mask = _mm256_and_si256(sse_countplus, mask);
                 ssecnv = _mm256_add_epi32(ssecnv, mask);
 
                 if (g->edge_dst[j] > g->edge_dst[t + 7]) {
@@ -235,8 +232,8 @@ inline void core_detection(Graph *g) {
                 __m256i jnodeA = _mm256_permutevar8x32_epi32(jnode, sj);
                 __m256i tnodeA = _mm256_permutevar8x32_epi32(tnode, st);
                 __m256i mask = _mm256_cmpeq_epi32(jnodeA, tnodeA);
-                mask = _mm256_and_si256(ssecountplus, mask);
-                ssecnv = _mm256_add_epi32(ssecnv, mask);
+                mask = _mm256_and_si256(sse_countplus, mask);
+                sse_cnv = _mm256_add_epi32(sse_cnv, mask);
 
                 if (g->edge_dst[j + 1] == g->edge_dst[t + 3]) {
                     j += 2;
@@ -254,7 +251,7 @@ inline void core_detection(Graph *g) {
                 }
             }
 
-            _mm256_store_si256((__m256i *) cnv, ssecnv);
+            _mm256_store_si256((__m256i *) cnv, sse_cnv);
 
             for (int cnvplus : cnv) {
                 g->common_node_num[i] += cnvplus;
@@ -290,7 +287,6 @@ inline void core_detection(Graph *g) {
 
 #pragma omp parallel for num_threads(NUMT)
     for (int i = 0; i < g->edgemax; i++) {
-
         if (g->sim_values[i] >= EPSILON) {
             g->core_count[g->edge_src[i]]++;
             g->similarity[i] = true;
@@ -299,23 +295,18 @@ inline void core_detection(Graph *g) {
         }
     }
 
-
 #pragma omp parallel for num_threads(NUMT)
     for (int i = 0; i < g->nodemax; i++) {
-        g->core[i] = g->core_count[i] >= MYU;
+        g->core[i] = g->core_count[i] >= MY_U;
     }
 }
 
 inline bool hub_check_uf(Graph *g, UnionFind *uf, int a) {
     set<int> c;
-    bool q;
 
     for (int i = g->node_off[a]; i < g->node_off[a + 1]; i++) {
-        if (g->label[g->edge_dst[i]] != CMEMBER)continue;
+        if (g->label[g->edge_dst[i]] != CORE)continue;
         c.insert((*uf).root(g->edge_dst[i]));
     }
-
-    q = c.size() >= 2;
-
-    return q;
+    return c.size() >= 2;
 }
