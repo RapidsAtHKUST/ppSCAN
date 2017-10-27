@@ -20,9 +20,10 @@
 inline void core_detection(Graph *g);
 
 inline bool hub_check_uf(Graph *g, UnionFind *uf, int a);
-//inline bool hub_check_uf(Graph *g, DisjointSets *uf, int a);
 
+#ifdef NAIVE
 inline int compute_cn(Graph *g, int edge_idx);
+#endif
 
 static int NUMT;
 

@@ -5,7 +5,6 @@ Xeon (AVX2) by http://www.kde.cs.tsukuba.ac.jp/~shihakata
 #include "scanxp.h"
 
 #include <chrono>
-#include <algorithm>
 
 void Usage() {
     cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold "
@@ -35,7 +34,6 @@ int main(int argc, char *argv[]) {
     MY_U = atoi(argv[3]);
     NUMT = atoi(argv[4]);
 
-//    DisjointSets uf(g.nodemax);
     UnionFind uf(g.nodemax);
 
     // pre-processing
@@ -76,7 +74,6 @@ int main(int argc, char *argv[]) {
                     }
                     if (rx == ry)break;
                 } while (!__sync_bool_compare_and_swap(&(uf.parent[rx]), rx, ry));
-//                uf.Union(i, g.edge_dst[n]);
             }
         }
     }
@@ -106,7 +103,6 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < g.nodemax; i++) {
         if (g.label[i] == CORE) {
             c.emplace(uf.root(i));
-//            c.emplace(uf.FindRoot(i));
         }
     }
     cluster_num = static_cast<int>(c.size());
@@ -151,6 +147,7 @@ Next, this method calculates structural similarity based on result of set inters
 Finally, this method determines whether all nodes are core or not.
 */
 
+#ifdef NAIVE
 inline int compute_cn(Graph *g, int edge_idx) {
     auto u = g->edge_src[edge_idx];
     auto v = g->edge_dst[edge_idx];
@@ -182,6 +179,7 @@ inline int compute_cn(Graph *g, int edge_idx) {
         }
     }
 }
+#endif
 
 inline void core_detection(Graph *g) {
     int countplus[PARA] = {1, 1, 1, 1, 1, 1, 1, 1};
@@ -191,7 +189,9 @@ inline void core_detection(Graph *g) {
 
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 6000)
     for (int i = 0; i < g->edgemax; i++) {
-//        g->common_node_num[i] += compute_cn(g, i);
+#ifdef NAIVE
+        g->common_node_num[i] += compute_cn(g, i);
+#else
         int cnv[PARA] = {0, 0, 0, 0, 0, 0, 0, 0};
 
         __m256i sse_cnv = _mm256_load_si256((__m256i *) (cnv));
@@ -316,6 +316,7 @@ inline void core_detection(Graph *g) {
                 }
             }
         }
+#endif
     }
 
 #pragma omp parallel for num_threads(NUMT)
@@ -352,13 +353,3 @@ inline bool hub_check_uf(Graph *g, UnionFind *uf, int a) {
     }
     return c.size() >= 2;
 }
-
-//inline bool hub_check_uf(Graph *g, DisjointSets *uf, int a) {
-//    set<int> c;
-//
-//    for (int i = g->node_off[a]; i < g->node_off[a + 1]; i++) {
-//        if (g->label[g->edge_dst[i]] != CORE)continue;
-//        c.insert((*uf).FindRoot(g->edge_dst[i]));
-//    }
-//    return c.size() >= 2;
-//}

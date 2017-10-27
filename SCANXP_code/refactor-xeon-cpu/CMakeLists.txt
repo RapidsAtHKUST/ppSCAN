@@ -16,3 +16,8 @@ set(SOURCE_FILES scanxp.cpp scanxp.h unionfind.h graph.cpp graph.h)
 
 add_executable(scan-xp-cpu ${SOURCE_FILES})
 target_compile_options(scan-xp-cpu PRIVATE -march=core-avx2 -O3 -g)
+
+
+add_executable(scan-xp-naive ${SOURCE_FILES})
+target_compile_options(scan-xp-naive PRIVATE -march=core-avx2 -O3 -g)
+target_compile_definitions(scan-xp-naive PRIVATE NAIVE=1)
