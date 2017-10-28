@@ -97,8 +97,6 @@ int main(int argc, char *argv[]) {
     double e3 = omp_get_wtime();
 
     // post-processing
-    g.MarkClusterMinEleAsId(&uf);
-
     set<int> c;
     for (int i = 0; i < g.nodemax; i++) {
         if (g.label[i] == CORE) {
@@ -125,6 +123,8 @@ int main(int argc, char *argv[]) {
     cout << "STEP3, hub_and_outlier_detection:" << e3 - s3 << endl;
 
     // prepare output
+    auto start = high_resolution_clock::now();
+    g.MarkClusterMinEleAsId(&uf);
     for (auto i = 0; i < g.nodemax; i++) {
         if (g.label[i] == CORE) {
             for (auto j = g.node_off[i]; j < g.node_off[i + 1]; j++) {
@@ -135,17 +135,11 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    cout << "prepare finish" << endl;
+    auto end = high_resolution_clock::now();
+    cout << "STEP4, prepare results: " << duration_cast<milliseconds>(end - start).count() << " ms\n";
 
     g.Output(argv[2], argv[3], &uf);
 }
-
-/*
-Step1 'core_detection' detects all core nodes in graph.
-Firstly, this method calculates set intersection of all edges.
-Next, this method calculates structural similarity based on result of set intersection.
-Finally, this method determines whether all nodes are core or not.
-*/
 
 #ifdef NAIVE
 inline int compute_cn(Graph *g, int edge_idx) {

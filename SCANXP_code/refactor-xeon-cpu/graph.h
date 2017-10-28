@@ -29,7 +29,6 @@ struct Graph {
     double *sim_values;
 
     // vertex property
-//    bool *core;
     int *core_count;
     int *label;
 
