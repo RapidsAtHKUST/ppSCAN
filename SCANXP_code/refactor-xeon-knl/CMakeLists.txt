@@ -16,12 +16,12 @@ set(SOURCE_FILES scanxp.cpp scanxp.h unionfind.h graph.cpp graph.h)
 set(SOURCE_FILES2 scanxp_galloping.cpp scan_xp_galloping.h unionfind.h graph.cpp graph.h)
 
 add_executable(scan-xp-knl ${SOURCE_FILES})
-target_compile_options(scan-xp-knl PRIVATE -march=core-avx2 -O3 -g)
+target_compile_options(scan-xp-knl PRIVATE -march=native -O3 -g)
 
 
 add_executable(scan-xp-knl-naive ${SOURCE_FILES})
-target_compile_options(scan-xp-knl-naive PRIVATE -march=core-avx2 -O3 -g)
+target_compile_options(scan-xp-knl-naive PRIVATE -march=native -O3 -g)
 target_compile_definitions(scan-xp-knl-naive PRIVATE NAIVE=1)
 
 add_executable(scan-xp-knl-galloping ${SOURCE_FILES2})
-target_compile_options(scan-xp-knl-galloping PRIVATE -march=core-avx2 -O3 -g)
+target_compile_options(scan-xp-knl-galloping PRIVATE -march=native -O3 -g)

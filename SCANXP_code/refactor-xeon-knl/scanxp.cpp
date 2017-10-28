@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         Usage();
         return 0;
     }
-    cout << "****scan-xp on cpu: " << argv[1] << ", " << argv[2] << ", " << argv[3] << " *** \n";
+    cout << "****scan-xp on knl: " << argv[1] << ", " << argv[2] << ", " << argv[3] << " *** \n";
 
     // input:
     int cluster_num = 0;
