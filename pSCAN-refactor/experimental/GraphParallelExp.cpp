@@ -3,7 +3,9 @@
 #if defined(__INTEL_COMPILER)
 #include <malloc.h>
 #else
+
 #include <mm_malloc.h>
+
 #endif // defined(__GNUC__)
 
 #include <cassert>
@@ -94,7 +96,7 @@ int GraphParallelExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
     auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
 
     // correctness guaranteed by two pruning previously in computing min_cn
-    while (cn < min_cn_num) {
+    while (true) {
         while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
             --du;
             if (du < min_cn_num) { return NOT_SIMILAR; }
@@ -107,11 +109,13 @@ int GraphParallelExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
         }
         if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
             ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
             ++offset_nei_u;
             ++offset_nei_v;
         }
     }
-    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 #endif
 }
 
