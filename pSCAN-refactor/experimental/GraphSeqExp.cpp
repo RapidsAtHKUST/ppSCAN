@@ -91,7 +91,7 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
 
     auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
     // correctness guaranteed by two pruning previously in computing min_cn
-    while (cn < min_cn_num) {
+    while (true) {
         while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
 #ifdef STATISTICS
             ++all_cmp0;
@@ -133,18 +133,20 @@ int GraphSeqExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++tmp1;
 #endif
             ++cn;
+            if (cn >= min_cn_num) {
+#ifdef STATISTICS
+                int max_val = max(tmp0, tmp1);
+                int min_val = min(tmp0, tmp1);
+                int local_portion = min_val == 0 ? max_val : max_val / min_val;
+                portion = max(portion, local_portion);
+                single_max_cmp = max(single_max_cmp, tmp0 + tmp1);
+#endif
+                return SIMILAR;
+            }
             ++offset_nei_u;
             ++offset_nei_v;
         }
     }
-#ifdef STATISTICS
-    int max_val = max(tmp0, tmp1);
-    int min_val = min(tmp0, tmp1);
-    int local_portion = min_val == 0 ? max_val : max_val / min_val;
-    portion = max(portion, local_portion);
-    single_max_cmp = max(single_max_cmp, tmp0 + tmp1);
-#endif
-    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 #endif
 }
 
