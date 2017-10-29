@@ -13,6 +13,23 @@ void Usage() {
 static double EPSILON;
 static int MY_U;
 
+int BinarySearchForGallopingSearch(int *array, int offset_beg, int offset_end, int val) {
+    auto mid = static_cast<int>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    if (array[mid] == val) {
+        return mid;
+    }
+
+    if (array[mid] < val) {
+        return mid + 1 == offset_end ? mid : BinarySearchForGallopingSearch(array, mid + 1, offset_end, val);
+    }
+
+    if (mid == offset_beg) {
+        return offset_beg;
+    }
+
+    return BinarySearchForGallopingSearch(array, offset_beg, mid, val);
+}
+
 int GallopingSearch(int *array, int offset_beg, int offset_end, int val) {
     if (array[offset_end - 1] < val) {
         return offset_end;
@@ -41,7 +58,8 @@ int GallopingSearch(int *array, int offset_beg, int offset_end, int val) {
             return peek_idx;
         }
         if (array[peek_idx] > val) {
-            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+//            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+            return BinarySearchForGallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
         }
         jump_idx <<= 1;
     }

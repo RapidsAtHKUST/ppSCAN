@@ -30,7 +30,9 @@ inline bool hub_check_uf(Graph *g, UnionFind *uf, int a);
 
 inline int compute_cn(Graph *g, int edge_idx);
 
-int GallopingSearch(int *array, int offset_beg, int offset_end, int val);
+inline int BinarySearchForGallopingSearch(int *array, int offset_beg, int offset_end, int val);
+
+inline int GallopingSearch(int *array, int offset_beg, int offset_end, int val);
 
 static int NUMT;
 
