@@ -14,6 +14,7 @@ endif ()
 
 set(SOURCE_FILES scanxp.cpp scanxp.h unionfind.h graph.cpp graph.h)
 set(SOURCE_FILES2 scanxp_galloping.cpp scan_xp_galloping.h unionfind.h graph.cpp graph.h)
+set(SOURCE_FILES3 scan_xp_galloping_single_direction.cpp scan_xp_galloping_single_direction.h unionfind.h graph.cpp graph.h)
 
 add_executable(scan-xp-cpu ${SOURCE_FILES})
 target_compile_options(scan-xp-cpu PRIVATE -march=core-avx2 -O3 -g)
@@ -25,3 +26,6 @@ target_compile_definitions(scan-xp-naive PRIVATE NAIVE=1)
 
 add_executable(scan-xp-galloping ${SOURCE_FILES2})
 target_compile_options(scan-xp-galloping PRIVATE -march=core-avx2 -O3 -g)
+
+add_executable(scan-xp-galloping-single-dir ${SOURCE_FILES3})
+target_compile_options(scan-xp-galloping-single-dir PRIVATE -O3 -g)
