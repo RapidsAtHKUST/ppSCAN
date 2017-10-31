@@ -6,6 +6,7 @@ Xeon (AVX2) by http://www.kde.cs.tsukuba.ac.jp/~shihakata
 
 #include <chrono>
 
+
 void Usage() {
     cout << "Usage: [1]exe [2]graph-dir [3]similarity-threshold "
             "[4]density-threshold [5 thread_num] [6 optional]output\n";
@@ -13,58 +14,6 @@ void Usage() {
 
 static double EPSILON;
 static int MY_U;
-
-int BinarySearchForGallopingSearch(int *array, int offset_beg, int offset_end, int val) {
-    auto mid = static_cast<int>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
-    if (array[mid] == val) {
-        return mid;
-    }
-
-    if (array[mid] < val) {
-        return mid + 1 == offset_end ? mid : BinarySearchForGallopingSearch(array, mid + 1, offset_end, val);
-    }
-
-    if (mid == offset_beg) {
-        return offset_beg;
-    }
-
-    return BinarySearchForGallopingSearch(array, offset_beg, mid, val);
-}
-
-int GallopingSearch(int *array, int offset_beg, int offset_end, int val) {
-    if (array[offset_end - 1] < val) {
-        return offset_end;
-    }
-
-    // galloping
-    if (array[offset_beg] >= val) {
-        return offset_beg;
-    }
-    if (array[offset_beg + 1] >= val) {
-        return offset_beg + 1;
-    }
-    if (array[offset_beg + 2] >= val) {
-        return offset_beg + 2;
-    }
-
-    auto jump_idx = 4u;
-    bool is_working = true;
-    while (is_working) {
-        auto peek_idx = offset_beg + jump_idx;
-        if (peek_idx >= offset_end) {
-            peek_idx = offset_end - 1;
-            is_working = false;
-        }
-        if (array[peek_idx] == val) {
-            return peek_idx;
-        }
-        if (array[peek_idx] > val) {
-            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
-//            return BinarySearchForGallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
-        }
-        jump_idx <<= 1;
-    }
-}
 
 int main(int argc, char *argv[]) {
     using namespace chrono;
@@ -112,20 +61,11 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < g.nodemax; i++) {
         int rx, ry, index;
         if (g.label[i] == CORE) {
-            for (int n = g.node_off[i]; n < g.node_off[i + 1]; n++) {
-                // yche: fix bug, only union when g.edge_dst[n] is a core vertex
-                if (g.label[g.edge_dst[n]] != CORE)continue;
-                if (!g.similarity[n])continue;
-                do {
-                    rx = uf.root(i);
-                    ry = uf.root(g.edge_dst[n]);
-                    if (rx < ry) {
-                        index = rx;
-                        rx = ry;
-                        ry = index;
-                    }
-                    if (rx == ry)break;
-                } while (!__sync_bool_compare_and_swap(&(uf.parent[rx]), rx, ry));
+            for (auto edge_idx = g.node_off[i]; edge_idx < g.node_off[i + 1]; edge_idx++) {
+                // yche: fix bug, only union when g.edge_dst[edge_idx] is a core vertex
+                if (g.label[g.edge_dst[edge_idx]] != CORE)continue;
+                if (!g.similarity[edge_idx])continue;
+                uf.UnionThreadSafe(i, g.edge_dst[edge_idx]);
             }
         }
     }
@@ -152,7 +92,7 @@ int main(int argc, char *argv[]) {
     set<int> c;
     for (int i = 0; i < g.nodemax; i++) {
         if (g.label[i] == CORE) {
-            c.emplace(uf.root(i));
+            c.emplace(uf.FindRoot(i));
         }
     }
     cluster_num = static_cast<int>(c.size());
@@ -182,7 +122,7 @@ int main(int argc, char *argv[]) {
             for (auto j = g.node_off[i]; j < g.node_off[i + 1]; j++) {
                 auto v = g.edge_dst[j];
                 if (g.label[v] != CORE && g.similarity[j]) {
-                    g.noncore_cluster.emplace_back(g.cluster_dict[uf.root(i)], v);
+                    g.noncore_cluster.emplace_back(g.cluster_dict[uf.FindRoot(i)], v);
                 }
             }
         }
@@ -193,233 +133,17 @@ int main(int argc, char *argv[]) {
     g.Output(argv[2], argv[3], &uf);
 }
 
-#ifdef NAIVE
-inline int compute_cn(Graph *g, int edge_idx) {
-    auto u = g->edge_src[edge_idx];
-    auto v = g->edge_dst[edge_idx];
-    auto cn_count = 0;
-    auto offset_nei_u = g->node_off[u], offset_nei_v = g->node_off[v];
-    auto off_u_end = g->node_off[u + 1], off_v_end = g->node_off[v + 1];
-    while (true) {
-        while (g->edge_dst[offset_nei_u] < g->edge_dst[offset_nei_v]) {
-            ++offset_nei_u;
-            if (offset_nei_u >= off_u_end) {
-                return cn_count;
-            }
-        }
-
-        while (g->edge_dst[offset_nei_u] > g->edge_dst[offset_nei_v]) {
-            ++offset_nei_v;
-            if (offset_nei_v >= off_v_end) {
-                return cn_count;
-            }
-        }
-
-        if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
-            cn_count++;
-            ++offset_nei_u;
-            ++offset_nei_v;
-            if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
-                return cn_count;
-            }
-        }
-    }
-}
-#endif
-
-inline int compute_cn_galloping(Graph *g, int edge_idx) {
-    auto u = g->edge_src[edge_idx];
-    auto v = g->edge_dst[edge_idx];
-    auto cn_count = 0;
-    auto offset_nei_u = g->node_off[u], offset_nei_v = g->node_off[v];
-    auto off_u_end = g->node_off[u + 1], off_v_end = g->node_off[v + 1];
-    auto is_first_galloping = off_u_end - offset_nei_u > off_v_end - offset_nei_v;
-
-    if (is_first_galloping) {
-        while (true) {
-            offset_nei_u = GallopingSearch(g->edge_dst, offset_nei_u, off_u_end, g->edge_dst[offset_nei_v]);
-            if (offset_nei_u >= off_u_end) {
-                return cn_count;
-            }
-
-            while (g->edge_dst[offset_nei_u] > g->edge_dst[offset_nei_v]) {
-                ++offset_nei_v;
-                if (offset_nei_v >= off_v_end) {
-                    return cn_count;
-                }
-            }
-
-            if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
-                cn_count++;
-                ++offset_nei_u;
-                ++offset_nei_v;
-                if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
-                    return cn_count;
-                }
-            }
-        }
-    } else {
-        while (true) {
-            while (g->edge_dst[offset_nei_u] < g->edge_dst[offset_nei_v]) {
-                ++offset_nei_u;
-                if (offset_nei_u >= off_u_end) {
-                    return cn_count;
-                }
-            }
-
-            offset_nei_v = GallopingSearch(g->edge_dst, offset_nei_v, off_v_end, g->edge_dst[offset_nei_u]);
-            if (offset_nei_v >= off_v_end) {
-                return cn_count;
-            }
-
-            if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
-                cn_count++;
-                ++offset_nei_u;
-                ++offset_nei_v;
-                if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
-                    return cn_count;
-                }
-            }
-        }
-    }
-}
-
-inline void core_detection(Graph *g) {
-    int countplus[PARA] = {1, 1, 1, 1, 1, 1, 1, 1};
-    __m256i sse_countplus = _mm256_load_si256((__m256i *) (countplus));
-    __m256i sj = _mm256_set_epi32(1, 1, 1, 1, 0, 0, 0, 0);
-    __m256i st = _mm256_set_epi32(3, 2, 1, 0, 3, 2, 1, 0);
-
+void core_detection(Graph *g) {
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 6000)
-    for (int i = 0; i < g->edgemax; i++) {
-#ifdef NAIVE
-        g->common_node_num[i] += compute_cn(g, i);
+    for (auto i = 0u; i < g->edgemax; i++) {
+#if defined(NAIVE)
+        g->common_node_num[i] += ComputeCNNaive(g, i);
+#elif defined(GALLOPING_SINGLE)
+        g->common_node_num[i] += ComputeCNGallopingSingleDir(g, i);
+#elif defined(GALLOPING_DOUBLE)
+        g->common_node_num[i] += ComputeCNGallopingDoubleDir(g, i);
 #else
-        int cnv[PARA] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-        __m256i sse_cnv = _mm256_load_si256((__m256i *) (cnv));
-        int j, t, j2, t2;
-
-        if (g->node_off[g->edge_src[i] + 1] - g->node_off[g->edge_src[i]] <
-            g->node_off[g->edge_dst[i] + 1] - g->node_off[g->edge_dst[i]]) {
-            j = g->node_off[g->edge_src[i]];
-            t = g->node_off[g->edge_dst[i]];
-            j2 = g->node_off[g->edge_src[i] + 1];
-            t2 = g->node_off[g->edge_dst[i] + 1];
-        } else {
-            t = g->node_off[g->edge_src[i]];
-            j = g->node_off[g->edge_dst[i]];
-            t2 = g->node_off[g->edge_src[i] + 1];
-            j2 = g->node_off[g->edge_dst[i] + 1];
-        }
-
-        int size_ratio;
-        size_ratio = (t2 - t) / (j2 - j);
-        if (size_ratio > 100) {
-            compute_cn_galloping(g, i);
-        } else if (size_ratio > 2) {
-            __m256i jnode = _mm256_set1_epi32(g->edge_dst[j]);
-            __m256i tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
-            __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));
-
-            int vsize = ((t2 - t) / PARA) * PARA;
-            int to = t;
-
-            while (j < j2 && t < to + vsize) {
-                __m256i mask = _mm256_cmpeq_epi32(jnode, tnode);
-                mask = _mm256_and_si256(sse_countplus, mask);
-                ssecnv = _mm256_add_epi32(ssecnv, mask);
-
-                if (g->edge_dst[j] > g->edge_dst[t + 7]) {
-                    t += PARA;
-                    tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
-                } else {
-                    j++;
-                    jnode = _mm256_set1_epi32(g->edge_dst[j]);
-                }
-            }
-            _mm256_store_si256((__m256i *) cnv, ssecnv);
-
-            for (int cnvplus : cnv) {
-                g->common_node_num[i] += cnvplus;
-            }
-
-            t = (to + vsize);
-
-            while (j < j2 && t < t2) {
-                if (g->edge_dst[j] == g->edge_dst[t]) {
-                    g->common_node_num[i]++;
-                    j++;
-                    t++;
-                } else if (g->edge_dst[j] > g->edge_dst[t]) {
-                    t++;
-                } else {
-                    j++;
-                }
-            }
-        } else {
-            if (t2 - t < j2 - j) {
-                j = g->node_off[g->edge_dst[i]];
-                t = g->node_off[g->edge_src[i]];
-                j2 = g->node_off[g->edge_dst[i] + 1];
-                t2 = g->node_off[g->edge_src[i] + 1];
-            }
-            int jsize = ((j2 - j) / 2) * 2 + j;
-            int tsize = ((t2 - t) / 4) * 4 + t;
-
-            __m256i jnode, tnode;
-
-            jnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + j));
-            tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
-
-            while (j < jsize && t < tsize) {
-                __m256i jnodeA = _mm256_permutevar8x32_epi32(jnode, sj);
-                __m256i tnodeA = _mm256_permutevar8x32_epi32(tnode, st);
-                __m256i mask = _mm256_cmpeq_epi32(jnodeA, tnodeA);
-                mask = _mm256_and_si256(sse_countplus, mask);
-                sse_cnv = _mm256_add_epi32(sse_cnv, mask);
-
-                if (g->edge_dst[j + 1] == g->edge_dst[t + 3]) {
-                    j += 2;
-                    t += 4;
-                    jnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + j));
-                    tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
-                } else if (g->edge_dst[j + 1] > g->edge_dst[t + 3]) {
-                    t += 4;
-
-                    tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
-                    _mm256_permutevar8x32_epi32(tnode, st);
-                } else {
-                    j += 2;
-                    jnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + j));
-                }
-            }
-
-            _mm256_store_si256((__m256i *) cnv, sse_cnv);
-
-            for (int cnvplus : cnv) {
-                g->common_node_num[i] += cnvplus;
-            }
-
-            if (j >= jsize) {
-                j = jsize;
-            } else {
-                t = tsize;
-            }
-
-            while (j < j2 && t < t2) {
-                if (g->edge_dst[j] == g->edge_dst[t]) {
-                    g->common_node_num[i]++;
-                    j++;
-                    t++;
-                } else if (g->edge_dst[j] > g->edge_dst[t]) {
-                    t++;
-
-                } else {
-                    j++;
-                }
-            }
-        }
+        g->common_node_num[i] += ComputeCNAVX2(g, i);
 #endif
     }
 
@@ -448,12 +172,12 @@ inline void core_detection(Graph *g) {
     }
 }
 
-inline bool hub_check_uf(Graph *g, UnionFind *uf, int a) {
+bool hub_check_uf(Graph *g, UnionFind *uf, int a) {
     set<int> c;
 
     for (int i = g->node_off[a]; i < g->node_off[a + 1]; i++) {
         if (g->label[g->edge_dst[i]] != CORE)continue;
-        c.insert((*uf).root(g->edge_dst[i]));
+        c.insert((*uf).FindRoot(g->edge_dst[i]));
     }
     return c.size() >= 2;
 }

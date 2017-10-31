@@ -3,8 +3,6 @@
 #include <chrono>
 #include <algorithm>
 
-#define UNCLASSIFIED 0
-
 using namespace chrono;
 
 Graph::Graph(char *dir_cstr) {
@@ -16,7 +14,6 @@ Graph::Graph(char *dir_cstr) {
 
     // vertex property
     label = new int[nodemax];
-//    core = new bool[nodemax];
     core_count = new int[nodemax];
 
     // edge_dst property
@@ -50,7 +47,7 @@ void Graph::ReadAdjacencyList() {
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
 
     // csr representation
-    node_off = new int[nodemax + 1];
+    node_off = new u_int32_t[nodemax + 1];
     edge_dst = new int[edgemax];
 
     node_off[0] = 0;
@@ -92,7 +89,7 @@ void Graph::MarkClusterMinEleAsId(UnionFind *union_find_ptr) {
 
     for (auto i = 0u; i < nodemax; i++) {
         if (label[i] == CORE) {
-            int x = union_find_ptr->root(i);
+            int x = union_find_ptr->FindRoot(i);
             if (i < cluster_dict[x]) { cluster_dict[x] = i; }
         }
     }
@@ -106,7 +103,7 @@ void Graph::Output(const char *eps_s, const char *min_u, UnionFind *union_find_p
     // observation 2: unique belonging
     for (auto i = 0; i < nodemax; i++) {
         if (label[i] == CORE) {
-            ofs << "c " << i << " " << cluster_dict[union_find_ptr->root(i)] << "\n";
+            ofs << "c " << i << " " << cluster_dict[union_find_ptr->FindRoot(i)] << "\n";
         }
     }
 
