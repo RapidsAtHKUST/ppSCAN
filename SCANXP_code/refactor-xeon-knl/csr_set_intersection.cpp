@@ -182,7 +182,7 @@ int ComputeCNAVX2(Graph *g, uint32_t edge_idx) {
     int cnv[PARA] = {0, 0, 0, 0, 0, 0, 0, 0};
 
     __m256i sse_cnv = _mm256_load_si256((__m256i *) (cnv));
-    int j, t, j2, t2;
+    uint32_t j, t, j2, t2;
 
     if (g->node_off[g->edge_src[edge_idx] + 1] - g->node_off[g->edge_src[edge_idx]] <
         g->node_off[g->edge_dst[edge_idx] + 1] - g->node_off[g->edge_dst[edge_idx]]) {
@@ -205,7 +205,7 @@ int ComputeCNAVX2(Graph *g, uint32_t edge_idx) {
         __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));
 
         int vsize = ((t2 - t) / PARA) * PARA;
-        int to = t;
+        auto to = t;
 
         while (j < j2 && t < to + vsize) {
             __m256i mask = _mm256_cmpeq_epi32(jnode, tnode);
@@ -246,8 +246,8 @@ int ComputeCNAVX2(Graph *g, uint32_t edge_idx) {
             j2 = g->node_off[g->edge_dst[edge_idx] + 1];
             t2 = g->node_off[g->edge_src[edge_idx] + 1];
         }
-        int jsize = ((j2 - j) / 2) * 2 + j;
-        int tsize = ((t2 - t) / 4) * 4 + t;
+        auto jsize = ((j2 - j) / 2) * 2 + j;
+        auto tsize = ((t2 - t) / 4) * 4 + t;
 
         __m256i jnode, tnode;
 
@@ -311,9 +311,9 @@ int ComputeCNAVX512(Graph *g, uint32_t edge_idx) {
     __m512i st = _mm512_set_epi32(3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0);
     __m512i ssecountplus = _mm512_set1_epi32(1);
     int cnv[PARA] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int to, jo;
+    uint32_t to, jo;
     __m512i ssecnv = _mm512_set1_epi32(0);
-    int j, t, j2, t2;
+    uint32_t j, t, j2, t2;
 
     if ((*g).node_off[(*g).edge_src[edge_idx] + 1] - (*g).node_off[(*g).edge_src[edge_idx]] <
         (*g).node_off[(*g).edge_dst[edge_idx] + 1] - (*g).node_off[(*g).edge_dst[edge_idx]]) {
@@ -335,7 +335,7 @@ int ComputeCNAVX512(Graph *g, uint32_t edge_idx) {
         __m512i jnode = _mm512_set1_epi32((*g).edge_dst[j]);
         __m512i tnode = _mm512_loadu_si512((__m512i *) ((*g).edge_dst + t));
 
-        int vsize = ((t2 - t) / PARA) * PARA + t;
+        auto vsize = ((t2 - t) / PARA) * PARA + t;
 
         while (j < j2 && t < vsize) {
 
@@ -357,8 +357,8 @@ int ComputeCNAVX512(Graph *g, uint32_t edge_idx) {
         }
         t = vsize;
     } else {
-        int jsize = ((j2 - j) / 4) * 4 + j;
-        int tsize = ((t2 - t) / 4) * 4 + t;
+        auto jsize = ((j2 - j) / 4) * 4 + j;
+        auto tsize = ((t2 - t) / 4) * 4 + t;
 
         __m512i jnode, tnode;
 

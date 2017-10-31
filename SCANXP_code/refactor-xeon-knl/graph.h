@@ -20,7 +20,7 @@ using namespace std;
 
 struct Graph {
     int nodemax;
-    int edgemax;
+    uint32_t edgemax;
 
     // csr representation
     uint32_t *node_off;
