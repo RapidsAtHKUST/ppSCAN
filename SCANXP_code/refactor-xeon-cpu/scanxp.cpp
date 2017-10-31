@@ -46,14 +46,14 @@ void SCAN_XP::CheckCore(Graph *g) {
     }
 
 #pragma omp parallel for num_threads(thread_num_)
-    for (int i = 0u; i < g->edgemax; i++) {
+    for (auto i = 0u; i < g->edgemax; i++) {
         long double du = g->node_off[g->edge_src[i] + 1] - g->node_off[g->edge_src[i]] + 1;
         long double dv = g->node_off[g->edge_dst[i] + 1] - g->node_off[g->edge_dst[i]] + 1;
         g->sim_values[i] = static_cast<double>((long double) g->common_node_num[i] / sqrt(du * dv));
     }
 
 #pragma omp parallel for num_threads(thread_num_)
-    for (int i = 0u; i < g->edgemax; i++) {
+    for (auto i = 0u; i < g->edgemax; i++) {
         if (g->sim_values[i] >= epsilon_) {
             g->core_count[g->edge_src[i]]++;
             g->similarity[i] = true;
@@ -63,7 +63,7 @@ void SCAN_XP::CheckCore(Graph *g) {
     }
 
 #pragma omp parallel for num_threads(thread_num_)
-    for (int i = 0u; i < g->nodemax; i++) {
+    for (auto i = 0u; i < g->nodemax; i++) {
         if (g->core_count[i] >= min_u_) {
             g->label[i] = CORE;
         };
@@ -72,7 +72,7 @@ void SCAN_XP::CheckCore(Graph *g) {
 
 void SCAN_XP::ClusterCore() {
 #pragma omp parallel for num_threads(thread_num_) schedule(dynamic, 2000)
-    for (int i = 0u; i < g.nodemax; i++) {
+    for (auto i = 0u; i < g.nodemax; i++) {
         if (g.label[i] == CORE) {
             for (auto edge_idx = g.node_off[i]; edge_idx < g.node_off[i + 1]; edge_idx++) {
                 // yche: fix bug, only union when g.edge_dst[edge_idx] is a core vertex
@@ -87,7 +87,7 @@ void SCAN_XP::ClusterCore() {
 bool SCAN_XP::CheckHub(Graph *g, UnionFind *uf, int a) {
     set<int> c;
 
-    for (int i = g->node_off[a]; i < g->node_off[a + 1]; i++) {
+    for (auto i = g->node_off[a]; i < g->node_off[a + 1]; i++) {
         if (g->label[g->edge_dst[i]] != CORE)continue;
         c.insert((*uf).FindRoot(g->edge_dst[i]));
     }
@@ -97,7 +97,7 @@ bool SCAN_XP::CheckHub(Graph *g, UnionFind *uf, int a) {
 void SCAN_XP::LabelNonCore() {
     int core_num = 0u;
 #pragma omp parallel for num_threads(thread_num_) schedule(dynamic, 1000), reduction(+:core_num)
-    for (int i = 0u; i < g.nodemax; i++) {
+    for (auto i = 0u; i < g.nodemax; i++) {
         if (g.label[i] == CORE) {
             core_num++;
             continue;
