@@ -14,6 +14,58 @@ void Usage() {
 static double EPSILON;
 static int MY_U;
 
+int BinarySearchForGallopingSearch(int *array, int offset_beg, int offset_end, int val) {
+    auto mid = static_cast<int>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    if (array[mid] == val) {
+        return mid;
+    }
+
+    if (array[mid] < val) {
+        return mid + 1 == offset_end ? mid : BinarySearchForGallopingSearch(array, mid + 1, offset_end, val);
+    }
+
+    if (mid == offset_beg) {
+        return offset_beg;
+    }
+
+    return BinarySearchForGallopingSearch(array, offset_beg, mid, val);
+}
+
+int GallopingSearch(int *array, int offset_beg, int offset_end, int val) {
+    if (array[offset_end - 1] < val) {
+        return offset_end;
+    }
+
+    // galloping
+    if (array[offset_beg] >= val) {
+        return offset_beg;
+    }
+    if (array[offset_beg + 1] >= val) {
+        return offset_beg + 1;
+    }
+    if (array[offset_beg + 2] >= val) {
+        return offset_beg + 2;
+    }
+
+    auto jump_idx = 4u;
+    bool is_working = true;
+    while (is_working) {
+        auto peek_idx = offset_beg + jump_idx;
+        if (peek_idx >= offset_end) {
+            peek_idx = offset_end - 1;
+            is_working = false;
+        }
+        if (array[peek_idx] == val) {
+            return peek_idx;
+        }
+        if (array[peek_idx] > val) {
+            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+//            return BinarySearchForGallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+        }
+        jump_idx <<= 1;
+    }
+}
+
 int main(int argc, char *argv[]) {
     using namespace chrono;
     if (argc < 4) {
@@ -175,6 +227,63 @@ inline int compute_cn(Graph *g, int edge_idx) {
 }
 #endif
 
+inline int compute_cn_galloping(Graph *g, int edge_idx) {
+    auto u = g->edge_src[edge_idx];
+    auto v = g->edge_dst[edge_idx];
+    auto cn_count = 0;
+    auto offset_nei_u = g->node_off[u], offset_nei_v = g->node_off[v];
+    auto off_u_end = g->node_off[u + 1], off_v_end = g->node_off[v + 1];
+    auto is_first_galloping = off_u_end - offset_nei_u > off_v_end - offset_nei_v;
+
+    if (is_first_galloping) {
+        while (true) {
+            offset_nei_u = GallopingSearch(g->edge_dst, offset_nei_u, off_u_end, g->edge_dst[offset_nei_v]);
+            if (offset_nei_u >= off_u_end) {
+                return cn_count;
+            }
+
+            while (g->edge_dst[offset_nei_u] > g->edge_dst[offset_nei_v]) {
+                ++offset_nei_v;
+                if (offset_nei_v >= off_v_end) {
+                    return cn_count;
+                }
+            }
+
+            if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
+                cn_count++;
+                ++offset_nei_u;
+                ++offset_nei_v;
+                if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
+                    return cn_count;
+                }
+            }
+        }
+    } else {
+        while (true) {
+            while (g->edge_dst[offset_nei_u] < g->edge_dst[offset_nei_v]) {
+                ++offset_nei_u;
+                if (offset_nei_u >= off_u_end) {
+                    return cn_count;
+                }
+            }
+
+            offset_nei_v = GallopingSearch(g->edge_dst, offset_nei_v, off_v_end, g->edge_dst[offset_nei_u]);
+            if (offset_nei_v >= off_v_end) {
+                return cn_count;
+            }
+
+            if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
+                cn_count++;
+                ++offset_nei_u;
+                ++offset_nei_v;
+                if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
+                    return cn_count;
+                }
+            }
+        }
+    }
+}
+
 inline void core_detection(Graph *g) {
     int countplus[PARA] = {1, 1, 1, 1, 1, 1, 1, 1};
     __m256i sse_countplus = _mm256_load_si256((__m256i *) (countplus));
@@ -206,8 +315,9 @@ inline void core_detection(Graph *g) {
 
         int size_ratio;
         size_ratio = (t2 - t) / (j2 - j);
-
-        if (size_ratio > 2) {
+        if (size_ratio > 100) {
+            compute_cn_galloping(g, i);
+        } else if (size_ratio > 2) {
             __m256i jnode = _mm256_set1_epi32(g->edge_dst[j]);
             __m256i tnode = _mm256_loadu_si256((__m256i *) (g->edge_dst + t));
             __m256i ssecnv = _mm256_load_si256((__m256i *) (cnv));

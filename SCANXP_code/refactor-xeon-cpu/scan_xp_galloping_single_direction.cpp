@@ -58,8 +58,8 @@ int GallopingSearch(int *array, int offset_beg, int offset_end, int val) {
             return peek_idx;
         }
         if (array[peek_idx] > val) {
-            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
-//            return BinarySearchForGallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+//            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+            return BinarySearchForGallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
         }
         jump_idx <<= 1;
     }
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
     g.Output(argv[2], argv[3], &uf);
 }
 
-inline int compute_cn(Graph *g, int edge_idx) {
+inline int compute_cn_galloping(Graph *g, int edge_idx) {
     auto u = g->edge_src[edge_idx];
     auto v = g->edge_dst[edge_idx];
     auto cn_count = 0;
@@ -249,7 +249,7 @@ inline int compute_cn(Graph *g, int edge_idx) {
 inline void core_detection(Graph *g) {
 #pragma omp parallel for num_threads(NUMT) schedule(dynamic, 6000)
     for (int i = 0; i < g->edgemax; i++) {
-        g->common_node_num[i] += compute_cn(g, i);
+        g->common_node_num[i] += compute_cn_galloping(g, i);
     }
 
 #pragma omp parallel for num_threads(NUMT)

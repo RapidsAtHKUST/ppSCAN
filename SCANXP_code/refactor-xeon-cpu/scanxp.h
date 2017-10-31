@@ -19,6 +19,12 @@
 
 inline void core_detection(Graph *g);
 
+inline int compute_cn_galloping(Graph *g, int edge_idx);
+
+inline int BinarySearchForGallopingSearch(int *array, int offset_beg, int offset_end, int val);
+
+inline int GallopingSearch(int *array, int offset_beg, int offset_end, int val);
+
 inline bool hub_check_uf(Graph *g, UnionFind *uf, int a);
 
 #ifdef NAIVE

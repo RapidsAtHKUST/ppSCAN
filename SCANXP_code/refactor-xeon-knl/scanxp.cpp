@@ -14,6 +14,86 @@ void Usage() {
 static double EPSILON;
 static int MY_U;
 
+int BinarySearchForGallopingSearch(int *array, int offset_beg, int offset_end, int val) {
+    auto mid = static_cast<int>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    if (array[mid] == val) {
+        return mid;
+    }
+
+    if (array[mid] < val) {
+        return mid + 1 == offset_end ? mid : BinarySearchForGallopingSearch(array, mid + 1, offset_end, val);
+    }
+
+    if (mid == offset_beg) {
+        return offset_beg;
+    }
+
+    return BinarySearchForGallopingSearch(array, offset_beg, mid, val);
+}
+
+inline int GallopingSearch(int *array, int offset_beg, int offset_end, int val) {
+    if (array[offset_end - 1] < val) {
+        return offset_end;
+    }
+
+    // galloping
+    if (array[offset_beg] >= val) {
+        return offset_beg;
+    }
+    if (array[offset_beg + 1] >= val) {
+        return offset_beg + 1;
+    }
+    if (array[offset_beg + 2] >= val) {
+        return offset_beg + 2;
+    }
+
+    auto jump_idx = 4u;
+    bool is_working = true;
+    while (is_working) {
+        auto peek_idx = offset_beg + jump_idx;
+        if (peek_idx >= offset_end) {
+            peek_idx = offset_end - 1;
+            is_working = false;
+        }
+        if (array[peek_idx] == val) {
+            return peek_idx;
+        }
+        if (array[peek_idx] > val) {
+//            return GallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+            return BinarySearchForGallopingSearch(array, jump_idx / 2 + offset_beg + 1, peek_idx + 1, val);
+        }
+        jump_idx <<= 1;
+    }
+}
+
+inline int compute_cn_galloping(Graph *g, int edge_idx) {
+    auto u = g->edge_src[edge_idx];
+    auto v = g->edge_dst[edge_idx];
+    auto cn_count = 0;
+    auto offset_nei_u = g->node_off[u], offset_nei_v = g->node_off[v];
+    auto off_u_end = g->node_off[u + 1], off_v_end = g->node_off[v + 1];
+    while (true) {
+        offset_nei_u = GallopingSearch(g->edge_dst, offset_nei_u, off_u_end, g->edge_dst[offset_nei_v]);
+        if (offset_nei_u >= off_u_end) {
+            return cn_count;
+        }
+
+        offset_nei_v = GallopingSearch(g->edge_dst, offset_nei_v, off_v_end, g->edge_dst[offset_nei_u]);
+        if (offset_nei_v >= off_v_end) {
+            return cn_count;
+        }
+
+        if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
+            cn_count++;
+            ++offset_nei_u;
+            ++offset_nei_v;
+            if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
+                return cn_count;
+            }
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
     using namespace chrono;
     if (argc < 4) {
@@ -201,12 +281,13 @@ inline void core_detection(Graph *g) {
             t2 = (*g).node_off[(*g).edge_src[i] + 1];
             j2 = (*g).node_off[(*g).edge_dst[i] + 1];
         }
+
         // /*
         int size1;
         size1 = (t2 - t) / (j2 - j);
-
-        if (size1 > 2) {
-
+        if (size1 > 100) {
+            g->common_node_num[i] += compute_cn_galloping(g, i);
+        } else if (size1 > 2) {
             __m512i jnode = _mm512_set1_epi32((*g).edge_dst[j]);
             __m512i tnode = _mm512_loadu_si512((__m512i *) ((*g).edge_dst + t));
 
@@ -225,16 +306,12 @@ inline void core_detection(Graph *g) {
                     jnode = _mm512_set1_epi32((*g).edge_dst[j]);
                 }
             }
-
             _mm512_store_si512((__m512i *) cnv, ssecnv);
 
-            for (int cnvplus = 0; cnvplus < PARA; cnvplus++) {
-                (*g).common_node_num[i] += cnv[cnvplus];
+            for (int cnvplus : cnv) {
+                (*g).common_node_num[i] += cnvplus;
             }
-
-
             t = vsize;
-
         } else {
             int jsize = ((j2 - j) / 4) * 4 + j;
             int tsize = ((t2 - t) / 4) * 4 + t;
@@ -246,7 +323,6 @@ inline void core_detection(Graph *g) {
 
             __mmask16 mask;
             while (j < jsize && t < tsize) {
-
                 __m512i jnodeA = _mm512_permutevar_epi32(st, jnode);
                 __m512i tnodeA = _mm512_permute4f128_epi32(tnode, 0b00000000);
                 __mmask16 mask = _mm512_cmpeq_epi32_mask(jnodeA, tnodeA);
@@ -266,13 +342,11 @@ inline void core_detection(Graph *g) {
                     j += 4;
                     jnode = _mm512_loadu_si512((__m512i *) ((*g).edge_dst + j));
                 }
-
             }
-
             _mm512_store_si512((__m512i *) cnv, ssecnv);
 
-            for (int cnvplus = 0; cnvplus < PARA; cnvplus++) {
-                (*g).common_node_num[i] += cnv[cnvplus];
+            for (int cnvplus : cnv) {
+                (*g).common_node_num[i] += cnvplus;
             }
 
             if (j >= jsize) {
@@ -280,7 +354,6 @@ inline void core_detection(Graph *g) {
             } else {
                 t = tsize;
             }
-
         }
         // */
         while (j < j2 && t < t2) {
