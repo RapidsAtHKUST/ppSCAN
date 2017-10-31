@@ -1,3 +1,6 @@
+#ifndef REFACTOR_XEON_CPU_GRAPH
+#define REFACTOR_XEON_CPU_GRAPH
+
 #include<cstdlib>
 #include<ctime>
 
@@ -6,7 +9,8 @@
 #include<string>
 #include<vector>
 #include<sstream>
-#include "unionfind.h"
+
+#include "union_find.h"
 
 using namespace std;
 
@@ -19,7 +23,7 @@ struct Graph {
     int edgemax;
 
     // csr representation
-    int *node_off;
+    uint32_t *node_off;
     int *edge_dst;
 
     // edge_dst property
@@ -45,13 +49,18 @@ struct Graph {
 
     explicit Graph(char *dir_cstr);
 
+public:
     void ReadDegree();
 
     void CheckInputGraph();
 
     void ReadAdjacencyList();
 
+    void Output(const char *eps_s, const char *min_u, UnionFind *union_find_ptr);
+
+public:
     void MarkClusterMinEleAsId(UnionFind *union_find_ptr);
 
-    void Output(const char *eps_s, const char *min_u, UnionFind *union_find_ptr);
 };
+
+#endif
