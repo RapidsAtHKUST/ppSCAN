@@ -17,10 +17,10 @@ SCAN_XP::SCAN_XP(int thread_num, int min_u, double epsilon, char *dir) : thread_
 
     // pre-processing
 #pragma omp parallel for num_threads(thread_num_) schedule(dynamic, 100000)
-    for (int i = 0u; i < g.nodemax; i++) {
-        g.core_count[i] = 0u;
+    for (auto i = 0u; i < g.nodemax; i++) {
+        g.core_count[i] = 0;
         g.label[i] = UNCLASSIFIED;
-        for (int n = g.node_off[i]; n < g.node_off[i + 1]; n++) {
+        for (auto n = g.node_off[i]; n < g.node_off[i + 1]; n++) {
             g.edge_src[n] = i;
             g.common_node_num[n] = 2;
         }
@@ -50,7 +50,7 @@ void SCAN_XP::CheckCore(Graph *g) {
 #pragma omp parallel for num_threads(thread_num_)
     for (int i = 0u; i < g->edgemax; i++) {
         long double du = g->node_off[g->edge_src[i] + 1] - g->node_off[g->edge_src[i]] + 1;
-        long double dv = g->node_off[(g->edge_dst[i] + 1)] - g->node_off[g->edge_dst[i]] + 1;
+        long double dv = g->node_off[g->edge_dst[i] + 1] - g->node_off[g->edge_dst[i]] + 1;
         g->sim_values[i] = static_cast<double>((long double) g->common_node_num[i] / sqrt(du * dv));
     }
 
@@ -67,6 +67,7 @@ void SCAN_XP::CheckCore(Graph *g) {
 #pragma omp parallel for num_threads(thread_num_)
     for (int i = 0u; i < g->nodemax; i++) {
         if (g->core_count[i] >= min_u_) {
+            cout << "core!!" << endl;
             g->label[i] = CORE;
         };
     }

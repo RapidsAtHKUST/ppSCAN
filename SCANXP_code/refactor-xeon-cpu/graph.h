@@ -19,7 +19,7 @@ using namespace std;
 #define HUB 2
 
 struct Graph {
-    int nodemax;
+    uint32_t nodemax;
     uint32_t edgemax;
 
     // csr representation

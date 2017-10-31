@@ -47,7 +47,7 @@ void Graph::ReadAdjacencyList() {
     ifstream adj_file(dir + string("/b_adj.bin"), ios::binary);
 
     // csr representation
-    node_off = new u_int32_t[nodemax + 1];
+    node_off = new uint32_t[nodemax + 1];
     edge_dst = new int[edgemax];
 
     node_off[0] = 0;
