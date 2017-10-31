@@ -47,7 +47,7 @@ inline int GallopingSearch(int *array, int offset_beg, int offset_end, int val) 
         return offset_beg + 2;
     }
 
-    auto jump_idx = 4u;
+    auto jump_idx = 4;
     bool is_working = true;
     while (is_working) {
         auto peek_idx = offset_beg + jump_idx;
@@ -72,27 +72,57 @@ inline int compute_cn_galloping(Graph *g, int edge_idx) {
     auto cn_count = 0;
     auto offset_nei_u = g->node_off[u], offset_nei_v = g->node_off[v];
     auto off_u_end = g->node_off[u + 1], off_v_end = g->node_off[v + 1];
-    while (true) {
-        offset_nei_u = GallopingSearch(g->edge_dst, offset_nei_u, off_u_end, g->edge_dst[offset_nei_v]);
-        if (offset_nei_u >= off_u_end) {
-            return cn_count;
-        }
+    auto is_first_galloping = off_u_end - offset_nei_u > off_v_end - offset_nei_v;
 
-        offset_nei_v = GallopingSearch(g->edge_dst, offset_nei_v, off_v_end, g->edge_dst[offset_nei_u]);
-        if (offset_nei_v >= off_v_end) {
-            return cn_count;
-        }
-
-        if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
-            cn_count++;
-            ++offset_nei_u;
-            ++offset_nei_v;
-            if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
+    if (is_first_galloping) {
+        while (true) {
+            offset_nei_u = GallopingSearch(g->edge_dst, offset_nei_u, off_u_end, g->edge_dst[offset_nei_v]);
+            if (offset_nei_u >= off_u_end) {
                 return cn_count;
+            }
+
+            while (g->edge_dst[offset_nei_u] > g->edge_dst[offset_nei_v]) {
+                ++offset_nei_v;
+                if (offset_nei_v >= off_v_end) {
+                    return cn_count;
+                }
+            }
+
+            if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
+                cn_count++;
+                ++offset_nei_u;
+                ++offset_nei_v;
+                if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
+                    return cn_count;
+                }
+            }
+        }
+    } else {
+        while (true) {
+            while (g->edge_dst[offset_nei_u] < g->edge_dst[offset_nei_v]) {
+                ++offset_nei_u;
+                if (offset_nei_u >= off_u_end) {
+                    return cn_count;
+                }
+            }
+
+            offset_nei_v = GallopingSearch(g->edge_dst, offset_nei_v, off_v_end, g->edge_dst[offset_nei_u]);
+            if (offset_nei_v >= off_v_end) {
+                return cn_count;
+            }
+
+            if (g->edge_dst[offset_nei_u] == g->edge_dst[offset_nei_v]) {
+                cn_count++;
+                ++offset_nei_u;
+                ++offset_nei_v;
+                if (offset_nei_u >= off_u_end || offset_nei_v >= off_v_end) {
+                    return cn_count;
+                }
             }
         }
     }
 }
+
 
 int main(int argc, char *argv[]) {
     using namespace chrono;
@@ -108,6 +138,7 @@ int main(int argc, char *argv[]) {
     int out_num = 0;
 
     // parse parameters
+    cout << "Number_of_threads" << NUMT << endl;
     cout << "graph dir" << argv[1] << endl;
     Graph g(argv[1]);
     EPSILON = strtod(argv[2], nullptr);
@@ -194,7 +225,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    cout << "Number_of_threads" << NUMT << endl;
     cout << g.nodemax << endl << g.edgemax << endl;
     cout << "Detect_cluster: " << cluster_num << endl << "Core:" << core_num << endl << "Hub: " << hub_num << endl
          << "Outlier: " << out_num << endl;

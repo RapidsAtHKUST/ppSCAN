@@ -21,5 +21,5 @@ Graph_file needs that it is CRS format.
 ・Number_of_thread
 This codes decide the number of threads when parallelizing by referring to "Number_of_thread”.
 
-If you want to change SCAN’s parameter ‘\epsilon’, you change EPSILON in scanxp.h
+If you want to change SCAN’s parameter ‘\epsilon’, you change epsilon_ in scanxp.h
 This codes assume that SCAN's parameter \mu is 2, because \mu is recommended to set 2 in SCAN's paper.

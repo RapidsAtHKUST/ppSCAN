@@ -12,7 +12,7 @@ struct UnionFind {
     }
 
     ~UnionFind() {
-        free(parent);
+        delete[] parent;
     }
 
     int FindRoot(int x) {

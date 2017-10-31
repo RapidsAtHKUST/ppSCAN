@@ -12,7 +12,10 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
-set(SOURCE_FILES scanxp.cpp scanxp.h union_find.h graph.cpp graph.h csr_set_intersection.h csr_set_intersection.cpp)
+set(SOURCE_FILES scanxp.cpp scanxp.h union_find.h graph.cpp graph.h csr_set_intersection.h csr_set_intersection.cpp
+        main_scanxp.cpp)
+
+add_executable(play0 playground/playground.cpp)
 
 add_executable(scan-xp-cpu ${SOURCE_FILES})
 target_compile_options(scan-xp-cpu PRIVATE -march=core-avx2 -O3 -g)

@@ -49,15 +49,18 @@ struct Graph {
 
     explicit Graph(char *dir_cstr);
 
+public:
     void ReadDegree();
 
     void CheckInputGraph();
 
     void ReadAdjacencyList();
 
+    void Output(const char *eps_s, const char *min_u, UnionFind *union_find_ptr);
+
+public:
     void MarkClusterMinEleAsId(UnionFind *union_find_ptr);
 
-    void Output(const char *eps_s, const char *min_u, UnionFind *union_find_ptr);
 };
 
 #endif
