@@ -26,11 +26,17 @@ add_executable(pSCANParallel ${SOURCE_FILES})
 target_compile_options(pSCANParallel PRIVATE -O3 -g)
 target_link_libraries(pSCANParallel ${CMAKE_THREAD_LIBS_INIT})
 
-## ppSCAN release 1: parallel with sse
+## ppSCAN release 2: parallel with sse4.2
 add_executable(pSCANParallelSSE ${SOURCE_FILES})
 target_compile_definitions(pSCANParallelSSE PRIVATE ENABLE_SSE=1)
 target_compile_options(pSCANParallelSSE PRIVATE -O3 -g -march=native)
 target_link_libraries(pSCANParallelSSE ${CMAKE_THREAD_LIBS_INIT})
+
+## ppSCAN release 3: parallel with avx2
+add_executable(pSCANParallelAVX2 ${SOURCE_FILES})
+target_compile_definitions(pSCANParallelAVX2 PRIVATE ENABLE_AVX2=1)
+target_compile_options(pSCANParallelAVX2 PRIVATE -O3 -g -march=core-avx2)
+target_link_libraries(pSCANParallelAVX2 ${CMAKE_THREAD_LIBS_INIT})
 
 ## ppSCAN serial experimental 0: statistics 0
 add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
