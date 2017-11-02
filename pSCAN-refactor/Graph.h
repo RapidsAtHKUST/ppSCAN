@@ -29,7 +29,7 @@ private:
     vector<char> core_status_lst;
 
     // clusters: core and non-core(hubs)
-    vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
+    int * cluster_dict;    // observation 2: core vertex clusters are disjoint
 
     // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core

@@ -81,6 +81,9 @@ public:
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<char> &is_core_lst, vector<int> &cid, DisjointSets &disjoint_sets);
 
+    void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
+                vector<char> &is_core_lst, int *cid, DisjointSets &disjoint_sets);
+
     // cid has all core-induced cluster info
     void Output(const char *eps_s, const char *min_u, vector<pair<int, int>> &noncore_cluster,
                 vector<bool> &is_core_lst, vector<int> &cid);

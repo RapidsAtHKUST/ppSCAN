@@ -5,24 +5,17 @@
 #else
 
 #include <mm_malloc.h>
+#include <x86intrin.h>
 
 #endif // defined(__GNUC__)
 
-#ifdef ENABLE_SSE
 #include <immintrin.h>
-#endif
-
-#ifndef __INTEL_COMPILER
-
-#include <x86intrin.h>
-
-#endif
-
 
 #include <cassert>
 #include <cmath>
 
 #include <algorithm>
+#include <cstring>
 
 #include "playground/pretty_print.h"
 #include "ThreadPool.h"
@@ -59,14 +52,18 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     auto all_end = high_resolution_clock::now();
 
     // 4th: cluster_dict
-    cluster_dict = vector<int>(n);
-    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
+    cluster_dict = static_cast<int *>(_mm_malloc(io_helper_ptr->n * sizeof(int), 32));
+    for (auto i = 0; i < io_helper_ptr->n; i++) {
+        cluster_dict[i] = n;
+    }
+    assert(PTR_TO_UINT64(cluster_dict) % 32 == 0);
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }
 
 Graph::~Graph() {
     _mm_free(min_cn);
+    _mm_free(cluster_dict);
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
@@ -411,7 +408,7 @@ void Graph::CheckCoreFirstBSP(int u) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-            // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torned read
+            // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torn read
 //        auto v = out_edges[edge_idx];
 //        if (u <= v) {
             if (min_cn[edge_idx] == SIMILAR) {
@@ -719,6 +716,7 @@ void Graph::MarkClusterMinEleAsId() {
                     int x = disjoint_set_ptr->FindRoot(i);
                     int cluster_min_ele;
                     do {
+                        // assume no torn read of cluster_dict[x]
                         cluster_min_ele = cluster_dict[x];
                         if (i >= cluster_dict[x]) {
                             break;
