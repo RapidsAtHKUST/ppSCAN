@@ -8,6 +8,17 @@
 
 #endif // defined(__GNUC__)
 
+#ifdef ENABLE_SSE
+#include <immintrin.h>
+#endif
+
+#ifndef __INTEL_COMPILER
+
+#include <x86intrin.h>
+
+#endif
+
+
 #include <cassert>
 #include <cmath>
 
@@ -66,6 +77,92 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
 }
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+#ifdef ENABLE_SSE
+    int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    constexpr int parallelism = 4;
+    while (true) {
+        // sse4.2, out_edges[offset_nei_v] as the pivot
+        __m128i pivot_u = _mm_set1_epi32(out_edges[offset_nei_v]);
+        while (offset_nei_u + parallelism < out_edge_start[u + 1]) {
+            __m128i inspected_ele = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&out_edges[offset_nei_u]));
+            __m128i cmp_res = _mm_cmpgt_epi32(pivot_u, inspected_ele);
+            auto mask = _mm_movemask_epi8(cmp_res);
+            auto count = mask == 0xffff ? parallelism : _popcnt32(mask) >> 2;
+            // update offset_nei_u and du
+            offset_nei_u += count;
+            du -= count;
+            if (du < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (offset_nei_u + parallelism >= out_edge_start[u + 1]) {
+            break;
+        }
+
+        // sse4.2, out_edges[offset_nei_u] as the pivot
+        __m128i pivot_v = _mm_set1_epi32(out_edges[offset_nei_u]);
+        while (offset_nei_v + parallelism < out_edge_start[v + 1]) {
+            __m128i inspected_ele = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&out_edges[offset_nei_v]));
+            __m128i cmp_res = _mm_cmpgt_epi32(pivot_v, inspected_ele);
+            auto mask = _mm_movemask_epi8(cmp_res);
+            auto count = mask == 0xffff ? parallelism : _popcnt32(mask) >> 2;
+
+            // update offset_nei_u and du
+            offset_nei_v += count;
+            dv -= count;
+            if (dv < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (offset_nei_v + parallelism >= out_edge_start[v + 1]) {
+            break;
+        }
+
+        // find possible equality
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+
+    while (true) {
+        // left ones
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            if (du < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_u;
+        }
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            if (dv < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_v;
+        }
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+#else
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
             out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
@@ -93,6 +190,7 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++offset_nei_v;
         }
     }
+#endif
 }
 
 int Graph::EvalSimilarity(int u, ui edge_idx) {
