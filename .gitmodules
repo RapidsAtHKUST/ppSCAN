@@ -1,6 +1,3 @@
-[submodule "boost.simd"]
-	path = boost.simd
-	url = https://github.com/NumScale/boost.simd.git
 [submodule "pSCAN"]
 	path = pSCAN
 	url = https://github.com/LijunChang/pSCAN.git

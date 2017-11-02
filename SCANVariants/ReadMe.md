@@ -2,7 +2,7 @@
 
 description | folder link
 --- | ---
-pSCAN  | [pSCAN](pSCAN), [pSCAN-statistics](pSCAN-statistics)
+pSCAN  | [pSCAN](https://github.com/LijunChang/pSCAN), [pSCAN-statistics](pSCAN-statistics)
 SCAN++ | [SCAN++](scan_plus2)
 anySCAN | [anySCANBin](anySCANBin)
 anySCANReImpl(Not Reproduce Origin) | [anySCANReImpl](anySCANReImpl)
