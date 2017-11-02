@@ -19,6 +19,13 @@ target_compile_definitions(pSCANSerial PRIVATE SERIAL=1)
 target_compile_options(pSCANSerial PRIVATE -O3 -g)
 #target_link_libraries(pSCANSerial profiler)
 
+## ppSCAN experimental: galloping search
+set(GALLOPING_FILES experimental/main_exp_parallel_galloping.cpp experimental/GraphGallopingSearchExp.cpp experimental/GraphGallopingSearchExp.h
+        InputOutput.cpp)
+add_executable(pSCANGalloping ${GALLOPING_FILES})
+target_compile_options(pSCANGalloping PRIVATE -O3 -g)
+target_link_libraries(pSCANGalloping ${CMAKE_THREAD_LIBS_INIT})
+
 ## ppSCAN release 1: parallel
 set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
         DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h ThreadSafeDisjointSet.h)
