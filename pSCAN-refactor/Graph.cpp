@@ -3,8 +3,11 @@
 #if defined(__INTEL_COMPILER)
 #include <malloc.h>
 #else
+
 #include <mm_malloc.h>
+
 #endif // defined(__GNUC__)
+
 #include <cassert>
 #include <cmath>
 
@@ -44,6 +47,10 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
     auto all_end = high_resolution_clock::now();
+
+    // 4th: cluster_dict
+    cluster_dict = vector<int>(n);
+    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }
@@ -51,7 +58,6 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 void Graph::Output(const char *eps_s, const char *miu) {
     io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, *disjoint_set_ptr);
 }
-
 
 int Graph::ComputeCnLowerBound(int du, int dv) {
     auto c = (int) (sqrtl((((long double) du) * ((long double) dv) * eps_a2) / eps_b2));
@@ -360,7 +366,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
 }
 
 void Graph::pSCANThirdPhaseClusterCore() {
-    // prepare data
+    // trivial: prepare data
     auto tmp_start = high_resolution_clock::now();
     for (auto i = 0; i < n; i++) {
         if (IsDefiniteCoreVertex(i)) { cores.emplace_back(i); }
@@ -433,14 +439,24 @@ void Graph::pSCANThirdPhaseClusterCore() {
 }
 
 void Graph::MarkClusterMinEleAsId() {
-    cluster_dict = vector<int>(n);
-    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
-
-    for (auto i = 0u; i < n; i++) {
-        if (IsDefiniteCoreVertex(i)) {
-            int x = disjoint_set_ptr->FindRoot(i);
-            if (i < cluster_dict[x]) { cluster_dict[x] = i; }
-        }
+    auto thread_num = std::thread::hardware_concurrency();
+    ThreadPool pool(thread_num);
+    auto step = max(1u, n / thread_num);
+    for (auto outer_i = 0u; outer_i < n; outer_i += step) {
+        pool.enqueue([this](ui i_start, ui i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                if (IsDefiniteCoreVertex(i)) {
+                    int x = disjoint_set_ptr->FindRoot(i);
+                    int cluster_min_ele;
+                    do {
+                        cluster_min_ele = cluster_dict[x];
+                        if (i >= cluster_dict[x]) {
+                            break;
+                        }
+                    } while (!__sync_bool_compare_and_swap(&cluster_dict[x], cluster_min_ele, i));
+                }
+            }
+        }, outer_i, min(outer_i + step, n));
     }
 }
 
