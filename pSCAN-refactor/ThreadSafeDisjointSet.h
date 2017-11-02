@@ -5,7 +5,6 @@
 #ifndef PPSCAN_THREADSAFE_DISJOINTSET_H
 #define PPSCAN_THREADSAFE_DISJOINTSET_H
 
-#include <vector>
 #include <atomic>
 #include <iostream>
 
@@ -27,9 +26,14 @@
  */
 class DisjointSets {
 public:
-    explicit DisjointSets(uint32_t size) : mData(size) {
+    explicit DisjointSets(uint32_t size) : data_size(size) {
+        mData = new std::atomic<uint64_t>[size];
         for (uint32_t i = 0; i < size; ++i)
             mData[i] = (uint32_t) i;
+    }
+
+    ~DisjointSets() {
+        free(mData);
     }
 
     uint32_t FindRoot(uint32_t id) const {
@@ -90,7 +94,7 @@ public:
         return id2;
     }
 
-    uint32_t size() const { return (uint32_t) mData.size(); }
+    uint32_t size() const { return data_size; }
 
     uint32_t rank(uint32_t id) const {
         return ((uint32_t) (mData[id] >> 32)) & 0x7FFFFFFFu;
@@ -101,12 +105,13 @@ public:
     }
 
     friend std::ostream &operator<<(std::ostream &os, const DisjointSets &f) {
-        for (size_t i = 0; i < f.mData.size(); ++i)
+        for (size_t i = 0; i < f.size(); ++i)
             os << i << ": parent=" << f.parent(i) << ", rank=" << f.rank(i) << std::endl;
         return os;
     }
 
-    mutable std::vector<std::atomic<uint64_t>> mData;
+    uint32_t data_size;
+    mutable std::atomic<uint64_t> *mData;
 };
 
 #endif //PPSCAN_THREADSAFE_DISJOINTSET_H
