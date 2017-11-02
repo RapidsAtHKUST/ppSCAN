@@ -14,6 +14,10 @@ namespace yche {
     constexpr char TRUE = 1;
     constexpr char FALSE = 0;
 
+    constexpr char UN_KNOWN = 0;
+    constexpr char CORE = 1;
+    constexpr char NON_CORE = 2;
+
     template<typename T, typename... Args>
     std::unique_ptr<T> make_unique(Args &&... args) {
         return std::unique_ptr<T>(new T(std::forward<Args>(args)...));

@@ -52,8 +52,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
-    is_core_lst = vector<char>(n, FALSE);
-    is_non_core_lst = vector<char>(n, FALSE);
+    core_status_lst = vector<char>(n, UN_KNOWN);
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
@@ -67,7 +66,7 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, *disjoint_set_ptr);
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, core_status_lst, cluster_dict, *disjoint_set_ptr);
 }
 
 int Graph::ComputeCnLowerBound(int du, int dv) {
@@ -368,7 +367,7 @@ int Graph::EvalSimilarity(int u, ui edge_idx) {
 }
 
 bool Graph::IsDefiniteCoreVertex(int u) {
-    return is_core_lst[u] == TRUE;
+    return core_status_lst[u] == CORE;
 }
 
 ui Graph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
@@ -397,14 +396,14 @@ void Graph::PruneDetail(int u) {
         }
     }
     if (sd >= min_u) {
-        is_core_lst[u] = TRUE;
+        core_status_lst[u] = CORE;
     } else if (ed < min_u) {
-        is_non_core_lst[u] = TRUE;
+        core_status_lst[u] = NON_CORE;
     }
 }
 
 void Graph::CheckCoreFirstBSP(int u) {
-    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
+    if (core_status_lst[u] == UN_KNOWN) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
@@ -414,13 +413,13 @@ void Graph::CheckCoreFirstBSP(int u) {
             if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
-                    is_core_lst[u] = TRUE;
+                    core_status_lst[u] = CORE;
                     return;
                 }
             } else if (min_cn[edge_idx] == NOT_SIMILAR) {
                 --ed;
                 if (ed < min_u) {
-                    is_non_core_lst[u] = TRUE;
+                    core_status_lst[u] = NON_CORE;
                     return;
                 }
             }
@@ -435,13 +434,13 @@ void Graph::CheckCoreFirstBSP(int u) {
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
-                        is_core_lst[u] = TRUE;
+                        core_status_lst[u] = CORE;
                         return;
                     }
                 } else {
                     --ed;
                     if (ed < min_u) {
-                        is_non_core_lst[u] = TRUE;
+                        core_status_lst[u] = NON_CORE;
                         return;
                     }
                 }
@@ -451,14 +450,14 @@ void Graph::CheckCoreFirstBSP(int u) {
 }
 
 void Graph::CheckCoreSecondBSP(int u) {
-    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
+    if (core_status_lst[u] == UN_KNOWN) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
-                    is_core_lst[u] = TRUE;
+                    core_status_lst[u] = CORE;
                     return;
                 }
             }
@@ -478,7 +477,7 @@ void Graph::CheckCoreSecondBSP(int u) {
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
-                        is_core_lst[u] = TRUE;
+                        core_status_lst[u] = CORE;
                         return;
                     }
                 } else {
@@ -583,7 +582,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
         auto v_start = 0;
         long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
-            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+            if (core_status_lst[v_i] == UN_KNOWN) {
                 deg_sum += degree[v_i];
                 if (deg_sum > 32 * 1024) {
                     deg_sum = 0;
@@ -610,7 +609,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
         auto v_start = 0;
         long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
-            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+            if (core_status_lst[v_i] == UN_KNOWN) {
                 deg_sum += degree[v_i];
                 if (deg_sum > 64 * 1024) {
                     deg_sum = 0;
