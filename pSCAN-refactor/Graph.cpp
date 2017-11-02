@@ -45,14 +45,14 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     out_edge_start = std::move(io_helper_ptr->offset_out_edges);
     out_edges = std::move(io_helper_ptr->out_edges);
 
+    // vertex properties
+    degree = std::move(io_helper_ptr->degree);
+    core_status_lst = vector<char>(n, UN_KNOWN);
+
     // edge properties
     min_cn = static_cast<int *>(_mm_malloc(io_helper_ptr->m * sizeof(int), 32));
 #define PTR_TO_UINT64(x) (uint64_t)(uintptr_t)(x)
     assert(PTR_TO_UINT64(min_cn) % 32 == 0);
-
-    // vertex properties
-    degree = std::move(io_helper_ptr->degree);
-    core_status_lst = vector<char>(n, UN_KNOWN);
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
@@ -63,6 +63,10 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
     std::fill(cluster_dict.begin(), cluster_dict.end(), n);
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
+}
+
+Graph::~Graph() {
+    _mm_free(min_cn);
 }
 
 void Graph::Output(const char *eps_s, const char *miu) {
@@ -824,8 +828,4 @@ void Graph::pSCAN() {
     pSCANThirdPhaseClusterCore();
 
     pSCANFourthPhaseClusterNonCore();
-}
-
-Graph::~Graph() {
-    _mm_free(min_cn);
 }
