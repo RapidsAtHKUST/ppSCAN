@@ -149,19 +149,23 @@ ui GraphGallopingSearchExp::BinarySearch(vector<int> &array, ui offset_beg, ui o
 
 
 ui GraphGallopingSearchExp::BinarySearchForGallopingSearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
-    auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    // linear search fallback
+    if (offset_end - offset_beg < 32) {
+        for (auto offset = offset_beg; offset < offset_end; offset++) {
+            if (array[offset] >= val) {
+                return offset;
+            }
+        }
+        return offset_end;
+    }
+    // recursive modified binary search to find first offset >= val
+    auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
     if (array[mid] == val) {
         return mid;
     }
-
     if (array[mid] < val) {
-        return mid + 1 == offset_end ? mid : BinarySearchForGallopingSearch(array, mid + 1, offset_end, val);
+        return BinarySearchForGallopingSearch(array, mid + 1, offset_end, val);
     }
-
-    if (mid == offset_beg) {
-        return offset_beg;
-    }
-
     return BinarySearchForGallopingSearch(array, offset_beg, mid, val);
 }
 
