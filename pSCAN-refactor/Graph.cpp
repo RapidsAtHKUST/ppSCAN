@@ -13,9 +13,9 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstring>
 
 #include <algorithm>
-#include <cstring>
 
 #include "playground/pretty_print.h"
 #include "ThreadPool.h"
@@ -49,7 +49,6 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
-    auto all_end = high_resolution_clock::now();
 
     // 4th: cluster_dict
     cluster_dict = static_cast<int *>(_mm_malloc(io_helper_ptr->n * sizeof(int), 32));
@@ -57,6 +56,8 @@ Graph::Graph(const char *dir_string, const char *eps_s, int min_u) {
         cluster_dict[i] = n;
     }
     assert(PTR_TO_UINT64(cluster_dict) % 32 == 0);
+
+    auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }
@@ -75,7 +76,6 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
     if (((long long) c) * ((long long) c) * eps_b2 < ((long long) du) * ((long long) dv) * eps_a2) { ++c; }
     return c;
 }
-
 
 int Graph::IntersectNeighborSetsSSE(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u

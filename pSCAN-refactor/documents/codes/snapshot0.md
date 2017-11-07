@@ -11,7 +11,7 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
     return c;
 }
 
-int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+int Graph::IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
 #ifdef STATISTICS
@@ -61,7 +61,7 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 
 int Graph::EvalReachable(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
-    return IntersectNeighborSets(u, v, min_cn[edge_idx]);
+    return IntersectNeighborSetsStdMerge(u, v, min_cn[edge_idx]);
 }
 ```
 

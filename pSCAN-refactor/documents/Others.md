@@ -379,7 +379,7 @@ int Graph::EvalReachable(int u, ui edge_idx) {
 //        min_cn[edge_idx] = c;
 //        UpdateViaCrossLink(edge_idx);
 //    }
-    return IntersectNeighborSets(u, v, min_cn[edge_idx]);
+    return IntersectNeighborSetsStdMerge(u, v, min_cn[edge_idx]);
 }
 ```
 

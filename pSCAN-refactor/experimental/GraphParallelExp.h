@@ -27,11 +27,10 @@ private:
 
     // vertex properties
     vector<int> degree;
-    vector<char> is_core_lst;
-    vector<char> is_non_core_lst;
+    vector<char> core_status_lst;
 
     // clusters: core and non-core(hubs)
-    vector<int> cluster_dict;    // observation 2: core vertex clusters are disjoint
+    int *cluster_dict;    // observation 2: core vertex clusters are disjoint
 
     // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
@@ -47,6 +46,12 @@ private:
     int ComputeCnLowerBound(int u, int v);
 
     int IntersectNeighborSets(int u, int v, int min_cn_num);
+
+    int IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num);
+
+    int IntersectNeighborSetsAVX2(int u, int v, int min_cn_num);
+
+    int IntersectNeighborSetsAVX512(int u, int v, int min_cn_num);
 
     int EvalSimilarity(int u, ui edge_idx);
 

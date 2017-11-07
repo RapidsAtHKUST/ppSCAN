@@ -5,8 +5,11 @@
 #else
 
 #include <mm_malloc.h>
+#include <x86intrin.h>
 
 #endif // defined(__GNUC__)
+
+#include <immintrin.h>
 
 #include <cassert>
 #include <cmath>
@@ -43,18 +46,30 @@ GraphParallelExp::GraphParallelExp(const char *dir_string, const char *eps_s, in
 
     // vertex properties
     degree = std::move(io_helper_ptr->degree);
-    is_core_lst = vector<char>(n, FALSE);
-    is_non_core_lst = vector<char>(n, FALSE);
+    core_status_lst = vector<char>(n, UN_KNOWN);
 
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSets>(n);
+
+    // 4th: cluster_dict
+    cluster_dict = static_cast<int *>(_mm_malloc(io_helper_ptr->n * sizeof(int), 32));
+    for (auto i = 0; i < io_helper_ptr->n; i++) {
+        cluster_dict[i] = n;
+    }
+    assert(PTR_TO_UINT64(cluster_dict) % 32 == 0);
+
     auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
          << " ms\n";
 }
 
+GraphParallelExp::~GraphParallelExp() {
+    _mm_free(min_cn);
+    _mm_free(cluster_dict);
+}
+
 void GraphParallelExp::Output(const char *eps_s, const char *miu) {
-    io_helper_ptr->Output(eps_s, miu, noncore_cluster, is_core_lst, cluster_dict, *disjoint_set_ptr);
+    io_helper_ptr->Output(eps_s, miu, noncore_cluster, core_status_lst, cluster_dict, *disjoint_set_ptr);
 }
 
 int GraphParallelExp::ComputeCnLowerBound(int du, int dv) {
@@ -64,31 +79,6 @@ int GraphParallelExp::ComputeCnLowerBound(int du, int dv) {
 }
 
 int GraphParallelExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
-#ifdef NAIVE_SET_INTERSECTION
-    int cn = 2; // count for self and v, count for self and u
-    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
-            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
-
-    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-
-    // correctness guaranteed by two pruning previously in computing min_cn
-    for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
-         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
-         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
-        if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
-            --du;
-            ++offset_nei_u;
-        } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
-            --dv;
-            ++offset_nei_v;
-        } else {
-            ++cn;
-            ++offset_nei_u;
-            ++offset_nei_v;
-        }
-    }
-    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
-#else
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
             out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
@@ -116,12 +106,217 @@ int GraphParallelExp::IntersectNeighborSets(int u, int v, int min_cn_num) {
             ++offset_nei_v;
         }
     }
-#endif
+}
+
+int GraphParallelExp::IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num) {
+    int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+         offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
+         cn < min_cn_num && du >= min_cn_num && dv >= min_cn_num;) {
+        if (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            ++offset_nei_u;
+        } else if (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            ++offset_nei_v;
+        } else {
+            ++cn;
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+    return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+}
+
+int GraphParallelExp::IntersectNeighborSetsAVX2(int u, int v, int min_cn_num) {
+    int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    constexpr int parallelism = 8;
+    while (true) {
+        // avx2, out_edges[offset_nei_v] as the pivot
+        __m256i pivot_u = _mm256_set1_epi32(out_edges[offset_nei_v]);
+        while (offset_nei_u + parallelism < out_edge_start[u + 1]) {
+            __m256i inspected_ele = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(&out_edges[offset_nei_u]));
+            __m256i cmp_res = _mm256_cmpgt_epi32(pivot_u, inspected_ele);
+            auto mask = _mm256_movemask_epi8(cmp_res);
+            auto count = mask == 0xffffffff ? parallelism : _popcnt32(mask) >> 2;
+            // update offset_nei_u and du
+            offset_nei_u += count;
+            du -= count;
+            if (du < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (offset_nei_u + parallelism >= out_edge_start[u + 1]) {
+            break;
+        }
+
+        // avx2, out_edges[offset_nei_u] as the pivot
+        __m256i pivot_v = _mm256_set1_epi32(out_edges[offset_nei_u]);
+        while (offset_nei_v + parallelism < out_edge_start[v + 1]) {
+            __m256i inspected_ele = _mm256_loadu_si256(reinterpret_cast<const __m256i *>(&out_edges[offset_nei_v]));
+            __m256i cmp_res = _mm256_cmpgt_epi32(pivot_v, inspected_ele);
+            auto mask = _mm256_movemask_epi8(cmp_res);
+            auto count = mask == 0xffffffff ? parallelism : _popcnt32(mask) >> 2;
+
+            // update offset_nei_u and du
+            offset_nei_v += count;
+            dv -= count;
+            if (dv < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (offset_nei_v + parallelism >= out_edge_start[v + 1]) {
+            break;
+        }
+
+        // find possible equality
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+
+    while (true) {
+        // left ones
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            if (du < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_u;
+        }
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            if (dv < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_v;
+        }
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+}
+
+
+int GraphParallelExp::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
+    int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    constexpr int parallelism = 16;
+    while (true) {
+        // avx512(knl), out_edges[offset_nei_v] as the pivot
+        while (offset_nei_u + parallelism < out_edge_start[u + 1]) {
+            __m512i pivot = _mm512_set1_epi32(out_edges[offset_nei_v]);
+            __m512i inspected_ele = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&out_edges[offset_nei_u]));
+            __mmask16 cmp_res = _mm512_cmpgt_epi32_mask(pivot, inspected_ele);
+            auto count = _mm_popcnt_u32(cmp_res);
+
+            // update offset_nei_u and du
+            offset_nei_u += count;
+            du -= count;
+            if (du < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (offset_nei_u + parallelism >= out_edge_start[u + 1]) {
+            break;
+        }
+
+        // avx512(knl), out_edges[offset_nei_u] as the pivot
+        while (offset_nei_v + parallelism < out_edge_start[v + 1]) {
+            __m512i pivot = _mm512_set1_epi32(out_edges[offset_nei_u]);
+            __m512i inspected_ele = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&out_edges[offset_nei_v]));
+            __mmask16 cmp_res = _mm512_cmpgt_epi32_mask(pivot, inspected_ele);
+            auto count = _mm_popcnt_u32(cmp_res);
+
+            // update offset_nei_u and du
+            offset_nei_v += count;
+            dv -= count;
+            if (dv < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (offset_nei_v + parallelism >= out_edge_start[v + 1]) {
+            break;
+        }
+
+        // find possible equality
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+
+    while (true) {
+        // left ones
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            if (du < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_u;
+        }
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            if (dv < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_v;
+        }
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
 }
 
 int GraphParallelExp::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
+#if defined(NAIVE_SET_INTERSECTION)
+    return IntersectNeighborSetsStdMerge(u, v, min_cn[edge_idx]);
+#elif defined(AVX2_PIVOT_SET_INTERSECTION)
+    return IntersectNeighborSetsAVX2(u, v, min_cn[edge_idx]);
+#elif defined(AVX512_PIVOT_SET_INTERSECTION)
+    return IntersectNeighborSetsAVX512(u, v, min_cn[edge_idx]);
+#else
     return IntersectNeighborSets(u, v, min_cn[edge_idx]);
+#endif
 }
 
 ui GraphParallelExp::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
@@ -131,7 +326,7 @@ ui GraphParallelExp::BinarySearch(vector<int> &array, ui offset_beg, ui offset_e
 }
 
 bool GraphParallelExp::IsDefiniteCoreVertex(int u) {
-    return is_core_lst[u] == TRUE;
+    return core_status_lst[u] == CORE;
 }
 
 void GraphParallelExp::PruneDetail(int u) {
@@ -154,30 +349,30 @@ void GraphParallelExp::PruneDetail(int u) {
         }
     }
     if (sd >= min_u) {
-        is_core_lst[u] = TRUE;
+        core_status_lst[u] = CORE;
     } else if (ed < min_u) {
-        is_non_core_lst[u] = TRUE;
+        core_status_lst[u] = NON_CORE;
     }
 }
 
 void GraphParallelExp::CheckCoreFirstBSP(int u) {
-    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
+    if (core_status_lst[u] == UN_KNOWN) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
-            // be careful, the next line can only be commented when memory load/store of min_cn is atomic
-//            auto v = out_edges[edge_idx];
+            // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torn read
+//        auto v = out_edges[edge_idx];
 //        if (u <= v) {
             if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
-                    is_core_lst[u] = TRUE;
+                    core_status_lst[u] = CORE;
                     return;
                 }
             } else if (min_cn[edge_idx] == NOT_SIMILAR) {
                 --ed;
                 if (ed < min_u) {
-                    is_non_core_lst[u] = TRUE;
+                    core_status_lst[u] = NON_CORE;
                     return;
                 }
             }
@@ -192,13 +387,13 @@ void GraphParallelExp::CheckCoreFirstBSP(int u) {
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
-                        is_core_lst[u] = TRUE;
+                        core_status_lst[u] = CORE;
                         return;
                     }
                 } else {
                     --ed;
                     if (ed < min_u) {
-                        is_non_core_lst[u] = TRUE;
+                        core_status_lst[u] = NON_CORE;
                         return;
                     }
                 }
@@ -208,14 +403,14 @@ void GraphParallelExp::CheckCoreFirstBSP(int u) {
 }
 
 void GraphParallelExp::CheckCoreSecondBSP(int u) {
-    if (is_core_lst[u] == FALSE && is_non_core_lst[u] == FALSE) {
+    if (core_status_lst[u] == UN_KNOWN) {
         auto sd = 0;
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
-                    is_core_lst[u] = TRUE;
+                    core_status_lst[u] = CORE;
                     return;
                 }
             }
@@ -235,7 +430,7 @@ void GraphParallelExp::CheckCoreSecondBSP(int u) {
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
-                        is_core_lst[u] = TRUE;
+                        core_status_lst[u] = CORE;
                         return;
                     }
                 } else {
@@ -337,7 +532,7 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
         auto v_start = 0;
         long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
-            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+            if (core_status_lst[v_i] == UN_KNOWN) {
                 deg_sum += degree[v_i];
                 if (deg_sum > 32 * 1024) {
                     deg_sum = 0;
@@ -364,7 +559,7 @@ void GraphParallelExp::pSCANSecondPhaseCheckCore() {
         auto v_start = 0;
         long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
-            if (is_core_lst[v_i] == FALSE && is_non_core_lst[v_i] == FALSE) {
+            if (core_status_lst[v_i] == UN_KNOWN) {
                 deg_sum += degree[v_i];
                 if (deg_sum > 64 * 1024) {
                     deg_sum = 0;
@@ -460,14 +655,24 @@ void GraphParallelExp::pSCANThirdPhaseClusterCore() {
 }
 
 void GraphParallelExp::MarkClusterMinEleAsId() {
-    cluster_dict = vector<int>(n);
-    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
-
-    for (auto i = 0u; i < n; i++) {
-        if (IsDefiniteCoreVertex(i)) {
-            int x = disjoint_set_ptr->FindRoot(i);
-            if (i < cluster_dict[x]) { cluster_dict[x] = i; }
-        }
+    ThreadPool pool(thread_num_);
+    auto step = max(1u, n / thread_num_);
+    for (auto outer_i = 0u; outer_i < n; outer_i += step) {
+        pool.enqueue([this](ui i_start, ui i_end) {
+            for (auto i = i_start; i < i_end; i++) {
+                if (IsDefiniteCoreVertex(i)) {
+                    int x = disjoint_set_ptr->FindRoot(i);
+                    int cluster_min_ele;
+                    do {
+                        // assume no torn read of cluster_dict[x]
+                        cluster_min_ele = cluster_dict[x];
+                        if (i >= cluster_dict[x]) {
+                            break;
+                        }
+                    } while (!__sync_bool_compare_and_swap(&cluster_dict[x], cluster_min_ele, i));
+                }
+            }
+        }, outer_i, min(outer_i + step, n));
     }
 }
 
@@ -567,8 +772,4 @@ void GraphParallelExp::pSCAN() {
     pSCANThirdPhaseClusterCore();
 
     pSCANFourthPhaseClusterNonCore();
-}
-
-GraphParallelExp::~GraphParallelExp() {
-    _mm_free(min_cn);
 }

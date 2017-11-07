@@ -35,7 +35,6 @@ private:
     // first: cluster id(min core-vertex id in cluster), second: non-core vertex id
     vector<pair<int, int>> noncore_cluster; // observation 1: clusters may overlap, observation 3: non-core uniquely determined by core
 
-
     // disjoint-set: used for core-vertex induced connected components
     unique_ptr<DisjointSets> disjoint_set_ptr;
 
@@ -52,7 +51,6 @@ private:
     int IntersectNeighborSetsAVX2(int u, int v, int min_cn_num);
 
     int IntersectNeighborSetsAVX512(int u, int v, int min_cn_num);
-
 
     int EvalSimilarity(int u, ui edge_idx);
 

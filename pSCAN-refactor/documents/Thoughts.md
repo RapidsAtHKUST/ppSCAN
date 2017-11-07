@@ -4,13 +4,13 @@
 
 * parallelize the computations for `EvalReachable`
 
-* try to reduce the cost of if-branch miss in `IntersectNeighborSets(int u, int v, int min_cn_num)`, 
+* try to reduce the cost of if-branch miss in `IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num)`, 
 still keep early quit intersection functionality
 
 ## Optimized Merge
 
 ```cpp
-int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+int Graph::IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u
 #ifdef STATISTICS
@@ -92,7 +92,7 @@ pair<bool, ui> Graph::BinarySearch2(vector<int> &array, ui offset_beg, ui offset
     return mid == offset_beg ? make_pair(false, offset_beg) : BinarySearch2(array, offset_beg, mid, val);
 }
 
-int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
+int Graph::IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     if (degree[u] > degree[v]) { std::swap(u, v); }
     int du = degree[u] + 1, dv = degree[v] + 1; // count for self and v, count for self and u

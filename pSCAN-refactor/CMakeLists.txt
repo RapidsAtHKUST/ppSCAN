@@ -61,18 +61,31 @@ add_executable(pSCANSerialNaive ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANSerialNaive PRIVATE SERIAL=1 NAIVE_SET_INTERSECTION=1)
 target_compile_options(pSCANSerialNaive PRIVATE -O3 -g)
 
-## ppSCAN parallel experimental 0
+## ppSCAN parallel experimental 0: avx2 enabled pivot-set-intersection
 set(EXP_FILES experimental/main_exp_parallel.cpp experimental/GraphParallelExp.cpp experimental/GraphParallelExp.h
         InputOutput.cpp InputOutput.h DisjointSet.cpp DisjointSet.h ThreadPool.h)
 add_executable(pSCANParallelExp0 ${EXP_FILES})
-target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g)
+target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g -march=core-avx2)
+target_compile_definitions(pSCANParallelExp0 PRIVATE AVX2_PIVOT_SET_INTERSECTION=1)
 target_link_libraries(pSCANParallelExp0 ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(pSCANParallelExp0AVX512 ${EXP_FILES})
+target_compile_options(pSCANParallelExp0AVX512 PRIVATE -O3 -g -march=native)
+target_compile_definitions(pSCANParallelExp0AVX512 PRIVATE AVX512_PIVOT_SET_INTERSECTION=1)
+target_link_libraries(pSCANParallelExp0AVX512 ${CMAKE_THREAD_LIBS_INIT})
+
 
 ## ppSCAN parallel experimental 1: naive-set-intersection
 add_executable(pSCANParallelExp1 ${EXP_FILES})
 target_compile_options(pSCANParallelExp1 PRIVATE -O3 -g)
 target_compile_definitions(pSCANParallelExp1 PRIVATE NAIVE_SET_INTERSECTION=1)
 target_link_libraries(pSCANParallelExp1 ${CMAKE_THREAD_LIBS_INIT})
+
+## ppSCAN parallel experimental 1: pivot-set-intersection
+add_executable(pSCANParallelExp2 ${EXP_FILES})
+target_compile_options(pSCANParallelExp2 PRIVATE -O3 -g)
+target_compile_definitions(pSCANParallelExp2 PRIVATE PIVOT_SET_INTERSECTION=1)
+target_link_libraries(pSCANParallelExp2 ${CMAKE_THREAD_LIBS_INIT})
 
 ## pscan: refactor implementaion, under GPLv3 license
 add_subdirectory(experimental/pscan_experimental)
