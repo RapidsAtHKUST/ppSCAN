@@ -52,6 +52,8 @@ private:
 
     int IntersectNeighborSetsAVX512(int u, int v, int min_cn_num);
 
+    int IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num);
+
     int EvalSimilarity(int u, ui edge_idx);
 
     // avoiding redundant computation optimization: find reverse edge index, e.g, (i,j) index know, compute (j,i) index

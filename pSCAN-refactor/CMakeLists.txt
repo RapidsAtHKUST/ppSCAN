@@ -51,6 +51,12 @@ target_compile_definitions(pSCANParallelAVX512 PRIVATE ENABLE_AVX512=1)
 target_compile_options(pSCANParallelAVX512 PRIVATE -O3 -g -march=native)
 target_link_libraries(pSCANParallelAVX512 ${CMAKE_THREAD_LIBS_INIT})
 
+## ppSCAN release 4: parallel with avx512 merge
+add_executable(pSCANParallelAVX512Merge ${SOURCE_FILES})
+target_compile_definitions(pSCANParallelAVX512Merge PRIVATE ENABLE_AVX512_MERGE=1)
+target_compile_options(pSCANParallelAVX512Merge PRIVATE -O3 -g -march=native)
+target_link_libraries(pSCANParallelAVX512Merge ${CMAKE_THREAD_LIBS_INIT})
+
 ## ppSCAN serial experimental 0: statistics 0
 add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
 target_compile_definitions(pSCANStatistics0 PRIVATE SERIAL=1 STATISTICS=1)
@@ -73,7 +79,6 @@ add_executable(pSCANParallelExp0AVX512 ${EXP_FILES})
 target_compile_options(pSCANParallelExp0AVX512 PRIVATE -O3 -g -march=native)
 target_compile_definitions(pSCANParallelExp0AVX512 PRIVATE AVX512_PIVOT_SET_INTERSECTION=1)
 target_link_libraries(pSCANParallelExp0AVX512 ${CMAKE_THREAD_LIBS_INIT})
-
 
 ## ppSCAN parallel experimental 1: naive-set-intersection
 add_executable(pSCANParallelExp1 ${EXP_FILES})

@@ -337,6 +337,110 @@ int Graph::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
     }
 }
 
+int Graph::IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num) {
+    if (degree[u] > degree[v]) {
+        auto tmp = u;
+        u = v;
+        v = tmp;
+    }
+    auto off_nei_u = out_edge_start[u], off_nei_v = out_edge_start[v];
+    auto off_u_end = out_edge_start[u + 1], off_v_end = out_edge_start[v + 1];
+
+    auto cn_count = 2;
+    constexpr int parallelism = 16;
+    __m512i st = _mm512_set_epi32(3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0, 0, 0);
+
+    auto size1 = (off_v_end - off_nei_v) / (off_u_end - off_nei_u);
+    if (size1 > 2) {
+        if (off_nei_u < off_u_end && off_nei_v + 15 < off_v_end) {
+            __m512i u_elements = _mm512_set1_epi32(out_edges[off_nei_u]);
+            __m512i v_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_v]));
+
+            while (true) {
+                __mmask16 mask = _mm512_cmpeq_epi32_mask(u_elements, v_elements);
+                cn_count += _mm_popcnt_u32(mask);
+
+                if (out_edges[off_nei_u] > out_edges[off_nei_v + 15]) {
+                    off_nei_v += 16;
+                    if (off_nei_v + 15 >= off_v_end) {
+                        break;
+                    }
+                    v_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_v]));
+                } else {
+                    off_nei_u++;
+                    if (off_nei_u >= off_u_end) {
+                        break;
+                    }
+                    u_elements = _mm512_set1_epi32(out_edges[off_nei_u]);
+                }
+            }
+        }
+    } else {
+        if (off_nei_u + 3 < off_u_end && off_nei_v + 3 < off_v_end) {
+            __m512i u_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_u]));
+            __m512i u_elements_per = _mm512_permutevar_epi32(st, u_elements);
+            __m512i v_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_v]));
+            __m512i v_elements_per = _mm512_permute4f128_epi32(v_elements, 0b00000000);
+
+            while (true) {
+                __mmask16 mask = _mm512_cmpeq_epi32_mask(u_elements_per, v_elements_per);
+                cn_count += _mm_popcnt_u32(mask);
+
+                if (out_edges[off_nei_u + 3] > out_edges[off_nei_v + 3]) {
+                    off_nei_v += 4;
+                    if (off_nei_v + 3 >= off_v_end) {
+                        break;
+                    }
+                    v_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_v]));
+                    v_elements_per = _mm512_permute4f128_epi32(v_elements, 0b00000000);
+                } else if (out_edges[off_nei_u + 3] < out_edges[off_nei_v + 3]) {
+                    off_nei_u += 4;
+                    if (off_nei_u + 3 >= off_u_end) {
+                        break;
+                    }
+                    u_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_u]));
+                    u_elements_per = _mm512_permutevar_epi32(st, u_elements);
+                } else {
+                    off_nei_u += 4;
+                    off_nei_v += 4;
+                    if (off_nei_u + 3 >= off_u_end || off_nei_v + 3 >= off_v_end) {
+                        break;
+                    }
+                    u_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_u]));
+                    u_elements_per = _mm512_permutevar_epi32(st, u_elements);
+                    v_elements = _mm512_loadu_si512((__m512i *) (&out_edges[off_nei_v]));
+                    v_elements_per = _mm512_permute4f128_epi32(v_elements, 0b00000000);
+                }
+            }
+        }
+    }
+    if (off_nei_u < off_u_end && off_nei_v < off_v_end) {
+        while (true) {
+            while (out_edges[off_nei_u] < out_edges[off_nei_v]) {
+                ++off_nei_u;
+                if (off_nei_u >= off_u_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+            while (out_edges[off_nei_u] > out_edges[off_nei_v]) {
+                ++off_nei_v;
+                if (off_nei_v >= off_v_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+            if (out_edges[off_nei_u] == out_edges[off_nei_v]) {
+                cn_count++;
+                ++off_nei_u;
+                ++off_nei_v;
+                if (off_nei_u >= off_u_end || off_nei_v >= off_v_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+        }
+    }
+    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+}
+
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -371,6 +475,8 @@ int Graph::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
 #if defined(ENABLE_AVX512)
     return IntersectNeighborSetsAVX512(u, v, min_cn[edge_idx]);
+#elif defined(ENABLE_AVX512_MERGE)
+    return IntersectNeighborSetsAVX512MergePopCnt(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_AVX2)
     return IntersectNeighborSetsAVX2(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_SSE)
