@@ -21,14 +21,17 @@ def post_process(statistics_dic):
 
 if __name__ == '__main__':
     data_set_lst = [
-        'small_snap_dblp',
-        'snap_pokec', 'snap_livejournal', 'snap_orkut',
-        'webgraph_uk', 'webgraph_webbase',
-        'webgraph_twitter', 'snap_friendster'
+        # 'small_snap_dblp',
+        # 'snap_pokec', 'snap_livejournal',
+        'snap_orkut',
+        # 'webgraph_uk',
+        'webgraph_webbase',
+        'webgraph_twitter',
+        'snap_friendster'
     ]
 
-    figure_folder = 'scalability_new4_all_in_parallel_deg_scheduler'
-    markdown_folder = 'case_studies/figures-case-study11-scalability-differ-eps'
+    figure_folder = 'scalability_simd_paper'
+    markdown_folder = 'case_studies/figures-case-study13-scalability-simd'
 
     os.system('mkdir -p ./figures/' + figure_folder)
     os.system('mkdir -p ' + markdown_folder)
@@ -40,7 +43,7 @@ if __name__ == '__main__':
             # should generate a markdown, e.g, small_snap_dblp.md
             for eps in eps_lst:
                 time_info_dict = get_statistics(data_set, eps, min_pts, figure_folder=figure_folder,
-                                                root_folder='/mnt/mount-gpu/d2/yche/projects/python_experiments')
+                                                root_folder='/home/yche/mnt/gpu-23/projects/python_experiments')
                 append_txt = ' - '.join([data_set, 'eps:' + str(eps), 'min_pts:' + str(min_pts)])
                 # 1st: overall time cost
                 display_overview(time_info_dict, append_txt, figure_folder)
