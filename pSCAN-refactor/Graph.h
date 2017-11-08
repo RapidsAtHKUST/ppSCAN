@@ -73,6 +73,10 @@ private:
 
     void ClusterCoreSecondPhase(int u);
 
+    void CheckCoreFirstPhaseDegree(int u, int degree_start, int degree_end);
+
+    void CheckCoreSecondPhaseDegree(int u, int degree_start, int degree_end);
+
     void ClusterNonCoreFirstPhase(int u);
 
     void ClusterNonCoreSecondPhase(int u, vector<pair<int, int>> &tmp_cluster);

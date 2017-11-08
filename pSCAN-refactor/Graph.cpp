@@ -696,29 +696,55 @@ void Graph::pSCANSecondPhaseCheckCore() {
     // check-core 1st phase
     auto find_core_start = high_resolution_clock::now();
     auto thread_num = std::thread::hardware_concurrency();
+    auto split_degree = 1024;
     {
         ThreadPool pool(thread_num);
 
         auto v_start = 0;
         long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
-            if (core_status_lst[v_i] == UN_KNOWN) {
+            if (degree[v_i] < split_degree && core_status_lst[v_i] == UN_KNOWN) {
                 deg_sum += degree[v_i];
                 if (deg_sum > 32 * 1024) {
                     deg_sum = 0;
-                    pool.enqueue([this](int i_start, int i_end) {
-                        for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+                    pool.enqueue([this, split_degree](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreFirstPhaseDegree(i, 0, split_degree); }
                     }, v_start, v_i + 1);
                     v_start = v_i + 1;
                 }
             }
         }
-
-        pool.enqueue([this](int i_start, int i_end) {
-            for (auto i = i_start; i < i_end; i++) { CheckCoreFirstBSP(i); }
+        pool.enqueue([this, split_degree](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreFirstPhaseDegree(i, 0, split_degree); }
         }, v_start, n);
     }
     auto first_bsp_end = high_resolution_clock::now();
+    cout << "middle time:"
+         << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
+
+    {
+        ThreadPool pool(thread_num);
+        auto v_start = 0;
+        long deg_sum = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            if (degree[v_i] >= 1024 && core_status_lst[v_i] == UN_KNOWN) {
+                deg_sum += degree[v_i];
+                if (deg_sum > 32 * 1024) {
+                    deg_sum = 0;
+                    pool.enqueue([this, split_degree](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) {
+                            CheckCoreFirstPhaseDegree(i, split_degree, degree.size());
+                        }
+                    }, v_start, v_i + 1);
+                    v_start = v_i + 1;
+                }
+            }
+        }
+        pool.enqueue([this, split_degree](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreFirstPhaseDegree(i, split_degree, degree.size()); }
+        }, v_start, n);
+    }
+    first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
 
@@ -729,12 +755,29 @@ void Graph::pSCANSecondPhaseCheckCore() {
         auto v_start = 0;
         long deg_sum = 0;
         for (auto v_i = 0; v_i < n; v_i++) {
-            if (core_status_lst[v_i] == UN_KNOWN) {
+            if (degree[v_i] < 256 && core_status_lst[v_i] == UN_KNOWN) {
                 deg_sum += degree[v_i];
                 if (deg_sum > 64 * 1024) {
                     deg_sum = 0;
                     pool.enqueue([this](int i_start, int i_end) {
-                        for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreSecondPhaseDegree(i, 0, 256); }
+                    }, v_start, v_i + 1);
+                    v_start = v_i + 1;
+                }
+            }
+        }
+        pool.enqueue([this](int i_start, int i_end) {
+            for (auto i = i_start; i < i_end; i++) { CheckCoreSecondPhaseDegree(i, 0, 256); }
+        }, v_start, n);
+
+        v_start = 0;
+        for (auto v_i = 0; v_i < n; v_i++) {
+            if (degree[v_i] >= 256 && core_status_lst[v_i] == UN_KNOWN) {
+                deg_sum += degree[v_i];
+                if (deg_sum > 64 * 1024) {
+                    deg_sum = 0;
+                    pool.enqueue([this](int i_start, int i_end) {
+                        for (auto i = i_start; i < i_end; i++) { CheckCoreSecondPhaseDegree(i, 256, degree.size()); }
                     }, v_start, v_i + 1);
                     v_start = v_i + 1;
                 }
@@ -742,7 +785,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
         }
 
         pool.enqueue([this](int i_start, int i_end) {
-            for (auto i = i_start; i < i_end; i++) { CheckCoreSecondBSP(i); }
+            for (auto i = i_start; i < i_end; i++) { CheckCoreSecondPhaseDegree(i, 256, degree.size()); }
         }, v_start, n);
     }
 
@@ -945,4 +988,16 @@ void Graph::pSCAN() {
     pSCANThirdPhaseClusterCore();
 
     pSCANFourthPhaseClusterNonCore();
+}
+
+void Graph::CheckCoreFirstPhaseDegree(int u, int degree_start, int degree_end) {
+    if (degree[u] >= degree_start && degree[u] < degree_end) {
+        CheckCoreFirstBSP(u);
+    }
+}
+
+void Graph::CheckCoreSecondPhaseDegree(int u, int degree_start, int degree_end) {
+    if (degree[u] >= degree_start && degree[u] < degree_end) {
+        CheckCoreSecondBSP(u);
+    }
 }
