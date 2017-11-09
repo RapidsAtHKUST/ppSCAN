@@ -106,6 +106,7 @@ def display_overview(statistics_dic, title_append_txt='', figure_folder='.'):
               fontdict=font)
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('time (s)', fontdict=font)
+    plt.xticks(thread_lst, map(lambda ele: int(2 ** ele), thread_lst))
     # plt.xscale('log')
     # plt.yscale('log')
     plt.savefig('./figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png',
@@ -151,6 +152,7 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     plt.legend(filtered_tag_list)
     plt.yscale('log')
     plt.ylabel('time (s)', fontdict=font)
+    plt.xticks(thread_lst, map(lambda ele: int(2 ** ele), thread_lst))
 
     # 2nd: draw speedup
     tag_speedup_lst = map(lambda tag_time_lst_pair: (
@@ -171,6 +173,8 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     plt.ylabel('speedup', fontdict=font)
     # plt.ylim([0, max_speedup * 1.1])
     plt.yscale('log')
+    plt.xticks(thread_lst, map(lambda ele: int(2 ** ele), thread_lst))
+
     # show the whole runtime/speedup figure
     plt.savefig(
         './figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'runtime-speedup.png',
