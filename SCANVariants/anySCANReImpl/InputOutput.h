@@ -33,6 +33,7 @@ namespace anySCAN {
 namespace yche {
     constexpr int NOT_SIMILAR = -2;
     constexpr int SIMILAR = -1;
+    constexpr int UNKNOWN = 0;
 
     template<typename T, typename... Args>
     std::unique_ptr<T> make_unique(Args &&... args) {

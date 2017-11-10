@@ -30,8 +30,12 @@ private:
     vector<char> vertex_status;
     vector<int> eps_neighbor_num;
 
+    // edge property
+    vector<int> min_cn;
+
     // clusters: core and non-core(hubs)
     vector<int> cluster_dict;
+
 
     // disjoint-sets represent core-induced clusters, eps_neighborhood has one-hop information
     unique_ptr<DisjointSet> disjoint_set_ptr;
@@ -55,6 +59,9 @@ private:
 
     int EvalSimilarity(int u, ui edge_idx);
 
+    ui BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val);
+
+private:
     void Summarize();
 
     void MergeStronglyRelatedCluster();

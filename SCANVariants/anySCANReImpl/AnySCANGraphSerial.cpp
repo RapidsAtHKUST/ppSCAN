@@ -37,6 +37,8 @@ AnySCANGraph::AnySCANGraph(const char *dir_string, const char *eps_s, int min_u)
     eps_neighborhood = vector<vector<int>>(n);
     candidate_super_nodes = vector<vector<int>>(n);
 
+    min_cn = vector<int>(io_helper_ptr->m, UNKNOWN);
+
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
 
     alpha_block_size = 8192;
@@ -115,7 +117,12 @@ void AnySCANGraph::Summarize() {
                 // compute eps-neighborhood for u
                 auto sd = 0;
                 for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-                    if (EvalSimilarity(u, j) == SIMILAR) {
+                    if (min_cn[j] == UNKNOWN) {
+                        min_cn[j] = EvalSimilarity(u, j);
+                        auto v = out_edges[j];
+                        min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[j];
+                    }
+                    if (min_cn[j] == SIMILAR) {
                         eps_neighborhood[u].emplace_back(out_edges[j]);
                         sd++;
                     }
@@ -214,7 +221,13 @@ void AnySCANGraph::MergeStronglyRelatedCluster() {
                 auto sd = 0;
                 for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
                     auto &eps_neighborhood_vec = eps_neighborhood[u];
-                    if (EvalSimilarity(u, j) == SIMILAR) {
+                    if (min_cn[j] == UNKNOWN) {
+                        min_cn[j] = EvalSimilarity(u, j);
+                        auto v = out_edges[j];
+                        min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[j];
+
+                    }
+                    if (min_cn[j] == SIMILAR) {
                         eps_neighborhood_vec.emplace_back(out_edges[j]);
                         sd++;
                     }
@@ -269,7 +282,12 @@ void AnySCANGraph::MergeWeaklyRelatedCluster() {
                     auto sd = 0;
                     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
                         auto &eps_neighborhood_vec = eps_neighborhood[u];
-                        if (EvalSimilarity(u, j) == SIMILAR) {
+                        if (min_cn[j] == UNKNOWN) {
+                            min_cn[j] = EvalSimilarity(u, j);
+                            auto v = out_edges[j];
+                            min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[j];
+                        }
+                        if (min_cn[j] == SIMILAR) {
                             eps_neighborhood_vec.emplace_back(out_edges[j]);
                             sd++;
                         }
@@ -293,7 +311,11 @@ void AnySCANGraph::MergeWeaklyRelatedCluster() {
                     auto v = out_edges[j];
                     if (vertex_status[v] == anySCAN::PROCESSED_CORE || vertex_status[v] == anySCAN::UNPROCESSED_CORE) {
                         if (!disjoint_set_ptr->IsSameSet(u, v)) {
-                            if (EvalSimilarity(u, j) == SIMILAR) {
+                            if (min_cn[j] == UNKNOWN) {
+                                min_cn[j] = EvalSimilarity(u, j);
+                                min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[j];
+                            }
+                            if (min_cn[j] == SIMILAR) {
                                 disjoint_set_ptr->Union(u, v);
                             }
                         }
@@ -333,7 +355,10 @@ void AnySCANGraph::ClusterNonCore() {
             for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
                 auto v = out_edges[j];
                 if (vertex_status[v] != anySCAN::PROCESSED_CORE && vertex_status[u] != anySCAN::UNPROCESSED_CORE) {
-                    if (EvalSimilarity(u, j) == SIMILAR) {
+                    if (min_cn[j] == UNKNOWN) {
+                        min_cn[j] = EvalSimilarity(u, j);
+                    }
+                    if (min_cn[j] == SIMILAR) {
                         noncore_cluster.emplace_back(cluster_id, v);
                     }
                 }
@@ -367,4 +392,10 @@ void AnySCANGraph::anySCAN() {
 
 void AnySCANGraph::Output(const char *eps_s, const char *miu) {
     io_helper_ptr->OutputAnySCAN(eps_s, miu, noncore_cluster, vertex_status, cluster_dict, disjoint_set_ptr->parent);
+}
+
+ui AnySCANGraph::BinarySearch(vector<int> &array, ui offset_beg, ui offset_end, int val) {
+    auto mid = static_cast<ui>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+    if (array[mid] == val) { return mid; }
+    return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
