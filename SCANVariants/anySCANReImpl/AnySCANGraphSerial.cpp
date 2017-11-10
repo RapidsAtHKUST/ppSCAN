@@ -62,6 +62,31 @@ int AnySCANGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 #ifdef STATISTICS
     intersection_times++;
 #endif
+#ifdef PIVOT_SET_INTERSECT
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    while (true) {
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            if (du < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_u;
+        }
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            if (dv < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_v;
+        }
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+#else
     // correctness guaranteed by two pruning previously in computing min_cn
     for (auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
          offset_nei_u < out_edge_start[u + 1] && offset_nei_v < out_edge_start[v + 1] &&
@@ -79,6 +104,7 @@ int AnySCANGraph::IntersectNeighborSets(int u, int v, int min_cn_num) {
         }
     }
     return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+#endif
 }
 
 int AnySCANGraph::EvalSimilarity(int u, ui edge_idx) {
@@ -313,7 +339,8 @@ void AnySCANGraph::MergeWeaklyRelatedCluster() {
                         if (!disjoint_set_ptr->IsSameSet(u, v)) {
                             if (min_cn[j] == UNKNOWN) {
                                 min_cn[j] = EvalSimilarity(u, j);
-                                min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1], u)] = min_cn[j];
+                                min_cn[BinarySearch(out_edges, out_edge_start[v], out_edge_start[v + 1],
+                                                    u)] = min_cn[j];
                             }
                             if (min_cn[j] == SIMILAR) {
                                 disjoint_set_ptr->Union(u, v);

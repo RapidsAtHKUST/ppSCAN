@@ -7,3 +7,7 @@ set(SOURCE_FILES main_exp_any_scan_serial.cpp AnySCANGraphSerial.h AnySCANGraphS
 add_executable(anySCANReImpl ${SOURCE_FILES})
 target_compile_options(anySCANReImpl PRIVATE -O3 -g)
 target_compile_definitions(anySCANReImpl PRIVATE STATISTICS=1)
+
+add_executable(anySCANReImplPivotSetInter ${SOURCE_FILES})
+target_compile_options(anySCANReImplPivotSetInter PRIVATE -O3 -g)
+target_compile_definitions(anySCANReImplPivotSetInter PRIVATE PIVOT_SET_INTERSECT=1)
