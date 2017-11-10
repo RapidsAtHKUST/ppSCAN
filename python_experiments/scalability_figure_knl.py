@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import sys, os
 from functools import partial
-import workload_figure
+import workload_figure_knl
 import math
 
 # total time tag, and five separate time tag: first three parallel, last two serial
@@ -44,8 +44,8 @@ def parse_lines(lines):
 def get_statistics(dataset, eps, min_pts, figure_folder, root_folder='.'):
     info_dict = dict()
     dir_path = os.sep.join([root_folder, figure_folder, dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts)])
-    pscan_time = workload_figure.get_workload_statistics(dataset, eps, min_pts, root_folder + os.sep + 'worklaod')[
-        workload_figure.runtime_tag + workload_figure.pscan_tag]
+    pscan_time = workload_figure_knl.get_workload_statistics(dataset, eps, min_pts, root_folder + os.sep + 'knl-workload-pscan-only')[
+        workload_figure_knl.runtime_tag + workload_figure_knl.pscan_tag]
 
     for root, dirs, files in os.walk(dir_path):
         for file in files:
