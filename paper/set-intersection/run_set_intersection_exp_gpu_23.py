@@ -16,14 +16,17 @@ if __name__ == '__main__':
     ppscan2_path = '/ghome/yche/projects/pSCAN-refactor/build/pSCANParallelExp2'
     exec_path_lst = [ppscan0_path, ppscan1_path, ppscan2_path]
 
-    profiler_tag_lst = ['advanced-hotspots', 'memory-access', 'general-exploration']
+    # profiler_tag_lst = ['advanced-hotspots', 'memory-access', 'general-exploration']
+    profiler_tag_lst = ['general-exploration']
 
-    sample_interval_lst = [10, 10, 100, 100]
+    # sample_interval_lst = [10, 10, 100, 100]
     for idx, dataset_path in enumerate(dataset_path_lst):
-        profiler_knob_tag_lst = ['-knob sampling-interval=' + str(sample_interval_lst[idx]),
-                                 '-knob sampling-interval=' + str(sample_interval_lst[idx]),
-                                 '-knob collect-memory-bandwidth=true '
-                                 '-knob enable-user-tasks=false -knob analyze-openmp=false']
+        # profiler_knob_tag_lst = ['-knob sampling-interval=' + str(sample_interval_lst[idx]),
+        #                          '-knob sampling-interval=' + str(sample_interval_lst[idx]),
+        #                          '-knob collect-memory-bandwidth=true '
+        #                          '-knob enable-user-tasks=false -knob analyze-openmp=false']
+        profiler_knob_tag_lst = [
+            '-knob collect-memory-bandwidth=true -knob enable-user-tasks=false']
         dataset_name = dataset_path.split(os.sep)[-1].split('_')[-1]
 
         for eps in eps_lst:

@@ -37,8 +37,8 @@ if __name__ == '__main__':
     os.system('mkdir -p ./figures/' + figure_folder)
     os.system('mkdir -p ' + markdown_folder)
     min_pts = 5
-    # eps_lst = [float(i + 1) / 10 for i in xrange(9)]
-    eps_lst = [0.1, 0.2]
+    eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+    # eps_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
 
     for data_set in data_set_lst:
         with open(markdown_folder + os.sep + data_set + '.md', 'w') as ifs:
