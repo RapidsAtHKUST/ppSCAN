@@ -26,9 +26,9 @@ if __name__ == '__main__':
         # 'snap_livejournal',
         # 'snap_orkut',
         # 'webgraph_uk',
-        'webgraph_webbase',
+        # 'webgraph_webbase',
         # 'webgraph_twitter',
-        # 'snap_friendster'
+        'snap_friendster'
     ]
 
     figure_folder = 'scalability_simd_paper'
@@ -37,8 +37,8 @@ if __name__ == '__main__':
     os.system('mkdir -p ./figures/' + figure_folder)
     os.system('mkdir -p ' + markdown_folder)
     min_pts = 5
-    eps_lst = [float(i + 1) / 10 for i in xrange(9)]
-    # eps_lst = [0.1]
+    # eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+    eps_lst = [0.1, 0.2]
 
     for data_set in data_set_lst:
         with open(markdown_folder + os.sep + data_set + '.md', 'w') as ifs:
