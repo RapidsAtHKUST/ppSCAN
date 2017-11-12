@@ -638,22 +638,14 @@ void Graph::ClusterCoreSecondPhase(int u) {
     }
 }
 
-void Graph::ClusterNonCoreFirstPhase(int u) {
-    for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
-        auto v = out_edges[j];
-        if (!IsDefiniteCoreVertex(v)) {
-            if (min_cn[j] > 0) {
-                min_cn[j] = EvalSimilarity(u, j);
-            }
-        }
-    }
-}
-
-void Graph::ClusterNonCoreSecondPhase(int u, vector<pair<int, int>> &tmp_cluster) {
+void Graph::ClusterNonCore(int u, vector<pair<int, int>> &tmp_cluster) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (!IsDefiniteCoreVertex(v)) {
             auto root_of_u = disjoint_set_ptr->FindRoot(static_cast<uint32_t>(u));
+            if (min_cn[j] > 0) {
+                min_cn[j] = EvalSimilarity(u, j);
+            }
             if (min_cn[j] == SIMILAR) {
                 tmp_cluster.emplace_back(cluster_dict[root_of_u], v);
             }
@@ -859,42 +851,9 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
     cout << "4th: marking cluster id cost in cluster-non-core:"
          << duration_cast<milliseconds>(tmp_next_start - tmp_start).count() << " ms\n";
 
-    // cluster non-core 1st phase
-    auto thread_num = std::thread::hardware_concurrency();
-    {
-        ThreadPool pool(thread_num);
-
-        auto v_start = 0;
-        long deg_sum = 0;
-        for (auto core_index = 0; core_index < cores.size(); core_index++) {
-            deg_sum += degree[cores[core_index]];
-            if (deg_sum > 32 * 1024) {
-                deg_sum = 0;
-                pool.enqueue([this](int i_start, int i_end) {
-                    for (auto i = i_start; i < i_end; i++) {
-                        auto u = cores[i];
-                        ClusterNonCoreFirstPhase(u);
-                    }
-                }, v_start, core_index + 1);
-                v_start = core_index + 1;
-            }
-        }
-
-        pool.enqueue([this](int i_start, int i_end) {
-            for (auto i = i_start; i < i_end; i++) {
-                auto u = cores[i];
-                ClusterNonCoreFirstPhase(u);
-            }
-        }, v_start, cores.size());
-    }
-    auto tmp_end = high_resolution_clock::now();
-    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_next_start).count()
-         << " ms\n";
-
-
     // cluster non-core 2nd phase
     {
-        ThreadPool pool(thread_num);
+        ThreadPool pool(std::thread::hardware_concurrency());
 
         auto v_start = 0;
         long deg_sum = 0;
@@ -907,7 +866,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
                     auto tmp_cluster = vector<pair<int, int>>();
                     for (auto i = i_start; i < i_end; i++) {
                         auto u = cores[i];
-                        ClusterNonCoreSecondPhase(u, tmp_cluster);
+                        ClusterNonCore(u, tmp_cluster);
                     }
                     return tmp_cluster;
                 }, v_start, core_index + 1));
@@ -919,7 +878,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
             auto tmp_cluster = vector<pair<int, int>>();
             for (auto i = i_start; i < i_end; i++) {
                 auto u = cores[i];
-                ClusterNonCoreSecondPhase(u, tmp_cluster);
+                ClusterNonCore(u, tmp_cluster);
             }
             return tmp_cluster;
         }, v_start, cores.size()));
