@@ -638,7 +638,7 @@ void Graph::ClusterCoreSecondPhase(int u) {
     }
 }
 
-void Graph::ClusterNonCore(int u, vector<pair<int, int>> &tmp_cluster) {
+void Graph::ClusterNonCoreDetail(int u, vector<pair<int, int>> &tmp_cluster) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
         if (!IsDefiniteCoreVertex(v)) {
@@ -866,7 +866,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
                     auto tmp_cluster = vector<pair<int, int>>();
                     for (auto i = i_start; i < i_end; i++) {
                         auto u = cores[i];
-                        ClusterNonCore(u, tmp_cluster);
+                        ClusterNonCoreDetail(u, tmp_cluster);
                     }
                     return tmp_cluster;
                 }, v_start, core_index + 1));
@@ -878,7 +878,7 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
             auto tmp_cluster = vector<pair<int, int>>();
             for (auto i = i_start; i < i_end; i++) {
                 auto u = cores[i];
-                ClusterNonCore(u, tmp_cluster);
+                ClusterNonCoreDetail(u, tmp_cluster);
             }
             return tmp_cluster;
         }, v_start, cores.size()));

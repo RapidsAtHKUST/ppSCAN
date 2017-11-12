@@ -73,7 +73,7 @@ private:
 
     void ClusterCoreSecondPhase(int u);
 
-    void ClusterNonCore(int u, vector<pair<int, int>> &tmp_cluster);
+    void ClusterNonCoreDetail(int u, vector<pair<int, int>> &tmp_cluster);
 
 private:
     // computation stages
