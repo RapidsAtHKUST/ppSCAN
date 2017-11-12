@@ -343,26 +343,13 @@ void GraphSeqExp::ClusterNonCores() {
             for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
                 auto v = out_edges[j];
                 if (!is_core_lst[v]) {
+                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
                     if (min_cn[j] > 0) {
 #ifdef STATISTICS
                         core_non_core_intersection_times++;
 #endif
                         min_cn[j] = EvalSimilarity(i, j);
                     }
-                }
-            }
-        }
-    }
-    auto tmp_end = high_resolution_clock::now();
-    cout << "4th: eval cost in cluster-non-core:" << duration_cast<milliseconds>(tmp_end - tmp_start).count()
-         << " ms\n";
-
-    for (auto i = 0; i < n; i++) {
-        if (is_core_lst[i]) {
-            for (auto j = out_edge_start[i]; j < out_edge_start[i + 1]; j++) {
-                auto v = out_edges[j];
-                if (!is_core_lst[v]) {
-                    auto root_of_i = disjoint_set_ptr->FindRoot(i);
                     if (min_cn[j] == SIMILAR) {
                         noncore_cluster.emplace_back(cluster_dict[root_of_i], v);
                     }
