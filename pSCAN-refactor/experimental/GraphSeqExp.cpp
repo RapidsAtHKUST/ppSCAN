@@ -35,8 +35,13 @@ GraphSeqExp::GraphSeqExp(const char *dir_string, const char *eps_s, int min_u) {
     degree = std::move(io_helper_ptr->degree);
     is_core_lst = vector<bool>(n, false);
     is_non_core_lst = vector<bool>(n, false);
+
     // 3rd: disjoint-set, make-set at the beginning
     disjoint_set_ptr = yche::make_unique<DisjointSet>(n);
+
+    // 4th: cluster dict
+    cluster_dict = vector<int>(n);
+    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
 
     auto all_end = high_resolution_clock::now();
     cout << "other construct time:" << duration_cast<milliseconds>(all_end - tmp_start).count()
@@ -319,9 +324,6 @@ void GraphSeqExp::ClusterCoreSecondPhase(int u) {
 }
 
 void GraphSeqExp::MarkClusterMinEleAsId() {
-    cluster_dict = vector<int>(n);
-    std::fill(cluster_dict.begin(), cluster_dict.end(), n);
-
     for (auto i = 0; i < n; i++) {
         if (is_core_lst[i]) {
             // after this, root must be left nodes' parent since disjoint_set_ptr->FindRoot(i)
