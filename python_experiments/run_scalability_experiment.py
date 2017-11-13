@@ -73,4 +73,4 @@ if __name__ == '__main__':
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
-                        folder_name='scalability_simd_paper')
+                        folder_name='scalability_simd_paper2')
