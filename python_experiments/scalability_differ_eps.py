@@ -26,11 +26,11 @@ if __name__ == '__main__':
         'snap_orkut',
         # 'webgraph_uk',
         'webgraph_webbase',
-        'webgraph_twitter',
-        'snap_friendster'
+        # 'webgraph_twitter',
+        # 'snap_friendster'
     ]
 
-    figure_folder = 'scalability_simd_paper'
+    figure_folder = 'scalability_simd_paper_gpu23'
     markdown_folder = 'case_studies/figures-case-study13-scalability-simd'
 
     os.system('mkdir -p ./figures/' + figure_folder)

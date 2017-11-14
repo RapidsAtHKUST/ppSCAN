@@ -2,143 +2,161 @@
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.1-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.1-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.1-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.1-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 16.982s | 21.694s | 2.976s | 13.622s | 10.89s | 66.168s | 1.000
-4 | 5.011s | 5.946s | 0.865s | 5.009s | 4.666s | 21.503s | 3.077
-8 | 3.055s | 3.295s | 0.474s | 3.246s | 3.666s | 13.745s | 4.814
-16 | 1.901s | 1.865s | 0.297s | 2.424s | 2.814s | 9.309s | 7.108
-24 | 1.609s | 1.398s | 0.278s | 2.128s | 2.197s | 7.613s | 8.691
-32 | 1.395s | 1.216s | 0.297s | 1.912s | 1.747s | 6.57s | 10.071
-40 | 1.263s | 1.046s | 0.29s | 1.806s | 1.823s | 6.238s | 10.607
+1 | 16.956s | 21.298s | 3.007s | 13.695s | 8.76s | 63.719s | 1.000
+2 | 9.382s | 11.796s | 1.959s | 7.649s | 7.097s | 37.887s | 1.682
+4 | 5.169s | 6.043s | 0.882s | 4.802s | 4.226s | 21.125s | 3.016
+8 | 3.22s | 3.102s | 0.496s | 3.451s | 3.196s | 13.468s | 4.731
+16 | 1.808s | 1.843s | 0.353s | 2.334s | 2.608s | 8.95s | 7.119
+24 | 1.799s | 1.469s | 0.213s | 2.005s | 2.046s | 7.536s | 8.455
+32 | 1.275s | 1.112s | 0.168s | 1.36s | 1.463s | 5.381s | 11.841
+40 | 1.271s | 0.974s | 0.191s | 1.385s | 1.759s | 5.582s | 11.415
+64 | 1.272s | 0.993s | 0.192s | 1.366s | 2.253s | 6.081s | 10.478
 
 ## eps:0.2
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.2-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.2-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.2-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.2-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 15.513s | 17.687s | 4.346s | 11.791s | 10.45s | 59.791s | 1.000
-4 | 4.617s | 4.836s | 1.304s | 4.279s | 4.111s | 19.159s | 3.121
-8 | 2.723s | 2.723s | 0.705s | 2.807s | 3.172s | 12.134s | 4.928
-16 | 1.772s | 1.475s | 0.378s | 2.07s | 2.67s | 8.375s | 7.139
-24 | 1.398s | 1.1s | 0.277s | 1.374s | 1.41s | 5.562s | 10.750
-32 | 1.226s | 0.929s | 0.313s | 1.376s | 1.503s | 5.36s | 11.155
-40 | 1.184s | 0.894s | 0.362s | 1.633s | 1.864s | 5.945s | 10.057
+1 | 15.602s | 17.622s | 4.383s | 11.485s | 8.072s | 57.168s | 1.000
+2 | 8.535s | 9.534s | 2.665s | 7.347s | 6.728s | 34.812s | 1.642
+4 | 4.822s | 4.648s | 1.202s | 4.331s | 4.77s | 19.777s | 2.891
+8 | 2.754s | 2.677s | 0.767s | 2.935s | 3.037s | 12.175s | 4.696
+16 | 1.859s | 1.452s | 0.402s | 2.123s | 2.178s | 8.017s | 7.131
+24 | 1.333s | 1.088s | 0.354s | 1.739s | 2.026s | 6.544s | 8.736
+32 | 1.165s | 0.983s | 0.242s | 1.276s | 1.116s | 4.786s | 11.945
+40 | 1.112s | 0.829s | 0.3s | 1.33s | 1.165s | 4.739s | 12.063
+64 | 1.23s | 0.788s | 0.273s | 1.23s | 2.062s | 5.586s | 10.234
 
 ## eps:0.3
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.3-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.3-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.3-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.3-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 14.256s | 17.264s | 4.591s | 9.648s | 8.541s | 54.313s | 1.000
-4 | 4.439s | 4.924s | 1.349s | 3.412s | 3.144s | 17.271s | 3.145
-8 | 2.58s | 2.574s | 0.805s | 2.577s | 2.744s | 11.284s | 4.813
-16 | 1.874s | 1.453s | 0.405s | 1.828s | 1.731s | 7.294s | 7.446
-24 | 1.446s | 1.09s | 0.365s | 1.639s | 1.792s | 6.335s | 8.573
-32 | 1.109s | 0.843s | 0.257s | 1.077s | 1.245s | 4.535s | 11.976
-40 | 1.183s | 0.704s | 0.264s | 1.131s | 1.334s | 4.618s | 11.761
+1 | 14.307s | 17.131s | 4.627s | 9.578s | 7.009s | 52.655s | 1.000
+2 | 7.651s | 9.477s | 2.891s | 5.134s | 4.594s | 29.749s | 1.770
+4 | 4.407s | 4.788s | 1.423s | 3.677s | 3.261s | 17.56s | 2.999
+8 | 2.57s | 2.467s | 0.773s | 2.402s | 2.636s | 10.852s | 4.852
+16 | 1.911s | 1.494s | 0.431s | 1.681s | 1.922s | 7.441s | 7.076
+24 | 1.48s | 1.098s | 0.386s | 1.608s | 1.716s | 6.291s | 8.370
+32 | 1.132s | 0.873s | 0.367s | 1.338s | 1.236s | 4.949s | 10.640
+40 | 1.165s | 0.693s | 0.285s | 1.065s | 1.045s | 4.257s | 12.369
+64 | 1.138s | 0.758s | 0.284s | 1.056s | 1.584s | 4.823s | 10.917
 
 ## eps:0.4
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.4-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.4-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.4-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.4-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 13.269s | 16.736s | 4.541s | 8.176s | 7.331s | 50.057s | 1.000
-4 | 4.147s | 4.856s | 1.317s | 3.15s | 3.098s | 16.571s | 3.021
-8 | 2.429s | 2.782s | 0.752s | 2.341s | 2.513s | 10.82s | 4.626
-16 | 1.596s | 1.359s | 0.416s | 1.627s | 1.065s | 6.066s | 8.252
-24 | 1.119s | 1.001s | 0.374s | 1.489s | 1.076s | 5.063s | 9.887
-32 | 1.042s | 0.833s | 0.235s | 1.309s | 1.376s | 4.798s | 10.433
-40 | 1.005s | 0.679s | 0.267s | 0.727s | 0.891s | 3.578s | 13.990
+1 | 13.248s | 16.607s | 4.568s | 7.993s | 5.641s | 48.06s | 1.000
+2 | 7.444s | 8.954s | 2.805s | 5.006s | 4.574s | 28.786s | 1.670
+4 | 4.042s | 4.543s | 1.289s | 3.179s | 2.933s | 15.989s | 3.006
+8 | 2.392s | 2.445s | 0.717s | 2.246s | 1.961s | 9.764s | 4.922
+16 | 1.716s | 1.416s | 0.447s | 1.637s | 1.491s | 6.709s | 7.164
+24 | 1.415s | 0.994s | 0.395s | 1.281s | 1.299s | 5.388s | 8.920
+32 | 1.185s | 0.859s | 0.258s | 0.826s | 1.078s | 4.208s | 11.421
+40 | 1.011s | 0.732s | 0.285s | 0.7s | 0.944s | 3.673s | 13.085
+64 | 1.077s | 0.739s | 0.304s | 0.879s | 1.04s | 4.041s | 11.893
 
 ## eps:0.5
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.5-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.5-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.5-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.5-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 12.654s | 15.982s | 4.356s | 7.094s | 6.026s | 46.114s | 1.000
-4 | 3.944s | 4.496s | 1.171s | 2.871s | 2.721s | 15.206s | 3.033
-8 | 2.253s | 2.632s | 0.739s | 2.022s | 1.658s | 9.316s | 4.950
-16 | 1.595s | 1.364s | 0.405s | 1.356s | 1.389s | 6.117s | 7.539
-24 | 1.435s | 0.998s | 0.38s | 1.19s | 0.736s | 4.754s | 9.700
-32 | 1.033s | 0.822s | 0.414s | 1.176s | 1.149s | 4.599s | 10.027
-40 | 1.056s | 0.666s | 0.239s | 0.771s | 0.882s | 3.623s | 12.728
+1 | 12.489s | 15.912s | 4.387s | 7.05s | 4.646s | 44.487s | 1.000
+2 | 6.897s | 9.148s | 2.682s | 4.946s | 3.419s | 27.095s | 1.642
+4 | 3.876s | 4.291s | 1.347s | 2.85s | 2.052s | 14.418s | 3.086
+8 | 2.37s | 2.388s | 0.79s | 1.937s | 1.48s | 8.968s | 4.961
+16 | 1.74s | 1.361s | 0.454s | 1.466s | 1.159s | 6.182s | 7.196
+24 | 1.212s | 1.004s | 0.437s | 1.252s | 1.048s | 4.956s | 8.976
+32 | 1.007s | 0.763s | 0.283s | 0.591s | 0.91s | 3.558s | 12.503
+40 | 0.942s | 0.643s | 0.264s | 0.634s | 0.619s | 3.106s | 14.323
+64 | 0.977s | 0.738s | 0.289s | 0.732s | 0.845s | 3.584s | 12.413
 
 ## eps:0.6
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.6-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.6-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.6-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.6-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 11.713s | 14.928s | 4.317s | 6.055s | 5.138s | 42.154s | 1.000
-4 | 3.666s | 4.475s | 1.39s | 2.574s | 2.22s | 14.331s | 2.941
-8 | 2.396s | 2.258s | 0.712s | 1.797s | 1.531s | 8.699s | 4.846
-16 | 1.419s | 1.237s | 0.622s | 1.392s | 1.085s | 5.765s | 7.312
-24 | 1.025s | 0.985s | 0.364s | 1.034s | 1.023s | 4.44s | 9.494
-32 | 1.062s | 0.732s | 0.291s | 0.752s | 0.807s | 3.655s | 11.533
-40 | 0.911s | 0.636s | 0.27s | 0.679s | 0.588s | 3.093s | 13.629
+1 | 11.808s | 14.875s | 4.28s | 6.007s | 3.804s | 40.777s | 1.000
+2 | 6.462s | 8.236s | 2.753s | 4.186s | 2.507s | 24.147s | 1.689
+4 | 3.572s | 4.546s | 1.507s | 2.596s | 1.651s | 13.874s | 2.939
+8 | 2.163s | 2.3s | 0.748s | 1.846s | 1.151s | 8.21s | 4.967
+16 | 1.453s | 1.279s | 0.426s | 1.254s | 0.826s | 5.242s | 7.779
+24 | 1.202s | 0.938s | 0.396s | 1.021s | 0.689s | 4.249s | 9.597
+32 | 0.954s | 0.706s | 0.31s | 0.605s | 0.624s | 3.202s | 12.735
+40 | 1.01s | 0.625s | 0.329s | 0.606s | 0.611s | 3.184s | 12.807
+64 | 0.9s | 0.724s | 0.335s | 0.593s | 0.643s | 3.198s | 12.751
 
 ## eps:0.7
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.7-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.7-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.7-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.7-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 11.167s | 14.105s | 4.305s | 5.616s | 4.366s | 39.564s | 1.000
-4 | 3.651s | 4.095s | 1.259s | 2.422s | 1.652s | 13.081s | 3.025
-8 | 2.221s | 2.228s | 0.683s | 1.733s | 1.213s | 8.087s | 4.892
-16 | 1.462s | 1.231s | 0.36s | 0.816s | 0.815s | 4.689s | 8.438
-24 | 1.13s | 0.866s | 0.388s | 1.002s | 0.807s | 4.198s | 9.424
-32 | 0.946s | 0.701s | 0.341s | 0.85s | 0.626s | 3.47s | 11.402
-40 | 0.961s | 0.602s | 0.281s | 0.521s | 0.474s | 2.845s | 13.907
+1 | 11.234s | 14.056s | 4.32s | 5.308s | 3.221s | 38.142s | 1.000
+2 | 6.275s | 7.758s | 2.69s | 3.508s | 2.21s | 22.444s | 1.699
+4 | 3.609s | 4.135s | 1.447s | 2.258s | 1.368s | 12.82s | 2.975
+8 | 2.155s | 2.222s | 0.717s | 1.542s | 0.987s | 7.627s | 5.001
+16 | 1.501s | 1.286s | 0.394s | 1.184s | 0.821s | 5.19s | 7.349
+24 | 1.109s | 0.906s | 0.343s | 0.955s | 0.55s | 3.866s | 9.866
+32 | 0.922s | 0.756s | 0.308s | 0.651s | 0.593s | 3.233s | 11.798
+40 | 0.951s | 0.612s | 0.317s | 0.488s | 0.387s | 2.759s | 13.825
+64 | 0.961s | 0.618s | 0.287s | 0.534s | 0.497s | 2.899s | 13.157
 
 ## eps:0.8
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.8-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.8-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.8-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.8-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 10.463s | 12.725s | 3.211s | 4.478s | 3.664s | 34.548s | 1.000
-4 | 3.355s | 3.983s | 0.991s | 1.827s | 1.472s | 11.63s | 2.971
-8 | 2.158s | 2.091s | 0.544s | 1.307s | 1.029s | 7.136s | 4.841
-16 | 1.434s | 1.153s | 0.306s | 0.895s | 0.707s | 4.5s | 7.677
-24 | 1.084s | 0.775s | 0.307s | 0.923s | 0.487s | 3.58s | 9.650
-32 | 0.875s | 0.662s | 0.267s | 0.691s | 0.514s | 3.013s | 11.466
-40 | 0.896s | 0.533s | 0.217s | 0.443s | 0.325s | 2.416s | 14.300
+1 | 10.533s | 12.7s | 3.208s | 4.177s | 2.599s | 33.221s | 1.000
+2 | 5.712s | 7.139s | 1.985s | 2.802s | 1.857s | 19.498s | 1.704
+4 | 3.409s | 3.635s | 0.887s | 1.846s | 0.949s | 10.73s | 3.096
+8 | 2.022s | 1.964s | 0.612s | 1.287s | 0.761s | 6.648s | 4.997
+16 | 1.347s | 1.143s | 0.322s | 0.878s | 0.525s | 4.219s | 7.874
+24 | 1.18s | 0.794s | 0.345s | 0.813s | 0.478s | 3.613s | 9.195
+32 | 0.918s | 0.629s | 0.365s | 0.683s | 0.434s | 3.033s | 10.953
+40 | 0.864s | 0.528s | 0.24s | 0.444s | 0.328s | 2.407s | 13.802
+64 | 0.816s | 0.571s | 0.231s | 0.429s | 0.365s | 2.416s | 13.750
 
 ## eps:0.9
 
 overview | speedup
 --- | ---
-![webgraph_webbase-overview](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.9-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper/webgraph_webbase-eps:0.9-min_pts:5-runtime-speedup.png)
+![webgraph_webbase-overview](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.9-min_pts:5-overview.png) | ![webgraph_webbase-runtime-speedup](../../figures/scalability_simd_paper_gpu23/webgraph_webbase-eps:0.9-min_pts:5-runtime-speedup.png)
 
 thread_num | prune | check-core 1st bsp | check-core 2nd bsp | cluster-core | cluster-non-core | total | total speedup
 --- | --- | --- | --- | --- | --- | --- | ---
-1 | 9.91s | 11.335s | 2.655s | 3.93s | 2.791s | 30.624s | 1.000
-4 | 3.074s | 3.421s | 0.802s | 1.786s | 1.2s | 10.29s | 2.976
-8 | 1.926s | 1.872s | 0.484s | 1.246s | 0.767s | 6.299s | 4.862
-16 | 1.268s | 1.007s | 0.279s | 0.783s | 0.542s | 3.882s | 7.889
-24 | 1.102s | 0.736s | 0.268s | 0.73s | 0.458s | 3.297s | 9.288
-32 | 0.862s | 0.579s | 0.207s | 0.394s | 0.318s | 2.362s | 12.965
-40 | 0.802s | 0.46s | 0.197s | 0.394s | 0.274s | 2.131s | 14.371
+1 | 9.735s | 11.342s | 2.641s | 3.739s | 2.056s | 29.515s | 1.000
+2 | 5.746s | 6.446s | 1.777s | 2.642s | 1.415s | 18.028s | 1.637
+4 | 3.175s | 3.322s | 0.784s | 1.643s | 0.8s | 9.728s | 3.034
+8 | 1.916s | 1.791s | 0.471s | 1.12s | 0.652s | 5.953s | 4.958
+16 | 1.279s | 0.983s | 0.274s | 0.756s | 0.417s | 3.712s | 7.951
+24 | 0.983s | 0.725s | 0.335s | 0.648s | 0.317s | 3.011s | 9.802
+32 | 0.837s | 0.588s | 0.168s | 0.405s | 0.255s | 2.256s | 13.083
+40 | 0.78s | 0.463s | 0.189s | 0.367s | 0.217s | 2.019s | 14.619
+64 | 0.853s | 0.591s | 0.245s | 0.385s | 0.263s | 2.339s | 12.619
 

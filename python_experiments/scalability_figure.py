@@ -1,3 +1,4 @@
+import math
 import matplotlib.pyplot as plt
 import sys, os
 from functools import partial
@@ -84,6 +85,7 @@ def display_overview(statistics_dic, title_append_txt='', figure_folder='.'):
 
     # draw after get data, with partial binding technique
     thread_lst, time_lst_lst = post_process()
+    thread_lst = map(lambda ele: math.log(ele, 2), thread_lst)
 
     # bar charts
     shape_color_lst = ['b', 'g', 'r', 'c', 'y', 'm']
@@ -104,9 +106,12 @@ def display_overview(statistics_dic, title_append_txt='', figure_folder='.'):
               fontdict=font)
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('time (s)', fontdict=font)
-
+    plt.xticks(thread_lst, map(lambda ele: int(2 ** ele), thread_lst))
+    # plt.xscale('log')
+    # plt.yscale('log')
     plt.savefig('./figures/' + figure_folder + os.sep + title_append_txt.replace(' ', '') + '-' + 'overview.png',
                 bbox_inches='tight', pad_inches=0, transparent=True)
+
     # plt.show()
     plt.close()
 
@@ -126,6 +131,7 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
 
     # init parameters
     thread_lst, tag_time_lst_lst = post_process()
+    thread_lst = map(lambda ele: math.log(ele, 2), thread_lst)
     tag_list = [prune_time_tag, first_bsp_time_tag, second_bsp_time_tag, core_cluster_time_tag,
                 non_core_cluster_time_tag, total_time_tag]
     shape_color_lst = ['bo-', 'g^-', 'rs-', 'c<-', 'y>-', 'mx-']
@@ -144,14 +150,19 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     plt.title('Total and hotspot time cost/speedup\n' +
               title_append_txt if title_append_txt != '' else 'Total and hotspot time cost\n', fontdict=font)
     plt.legend(filtered_tag_list)
+    plt.yscale('log')
     plt.ylabel('time (s)', fontdict=font)
+    plt.xticks(thread_lst, map(lambda ele: int(2 ** ele), thread_lst))
 
     # 2nd: draw speedup
     tag_speedup_lst = map(lambda tag_time_lst_pair: (
         tag_time_lst_pair[0], map(lambda ele: max(tag_time_lst_pair[1]) / float(ele), tag_time_lst_pair[1])),
                           tag_time_lst_lst)
     prev_partial_func = plt.plot
+
+    max_speedup = 0
     for tag, speedup_lst in tag_speedup_lst:
+        max_speedup = max(max_speedup, max(speedup_lst))
         # partially bind parameters
         prev_partial_func = partial(prev_partial_func, thread_lst, speedup_lst, shape_color_dict[tag])
     plt.subplot(212)
@@ -160,7 +171,9 @@ def display_filtered_tags(statistics_dic, title_append_txt='', figure_folder='.'
     font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 12, }
     plt.xlabel('thread num', fontdict=font)
     plt.ylabel('speedup', fontdict=font)
-    plt.ylim([0, 35.0])
+    # plt.ylim([0, max_speedup * 1.1])
+    plt.yscale('log')
+    plt.xticks(thread_lst, map(lambda ele: int(2 ** ele), thread_lst))
 
     # show the whole runtime/speedup figure
     plt.savefig(
