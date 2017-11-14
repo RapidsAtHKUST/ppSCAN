@@ -47,7 +47,7 @@ class ScalabilityFigureDrawer:
         self.root_dir_path = server_root_dir_path
         self.edge_num_lst = edge_num_lst
         self.overview_figure_folder = overview_folder
-        self.root_folder = '/mnt/mount-gpu/d2/yche/projects/python_experiments/'
+        self.root_folder = '/home/yche/mnt/gpu-23/projects/python_experiments/'
 
         os.system('mkdir -p ./figures/' + self.overview_figure_folder)
 
@@ -199,7 +199,7 @@ if __name__ == '__main__':
     drawer = ScalabilityFigureDrawer(data_set_lst=all_data_set_lst[1:],
                                      input_time_lst=all_input_time_lst[1:],
                                      edge_num_lst=all_edge_num_lst[1:],
-                                     server_root_dir_path='/mnt/mount-gpu/d2/yche/projects/python_experiments'
+                                     server_root_dir_path='/home/yche/mnt/gpu-23/projects/python_experiments'
                                                           '/scalability_input_output',
                                      overview_folder='scalability_new0')
     drawer.draw_overview_figure()
