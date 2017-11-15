@@ -44,6 +44,13 @@ private:
     // easy-computation pruning optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
+    // galloping-search
+    ui BinarySearchForGallopingSearchAVX512(vector<int> &array, uint32_t offset_beg, uint32_t offset_end, int val);
+
+    ui GallopingSearchAVX512(vector<int> &array, uint32_t offset_beg, uint32_t offset_end, int val);
+
+    int IntersectNeighborSetsGallopingAVX512(int u, int v, int min_cn_num);
+
     int IntersectNeighborSets(int u, int v, int min_cn_num);
 
     int IntersectNeighborSetsSSE(int u, int v, int min_cn_num);

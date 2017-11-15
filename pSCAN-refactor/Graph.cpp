@@ -77,6 +77,112 @@ int Graph::ComputeCnLowerBound(int du, int dv) {
     return c;
 }
 
+ui Graph::BinarySearchForGallopingSearchAVX512(vector<int> &array, uint32_t offset_beg, uint32_t offset_end, int val) {
+    while (offset_end - offset_beg >= 32) {
+        auto mid = static_cast<uint32_t>((static_cast<unsigned long>(offset_beg) + offset_end) / 2);
+        _mm_prefetch((char *) &array[(mid + 1 + offset_end) / 2], _MM_HINT_T0);
+        _mm_prefetch((char *) &array[(mid - 1 + offset_beg) / 2], _MM_HINT_T0);
+        if (array[mid] == val) {
+            return mid;
+        } else if (array[mid] < val) {
+            offset_beg = mid + 1;
+        } else {
+            offset_end = mid - 1;
+        }
+    }
+
+    // linear search fallback
+    constexpr int parallelism = 16;
+    __m512i pivot_element = _mm512_set1_epi32(val);
+    for (; offset_beg + 15 < offset_end; offset_beg += parallelism) {
+        __m512i elements = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&array[offset_beg]));
+        __mmask16 mask = _mm512_cmplt_epi32_mask(elements, pivot_element);
+        if (mask != 0xffff) { return offset_beg + _mm_popcnt_u32(mask); }
+    }
+    if (offset_beg < offset_end) {
+        auto left_size = offset_end - offset_beg;
+        __m512i elements = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&array[offset_beg]));
+        __mmask16 mask = _mm512_cmplt_epi32_mask(elements, pivot_element);
+        __mmask16 cmp_mask = ((__mmask16) 0xffff) >> (16 - left_size);
+        mask &= cmp_mask;
+        if (mask != cmp_mask) { return offset_beg + _mm_popcnt_u32(mask); }
+    }
+    return offset_end;
+}
+
+ui Graph::GallopingSearchAVX512(vector<int> &array, uint32_t offset_beg, uint32_t offset_end, int val) {
+    if (array[offset_end - 1] < val) {
+        return offset_end;
+    }
+
+    // front peeking
+    __m512i pivot_element = _mm512_set1_epi32(val);
+    auto left_size = offset_end - offset_beg;
+    if (left_size >= 16) {
+        __m512i elements = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&array[offset_beg]));
+        __mmask16 mask = _mm512_cmplt_epi32_mask(elements, pivot_element);
+        if (mask != 0xffff) { return offset_beg + _mm_popcnt_u32(mask); }
+    } else {
+        __m512i elements = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&array[offset_beg]));
+        __mmask16 mask = _mm512_cmplt_epi32_mask(elements, pivot_element);
+        __mmask16 cmp_mask = ((__mmask16) 0xffff) >> (16 - left_size);
+        mask &= cmp_mask;
+        if (mask != cmp_mask) { return offset_beg + _mm_popcnt_u32(mask); }
+    }
+
+    // galloping
+    auto jump_idx = 16u;
+    // pre-fetch
+    auto jump_times = 32 - _lzcnt_u32((offset_end - offset_beg) >> 4);
+    __m512i prefetch_idx = _mm512_set_epi64(16, 32, 64, 128, 256, 512, 1024, 2048);
+    __mmask8 mask = jump_times >= 8 ? (__mmask8) 0xff : (__mmask8) 0xff << (8 - jump_times);
+    _mm512_mask_prefetch_i64gather_ps(prefetch_idx, mask, &array[offset_beg], 1, _MM_HINT_T0);
+
+    while (true) {
+        auto peek_idx = offset_beg + jump_idx;
+        if (peek_idx >= offset_end) {
+            return BinarySearchForGallopingSearchAVX512(array, (jump_idx >> 1) + offset_beg + 1, offset_end, val);
+        }
+        if (array[peek_idx] < val) {
+            jump_idx <<= 1;
+        } else {
+            return array[peek_idx] == val ? peek_idx :
+                   BinarySearchForGallopingSearchAVX512(array, (jump_idx >> 1) + offset_beg + 1, peek_idx + 1, val);
+        }
+    }
+}
+
+// assume u < v, dv/du > threshold
+int Graph::IntersectNeighborSetsGallopingAVX512(int u, int v, int min_cn_num) {
+    int cn = 2; // count for self and v, count for self and u
+    int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
+            out_edge_start[v + 1] - out_edge_start[v] + 2; // count for self and v, count for self and u
+    auto offset_nei_u = out_edge_start[u], offset_nei_v = out_edge_start[v];
+
+    // correctness guaranteed by two pruning previously in computing min_cn
+    while (cn < min_cn_num) {
+        auto tmp = GallopingSearchAVX512(out_edges, offset_nei_u, out_edge_start[u + 1], out_edges[offset_nei_v]);
+        du -= tmp - offset_nei_u;
+        if (du < min_cn_num) { return NOT_SIMILAR; }
+        offset_nei_u = tmp;
+
+        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
+            --dv;
+            if (dv < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_v;
+        }
+
+        if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
+            ++cn;
+            if (cn >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++offset_nei_u;
+            ++offset_nei_v;
+        }
+    }
+}
+
 int Graph::IntersectNeighborSetsSSE(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -474,7 +580,14 @@ int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
 int Graph::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
 #if defined(ENABLE_AVX512)
-    return IntersectNeighborSetsAVX512(u, v, min_cn[edge_idx]);
+    if (degree[u] > degree[v]) {
+        swap(u, v);
+    }
+    if (degree[u] * 25 < degree[v]) {
+        return IntersectNeighborSetsAVX512(u, v, min_cn[edge_idx]);
+    } else {
+        return IntersectNeighborSetsGallopingAVX512(u, v, min_cn[edge_idx]);
+    }
 #elif defined(ENABLE_AVX512_MERGE)
     return IntersectNeighborSetsAVX512MergePopCnt(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_AVX2)
