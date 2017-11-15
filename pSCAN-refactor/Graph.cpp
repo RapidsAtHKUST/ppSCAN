@@ -152,7 +152,7 @@ ui Graph::GallopingSearchAVX512(vector<int> &array, uint32_t offset_beg, uint32_
     }
 }
 
-// assume u < v, dv/du > threshold
+// assume u  v, dv/du > threshold
 int Graph::IntersectNeighborSetsGallopingAVX512(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -161,22 +161,36 @@ int Graph::IntersectNeighborSetsGallopingAVX512(int u, int v, int min_cn_num) {
 
     // correctness guaranteed by two pruning previously in computing min_cn
     while (cn < min_cn_num) {
-        auto tmp = GallopingSearchAVX512(out_edges, offset_nei_u, out_edge_start[u + 1], out_edges[offset_nei_v]);
-        du -= tmp - offset_nei_u;
-        if (du < min_cn_num) { return NOT_SIMILAR; }
-        offset_nei_u = tmp;
+        while (offset_nei_u + 16 < out_edge_start[u + 1]) {
+            __m512i pivot = _mm512_set1_epi32(out_edges[offset_nei_v]);
+            __m512i inspected_ele = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&out_edges[offset_nei_u]));
+            __mmask16 cmp_res = _mm512_cmpgt_epi32_mask(pivot, inspected_ele);
+            auto count = _mm_popcnt_u32(cmp_res);   
 
-        while (out_edges[offset_nei_u] > out_edges[offset_nei_v]) {
-            --dv;
-            if (dv < min_cn_num) { return NOT_SIMILAR; }
-            ++offset_nei_v;
+            // update offset_nei_u and du
+            offset_nei_u += count;
+            du -= count;
+            if (du < min_cn_num) {
+                return NOT_SIMILAR;
+            }
+            if (count < 16) {
+                break;
+            }
         }
+        while (out_edges[offset_nei_u] < out_edges[offset_nei_v]) {
+            --du;
+            if (du < min_cn_num) { return NOT_SIMILAR; }
+            ++offset_nei_u;
+        }
+
+        auto tmp = GallopingSearchAVX512(out_edges, offset_nei_v, out_edge_start[v + 1], out_edges[offset_nei_u]);
+        dv -= tmp - offset_nei_v;
+        if (dv < min_cn_num) { return NOT_SIMILAR; }
+        offset_nei_v = tmp;
 
         if (out_edges[offset_nei_u] == out_edges[offset_nei_v]) {
             ++cn;
-            if (cn >= min_cn_num) {
-                return SIMILAR;
-            }
+            if (cn >= min_cn_num) { return SIMILAR; }
             ++offset_nei_u;
             ++offset_nei_v;
         }
@@ -583,7 +597,7 @@ int Graph::EvalSimilarity(int u, ui edge_idx) {
     if (degree[u] > degree[v]) {
         swap(u, v);
     }
-    if (degree[u] * 25 < degree[v]) {
+    if (degree[u] * 50 < degree[v]) {
         return IntersectNeighborSetsAVX512(u, v, min_cn[edge_idx]);
     } else {
         return IntersectNeighborSetsGallopingAVX512(u, v, min_cn[edge_idx]);
