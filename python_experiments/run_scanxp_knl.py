@@ -3,11 +3,12 @@ import time
 
 if __name__ == '__main__':
     scan_xp_path = '/nfsshare/share/refactor-xeon-knl/build/scan-xp-avx512'
-    data_set_lst = ['snap_livejournal',
-                    'snap_orkut',
-                    'webgraph_webbase', 'webgraph_twitter',
-                    # 'snap_friendster'
-                    ]
+    data_set_lst = [
+        # 'snap_livejournal',
+        # 'snap_orkut',
+        # 'webgraph_webbase', 'webgraph_twitter',
+        'snap_friendster'
+    ]
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     parameter_min_pts_lst = [5]
 

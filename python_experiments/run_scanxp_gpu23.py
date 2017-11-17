@@ -1,13 +1,15 @@
 import os
 import time
+import time_out_util
 
 if __name__ == '__main__':
     scan_xp_path = '/ghome/yche/projects/refactor-xeon-knl/build/scan-xp-avx2'
-    data_set_lst = ['snap_livejournal',
-                    'snap_orkut',
-                    'webgraph_webbase', 'webgraph_twitter',
-                    # 'snap_friendster'
-                    ]
+    data_set_lst = [
+        'snap_livejournal',
+        # 'snap_orkut',
+        # 'webgraph_webbase', 'webgraph_twitter',
+        'snap_friendster'
+    ]
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     parameter_min_pts_lst = [5]
 
@@ -50,11 +52,14 @@ if __name__ == '__main__':
                 # pscan statistics, pscan+ statistics, pscan, pscan+
                 params_lst = map(str, [scan_xp_path, data_set_path,
                                        eps, min_pts, thread_num, '>>', statistics_file_path])
-                os.system(' '.join(params_lst))
+                cmd = ' '.join(params_lst)
+                print cmd
+                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=4800)
                 check_result()
                 write_split()
 
                 with open(statistics_file_path, 'a+') as ifs:
+                    ifs.write(correct_info)
                     ifs.write(my_splitter + time.ctime() + my_splitter)
                     ifs.write('\n\n\n\n')
                 print 'finish:', '-'.join(map(str, [data_set_path, eps, min_pts]))
