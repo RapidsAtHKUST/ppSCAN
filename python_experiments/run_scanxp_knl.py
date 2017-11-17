@@ -1,6 +1,8 @@
 import os
 import time
 
+import time_out_util
+
 if __name__ == '__main__':
     scan_xp_path = '/nfsshare/share/refactor-xeon-knl/build/scan-xp-avx512'
     data_set_lst = [
@@ -51,11 +53,14 @@ if __name__ == '__main__':
                 # pscan statistics, pscan+ statistics, pscan, pscan+
                 params_lst = map(str, [scan_xp_path, data_set_path,
                                        eps, min_pts, thread_num, '>>', statistics_file_path])
-                os.system(' '.join(params_lst))
+                cmd = ' '.join(params_lst)
+                print cmd
+                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=4800)
                 check_result()
                 write_split()
 
                 with open(statistics_file_path, 'a+') as ifs:
+                    ifs.write(correct_info)
                     ifs.write(my_splitter + time.ctime() + my_splitter)
                     ifs.write('\n\n\n\n')
                 print 'finish:', '-'.join(map(str, [data_set_path, eps, min_pts]))
