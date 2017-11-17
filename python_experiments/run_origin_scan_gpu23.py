@@ -2,7 +2,7 @@ import time_out_util
 import os, time
 
 if __name__ == '__main__':
-    any_scan_path = '/nfsshare/share/anySCANBin/anyscan1114'
+    origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANOrigin'
     data_set_lst = [
         'snap_livejournal',
         'snap_orkut',
@@ -14,8 +14,8 @@ if __name__ == '__main__':
     parameter_min_pts_lst = [5]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
-    thread_num = 256
-    foler_name = 'anyscan-exp'
+    thread_num = 64
+    foler_name = 'origin-scan-opt-exp'
     for data_set_path in data_set_lst:
         for eps in parameter_eps_lst:
             for min_pts in parameter_min_pts_lst:
@@ -39,13 +39,23 @@ if __name__ == '__main__':
                         ifs.write(my_splitter + my_splitter + '\n')
 
 
-                params_lst = map(str, [any_scan_path,
-                                       '-c', 4, '-g', 'label.gold',
-                                       '-i', data_set_path, '-o', 'out.txt', '-e', eps, '-m', min_pts,
-                                       '-a', 32768, '-b', 32768, '-t', thread_num, '>>', statistics_file_path])
+                params_lst = map(str, [origin_scan_opt_path, data_set_path,
+                                       eps, min_pts, 'output', '>>', statistics_file_path])
                 cmd = ' '.join(params_lst)
                 print cmd
-                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=3600)
+                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=36000)
+
+
+                # check md5, line count and byte count
+                def check_result():
+                    res_file_name = '-'.join(map(str, ['result', eps, min_pts])) + '.txt'
+                    res_file_path = data_set_path + os.sep + res_file_name
+                    os.system(' '.join(['md5sum', res_file_path, '>>', statistics_file_path]))
+                    os.system(' '.join(['wc -l', res_file_path, '>>', statistics_file_path]))
+                    os.system(' '.join(['du -b', res_file_path, '>>', statistics_file_path]))
+
+
+                check_result()
                 write_split()
 
                 with open(statistics_file_path, 'a+') as ifs:
