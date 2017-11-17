@@ -23,7 +23,7 @@ def run_with_timeout(cmd, timeout_sec):
     finally:
         timer.cancel()
     # print is_time_out
-    return is_time_out, str(stderr).replace('\n', '')
+    return is_time_out, str(stderr).replace('\n', ''), str(stdout)
 
 
 if __name__ == '__main__':

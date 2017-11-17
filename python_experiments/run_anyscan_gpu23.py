@@ -2,19 +2,19 @@ import time_out_util
 import os, time
 
 if __name__ == '__main__':
-    any_scan_path = '/nfsshare/share/anySCANBin/anyscan1114'
+    any_scan_path = '/ghome/yche/projects/anySCANBin/anyscan1114'
     data_set_lst = [
-        # 'snap_livejournal',
+        'snap_livejournal',
         'snap_orkut',
-        'webgraph_webbase',
-        'webgraph_twitter',
-        'snap_friendster'
+        # 'webgraph_webbase',
+        # 'webgraph_twitter',
+        # 'snap_friendster'
     ]
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     parameter_min_pts_lst = [5]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
-    thread_num = 256
+    thread_num = 64
     foler_name = 'anyscan-exp'
     for data_set_path in data_set_lst:
         for eps in parameter_eps_lst:
