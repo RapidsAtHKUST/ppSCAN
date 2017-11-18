@@ -2,7 +2,12 @@ import time_out_util
 import os, time
 
 if __name__ == '__main__':
-    origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANOrigin'
+    # origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANOrigin'
+    # foler_name = 'origin-scan-opt-exp'
+
+    origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANSuperNaive'
+    foler_name = 'origin-scan-super-naive-exp'
+
     data_set_lst = [
         'snap_livejournal',
         'snap_orkut',
@@ -14,8 +19,6 @@ if __name__ == '__main__':
     parameter_min_pts_lst = [5]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
-    thread_num = 64
-    foler_name = 'origin-scan-opt-exp'
     for data_set_path in data_set_lst:
         for eps in parameter_eps_lst:
             for min_pts in parameter_min_pts_lst:
