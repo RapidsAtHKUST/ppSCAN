@@ -132,6 +132,7 @@ int GraphParallelExp::IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num
     return cn >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 }
 
+#if defined(AVX2_PIVOT_SET_INTERSECTION)
 int GraphParallelExp::IntersectNeighborSetsAVX2(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -218,8 +219,9 @@ int GraphParallelExp::IntersectNeighborSetsAVX2(int u, int v, int min_cn_num) {
         }
     }
 }
+#endif
 
-
+#if defined(AVX512_PIVOT_SET_INTERSECTION)
 int GraphParallelExp::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -305,6 +307,7 @@ int GraphParallelExp::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) 
         }
     }
 }
+#endif
 
 int GraphParallelExp::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];

@@ -164,6 +164,7 @@ int Graph::IntersectNeighborSetsSSE(int u, int v, int min_cn_num) {
     }
 }
 
+#if defined(ENABLE_AVX2)
 int Graph::IntersectNeighborSetsAVX2(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -250,7 +251,10 @@ int Graph::IntersectNeighborSetsAVX2(int u, int v, int min_cn_num) {
         }
     }
 }
+#endif
 
+
+#if defined(ENABLE_AVX512)
 int Graph::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u
     int du = out_edge_start[u + 1] - out_edge_start[u] + 2, dv =
@@ -336,7 +340,9 @@ int Graph::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
         }
     }
 }
+#endif
 
+#if defined(ENABLE_AVX512_MERGE)
 int Graph::IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num) {
     if (degree[u] > degree[v]) {
         auto tmp = u;
@@ -440,6 +446,7 @@ int Graph::IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num) 
     }
     return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
 }
+#endif
 
 int Graph::IntersectNeighborSets(int u, int v, int min_cn_num) {
     int cn = 2; // count for self and v, count for self and u

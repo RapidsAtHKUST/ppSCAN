@@ -11,6 +11,18 @@ add_subdirectory(playground)
 ## utility2: graoph converter edge list to binary files
 add_subdirectory(converter)
 
+# usgae(knl): cmake .. -DKNL=ON
+# usgae(avx2): cmake .. -DKNL=OFF -DAVX2=ON
+# usage(sse): cmake .. -DKNL=OFF -DAVX2=OFF
+if (KNL)
+    message(KNL)
+elseif (AVX2)
+    message(AVX2)
+else ()
+    message(NOT_KNL,NOT_AVX2)
+endif ()
+
+
 ## ppSCAN release 0: serial
 set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/GraphSeqExp.cpp InputOutput.cpp DisjointSet.cpp)
 add_executable(pSCANSerial ${SERIAL_SOURCE_FILES})
@@ -40,22 +52,29 @@ target_compile_options(pSCANParallelSSE PRIVATE -O3 -g -march=native)
 target_link_libraries(pSCANParallelSSE ${CMAKE_THREAD_LIBS_INIT})
 
 ## ppSCAN release 3: parallel with avx2
-add_executable(pSCANParallelAVX2 ${SOURCE_FILES})
-target_compile_definitions(pSCANParallelAVX2 PRIVATE ENABLE_AVX2=1)
-target_compile_options(pSCANParallelAVX2 PRIVATE -O3 -g -march=core-avx2)
-target_link_libraries(pSCANParallelAVX2 ${CMAKE_THREAD_LIBS_INIT})
+if (KNL OR AVX2)
+    message(REDAY_SIMD)
+    add_executable(pSCANParallelAVX2 ${SOURCE_FILES})
+    target_compile_definitions(pSCANParallelAVX2 PRIVATE ENABLE_AVX2=1)
+    target_compile_options(pSCANParallelAVX2 PRIVATE -O3 -g -march=core-avx2)
+    target_link_libraries(pSCANParallelAVX2 ${CMAKE_THREAD_LIBS_INIT})
+endif ()
 
 ## ppSCAN release 4: parallel with avx512
-add_executable(pSCANParallelAVX512 ${SOURCE_FILES})
-target_compile_definitions(pSCANParallelAVX512 PRIVATE ENABLE_AVX512=1)
-target_compile_options(pSCANParallelAVX512 PRIVATE -O3 -g -march=native)
-target_link_libraries(pSCANParallelAVX512 ${CMAKE_THREAD_LIBS_INIT})
+if (KNL)
+    add_executable(pSCANParallelAVX512 ${SOURCE_FILES})
+    target_compile_definitions(pSCANParallelAVX512 PRIVATE ENABLE_AVX512=1)
+    target_compile_options(pSCANParallelAVX512 PRIVATE -O3 -g -march=native)
+    target_link_libraries(pSCANParallelAVX512 ${CMAKE_THREAD_LIBS_INIT})
+endif ()
 
 ## ppSCAN release 4: parallel with avx512 merge
-add_executable(pSCANParallelAVX512Merge ${SOURCE_FILES})
-target_compile_definitions(pSCANParallelAVX512Merge PRIVATE ENABLE_AVX512_MERGE=1)
-target_compile_options(pSCANParallelAVX512Merge PRIVATE -O3 -g -march=native)
-target_link_libraries(pSCANParallelAVX512Merge ${CMAKE_THREAD_LIBS_INIT})
+if (KNL)
+    add_executable(pSCANParallelAVX512Merge ${SOURCE_FILES})
+    target_compile_definitions(pSCANParallelAVX512Merge PRIVATE ENABLE_AVX512_MERGE=1)
+    target_compile_options(pSCANParallelAVX512Merge PRIVATE -O3 -g -march=native)
+    target_link_libraries(pSCANParallelAVX512Merge ${CMAKE_THREAD_LIBS_INIT})
+endif ()
 
 ## ppSCAN serial experimental 0: statistics 0
 add_executable(pSCANStatistics0 ${SERIAL_SOURCE_FILES})
@@ -70,15 +89,20 @@ target_compile_options(pSCANSerialNaive PRIVATE -O3 -g)
 ## ppSCAN parallel experimental 0: avx2 enabled pivot-set-intersection
 set(EXP_FILES experimental/main_exp_parallel.cpp experimental/GraphParallelExp.cpp experimental/GraphParallelExp.h
         InputOutput.cpp InputOutput.h DisjointSet.cpp DisjointSet.h ThreadPool.h)
-add_executable(pSCANParallelExp0 ${EXP_FILES})
-target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g -march=core-avx2)
-target_compile_definitions(pSCANParallelExp0 PRIVATE AVX2_PIVOT_SET_INTERSECTION=1)
-target_link_libraries(pSCANParallelExp0 ${CMAKE_THREAD_LIBS_INIT})
 
-add_executable(pSCANParallelExp0AVX512 ${EXP_FILES})
-target_compile_options(pSCANParallelExp0AVX512 PRIVATE -O3 -g -march=native)
-target_compile_definitions(pSCANParallelExp0AVX512 PRIVATE AVX512_PIVOT_SET_INTERSECTION=1)
-target_link_libraries(pSCANParallelExp0AVX512 ${CMAKE_THREAD_LIBS_INIT})
+if (KNL OR AVX2)
+    add_executable(pSCANParallelExp0 ${EXP_FILES})
+    target_compile_options(pSCANParallelExp0 PRIVATE -O3 -g -march=core-avx2)
+    target_compile_definitions(pSCANParallelExp0 PRIVATE AVX2_PIVOT_SET_INTERSECTION=1)
+    target_link_libraries(pSCANParallelExp0 ${CMAKE_THREAD_LIBS_INIT})
+endif ()
+
+if (KNL)
+    add_executable(pSCANParallelExp0AVX512 ${EXP_FILES})
+    target_compile_options(pSCANParallelExp0AVX512 PRIVATE -O3 -g -march=native)
+    target_compile_definitions(pSCANParallelExp0AVX512 PRIVATE AVX512_PIVOT_SET_INTERSECTION=1)
+    target_link_libraries(pSCANParallelExp0AVX512 ${CMAKE_THREAD_LIBS_INIT})
+endif ()
 
 ## ppSCAN parallel experimental 1: naive-set-intersection
 add_executable(pSCANParallelExp1 ${EXP_FILES})

@@ -48,11 +48,17 @@ private:
 
     int IntersectNeighborSetsSSE(int u, int v, int min_cn_num);
 
+#if defined(ENABLE_AVX2)
     int IntersectNeighborSetsAVX2(int u, int v, int min_cn_num);
+#endif
 
+#if defined(ENABLE_AVX512)
     int IntersectNeighborSetsAVX512(int u, int v, int min_cn_num);
+#endif
 
+#if defined(ENABLE_AVX512_MERGE)
     int IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num);
+#endif
 
     int EvalSimilarity(int u, ui edge_idx);
 

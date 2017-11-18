@@ -49,9 +49,13 @@ private:
 
     int IntersectNeighborSetsStdMerge(int u, int v, int min_cn_num);
 
+#if defined(AVX2_PIVOT_SET_INTERSECTION)
     int IntersectNeighborSetsAVX2(int u, int v, int min_cn_num);
+#endif
 
+#if defined(AVX512_PIVOT_SET_INTERSECTION)
     int IntersectNeighborSetsAVX512(int u, int v, int min_cn_num);
+#endif
 
     int EvalSimilarity(int u, ui edge_idx);
 
