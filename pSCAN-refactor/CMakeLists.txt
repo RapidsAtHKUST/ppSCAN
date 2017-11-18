@@ -3,13 +3,8 @@ project(ppSCAN)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# setup pthread environmental variables
 find_package(Threads REQUIRED)
-
-## utility 1: check binary file, and some playground codes
-add_subdirectory(playground)
-
-## utility2: graoph converter edge list to binary files
-add_subdirectory(converter)
 
 # usgae(knl): cmake .. -DKNL=ON
 # usgae(avx2): cmake .. -DKNL=OFF -DAVX2=ON
@@ -22,14 +17,11 @@ else ()
     message(NOT_KNL,NOT_AVX2)
 endif ()
 
-
 ## ppSCAN release 0: serial
 set(SERIAL_SOURCE_FILES experimental/main_exp_serial.cpp experimental/GraphSeqExp.cpp InputOutput.cpp DisjointSet.cpp)
 add_executable(pSCANSerial ${SERIAL_SOURCE_FILES})
-#target_compile_definitions(pSCANSerial PRIVATE WITHGPERFTOOLS=1 SERIAL=1)
 target_compile_definitions(pSCANSerial PRIVATE SERIAL=1)
 target_compile_options(pSCANSerial PRIVATE -O3 -g)
-#target_link_libraries(pSCANSerial profiler)
 
 ## ppSCAN experimental: galloping search
 set(GALLOPING_FILES experimental/main_exp_parallel_galloping.cpp experimental/GraphGallopingSearchExp.cpp experimental/GraphGallopingSearchExp.h
@@ -116,11 +108,17 @@ target_compile_options(pSCANParallelExp2 PRIVATE -O3 -g)
 target_compile_definitions(pSCANParallelExp2 PRIVATE PIVOT_SET_INTERSECTION=1)
 target_link_libraries(pSCANParallelExp2 ${CMAKE_THREAD_LIBS_INIT})
 
-## pscan: refactor implementaion, under GPLv3 license
-add_subdirectory(experimental/pscan_experimental)
-
-## original scan: reimplementation
+## 2007 original scan: reimplementation
 add_subdirectory(experimental/scan_origin)
 
-## anySCAN
+## 2016 pscan: refactor implementaion, under GPLv3 license
+add_subdirectory(experimental/pscan_experimental)
+
+## 2017 anySCAN: reimplementation
 add_subdirectory(experimental/anyscan)
+
+## utility 1: check binary file, and some playground codes
+add_subdirectory(playground)
+
+## utility2: graoph converter edge list to binary files
+add_subdirectory(converter)
