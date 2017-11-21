@@ -2,20 +2,19 @@ import time_out_util
 import os, time
 
 if __name__ == '__main__':
-    any_scan_path = '/nfsshare/share/anySCANBin/anyscan1121'
+    scanpp_path = '/ghome/yche/projects/scan_plus2/scanpp'
     data_set_lst = [
         # 'snap_livejournal',
-        'snap_orkut',
+        # 'snap_orkut',
         'webgraph_webbase',
-        'webgraph_twitter',
-        'snap_friendster'
+        # 'webgraph_twitter',
+        # 'snap_friendster'
     ]
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     parameter_min_pts_lst = [5]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
-    thread_num = 256
-    foler_name = 'anyscan-exp-1121'
+    foler_name = 'scanpp-exp'
     for data_set_path in data_set_lst:
         for eps in parameter_eps_lst:
             for min_pts in parameter_min_pts_lst:
@@ -39,13 +38,12 @@ if __name__ == '__main__':
                         ifs.write(my_splitter + my_splitter + '\n')
 
 
-                params_lst = map(str, [any_scan_path,
-                                       '-c', 4, '-g', 'label.gold',
-                                       '-i', data_set_path, '-o', 'out.txt', '-e', eps, '-m', min_pts,
-                                       '-a', 65536, '-b', 65536, '-t', thread_num, '>>', statistics_file_path])
+                params_lst = map(str, [scanpp_path,
+                                       '-e', eps, '-m', min_pts, data_set_path + os.sep + 'edges.txt',
+                                       '-v', '>>', statistics_file_path])
                 cmd = ' '.join(params_lst)
                 print cmd
-                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=3600)
+                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=7200)
                 write_split()
 
                 with open(statistics_file_path, 'a+') as ifs:

@@ -2,11 +2,11 @@ import time_out_util
 import os, time
 
 if __name__ == '__main__':
-    # origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANOrigin'
-    # foler_name = 'origin-scan-opt-exp'
+    origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANOrigin'
+    foler_name = 'origin-scan-opt-exp'
 
-    origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANSuperNaive'
-    foler_name = 'origin-scan-super-naive-exp'
+    # origin_scan_opt_path = '../pSCAN-refactor/build/experimental/scan_origin/SCANSuperNaive'
+    # foler_name = 'origin-scan-super-naive-exp'
 
     data_set_lst = [
         'snap_livejournal',
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                                        eps, min_pts, 'output', '>>', statistics_file_path])
                 cmd = ' '.join(params_lst)
                 print cmd
-                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=36000)
+                tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=5400)
 
 
                 # check md5, line count and byte count

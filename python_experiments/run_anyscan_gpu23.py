@@ -2,20 +2,20 @@ import time_out_util
 import os, time
 
 if __name__ == '__main__':
-    any_scan_path = '/ghome/yche/projects/anySCANBin/anyscan1114'
+    any_scan_path = '/ghome/yche/projects/anySCANBin/anyscan1121'
     data_set_lst = [
         'snap_livejournal',
         'snap_orkut',
-        # 'webgraph_webbase',
-        # 'webgraph_twitter',
-        # 'snap_friendster'
+        'webgraph_webbase',
+        'webgraph_twitter',
+        'snap_friendster'
     ]
     parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
     parameter_min_pts_lst = [5]
 
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
     thread_num = 64
-    foler_name = 'anyscan-exp'
+    foler_name = 'anyscan-exp-1121'
     for data_set_path in data_set_lst:
         for eps in parameter_eps_lst:
             for min_pts in parameter_min_pts_lst:
@@ -42,7 +42,7 @@ if __name__ == '__main__':
                 params_lst = map(str, [any_scan_path,
                                        '-c', 4, '-g', 'label.gold',
                                        '-i', data_set_path, '-o', 'out.txt', '-e', eps, '-m', min_pts,
-                                       '-a', 32768, '-b', 32768, '-t', thread_num, '>>', statistics_file_path])
+                                       '-a', 65536, '-b', 65536, '-t', thread_num, '>>', statistics_file_path])
                 cmd = ' '.join(params_lst)
                 print cmd
                 tle_flag, info, correct_info = time_out_util.run_with_timeout(cmd, timeout_sec=3600)
