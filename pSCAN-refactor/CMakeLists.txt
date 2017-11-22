@@ -50,6 +50,11 @@ if (KNL OR AVX2)
     target_compile_definitions(pSCANParallelAVX2 PRIVATE ENABLE_AVX2=1)
     target_compile_options(pSCANParallelAVX2 PRIVATE -O3 -g -march=core-avx2)
     target_link_libraries(pSCANParallelAVX2 ${CMAKE_THREAD_LIBS_INIT})
+
+    add_executable(pSCANParallelAVX2Merge ${SOURCE_FILES})
+    target_compile_definitions(pSCANParallelAVX2Merge PRIVATE ENABLE_AVX2_MERGE=1)
+    target_compile_options(pSCANParallelAVX2Merge PRIVATE -O3 -g -march=core-avx2)
+    target_link_libraries(pSCANParallelAVX2Merge ${CMAKE_THREAD_LIBS_INIT})
 endif ()
 
 ## ppSCAN release 4: parallel with avx512

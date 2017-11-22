@@ -253,6 +253,113 @@ int Graph::IntersectNeighborSetsAVX2(int u, int v, int min_cn_num) {
 }
 #endif
 
+#if defined(ENABLE_AVX2_MERGE)
+int Graph::IntersectNeighborSetsAVX2MergePopCnt(int u, int v, int min_cn_num) {
+    if (degree[u] > degree[v]) {
+        auto tmp = u;
+        u = v;
+        v = tmp;
+    }
+    auto off_nei_u = out_edge_start[u], off_nei_v = out_edge_start[v];
+    auto off_u_end = out_edge_start[u + 1], off_v_end = out_edge_start[v + 1];
+
+    auto cn_count = 2;
+    __m256i two_per_rule = _mm256_set_epi32(1, 1, 1, 1, 0, 0, 0, 0);
+    __m256i four_per_rule = _mm256_set_epi32(3, 2, 1, 0, 3, 2, 1, 0);
+
+    auto size1 = (off_v_end - off_nei_v) / (off_u_end - off_nei_u);
+    if (size1 > 2) {
+        if (off_nei_u < off_u_end && off_nei_v + 7 < off_v_end) {
+            __m256i u_elements = _mm256_set1_epi32(out_edges[off_nei_u]);
+            __m256i v_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_v]));
+
+            while (true) {
+                __m256i tmp_res = _mm256_cmpeq_epi32(u_elements, v_elements);
+                int mask = _mm256_movemask_epi8(tmp_res);
+                cn_count += _popcnt32(mask) >> 2;
+
+                if (out_edges[off_nei_u] > out_edges[off_nei_v + 7]) {
+                    off_nei_v += 8;
+                    if (off_nei_v + 7 >= off_v_end) {
+                        break;
+                    }
+                    v_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_v]));
+                } else {
+                    off_nei_u++;
+                    if (off_nei_u >= off_u_end) {
+                        break;
+                    }
+                    u_elements = _mm256_set1_epi32(out_edges[off_nei_u]);
+                }
+            }
+        }
+    } else {
+        if (off_nei_u + 1 < off_u_end && off_nei_v + 3 < off_v_end) {
+            __m256i u_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_u]));
+            __m256i u_elements_per = _mm256_permutevar8x32_epi32(u_elements, two_per_rule);
+            __m256i v_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_v]));
+            __m256i v_elements_per = _mm256_permutevar8x32_epi32(v_elements, four_per_rule);
+
+            while (true) {
+                __m256i tmp_res = _mm256_cmpeq_epi32(u_elements_per, v_elements_per);
+                int mask = _mm256_movemask_epi8(tmp_res);
+                cn_count += _popcnt32(mask) >> 2;
+
+                if (out_edges[off_nei_u + 1] > out_edges[off_nei_v + 3]) {
+                    off_nei_v += 4;
+                    if (off_nei_v + 3 >= off_v_end) {
+                        break;
+                    }
+                    v_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_v]));
+                    v_elements_per = _mm256_permutevar8x32_epi32(v_elements, four_per_rule);
+                } else if (out_edges[off_nei_u + 1] < out_edges[off_nei_v + 3]) {
+                    off_nei_u += 2;
+                    if (off_nei_u + 1 >= off_u_end) {
+                        break;
+                    }
+                    u_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_u]));
+                    u_elements_per = _mm256_permutevar8x32_epi32(u_elements, two_per_rule);
+                } else {
+                    off_nei_u += 2;
+                    off_nei_v += 4;
+                    if (off_nei_u + 1 >= off_u_end || off_nei_v + 3 >= off_v_end) {
+                        break;
+                    }
+                    u_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_u]));
+                    u_elements_per = _mm256_permutevar8x32_epi32(u_elements, two_per_rule);
+                    v_elements = _mm256_loadu_si256((__m256i *) (&out_edges[off_nei_v]));
+                    v_elements_per = _mm256_permutevar8x32_epi32(v_elements, four_per_rule);
+                }
+            }
+        }
+    }
+    if (off_nei_u < off_u_end && off_nei_v < off_v_end) {
+        while (true) {
+            while (out_edges[off_nei_u] < out_edges[off_nei_v]) {
+                ++off_nei_u;
+                if (off_nei_u >= off_u_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+            while (out_edges[off_nei_u] > out_edges[off_nei_v]) {
+                ++off_nei_v;
+                if (off_nei_v >= off_v_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+            if (out_edges[off_nei_u] == out_edges[off_nei_v]) {
+                cn_count++;
+                ++off_nei_u;
+                ++off_nei_v;
+                if (off_nei_u >= off_u_end || off_nei_v >= off_v_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+        }
+    }
+    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+}
+#endif
 
 #if defined(ENABLE_AVX512)
 int Graph::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
@@ -486,6 +593,8 @@ int Graph::EvalSimilarity(int u, ui edge_idx) {
     return IntersectNeighborSetsAVX512MergePopCnt(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_AVX2)
     return IntersectNeighborSetsAVX2(u, v, min_cn[edge_idx]);
+#elif defined(ENABLE_AVX2_MERGE)
+    return IntersectNeighborSetsAVX2MergePopCnt(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_SSE)
     return IntersectNeighborSetsSSE(u, v, min_cn[edge_idx]);
 #else
