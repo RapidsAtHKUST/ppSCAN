@@ -63,6 +63,12 @@ if (KNL)
     target_compile_definitions(pSCANParallelAVX512 PRIVATE ENABLE_AVX512=1)
     target_compile_options(pSCANParallelAVX512 PRIVATE -O3 -g -march=native)
     target_link_libraries(pSCANParallelAVX512 ${CMAKE_THREAD_LIBS_INIT})
+
+    # no du/dv for min-max pruning, becomes slower
+    add_executable(pSCANParallelAVX512NoDuDv ${SOURCE_FILES})
+    target_compile_definitions(pSCANParallelAVX512NoDuDv PRIVATE ENABLE_AVX512_NO_DU_DV=1)
+    target_compile_options(pSCANParallelAVX512NoDuDv PRIVATE -O3 -g -march=native)
+    target_link_libraries(pSCANParallelAVX512NoDuDv ${CMAKE_THREAD_LIBS_INIT})
 endif ()
 
 ## ppSCAN release 4: parallel with avx512 merge

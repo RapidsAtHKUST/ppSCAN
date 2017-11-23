@@ -60,6 +60,10 @@ private:
     int IntersectNeighborSetsAVX512(int u, int v, int min_cn_num);
 #endif
 
+#if defined(ENABLE_AVX512_NO_DU_DV)
+    int IntersectNeighborSetsAVX512NoDuDv(int u, int v, int min_cn_num);
+#endif
+
 #if defined(ENABLE_AVX512_MERGE)
     int IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num);
 #endif

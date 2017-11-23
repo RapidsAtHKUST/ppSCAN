@@ -449,6 +449,87 @@ int Graph::IntersectNeighborSetsAVX512(int u, int v, int min_cn_num) {
 }
 #endif
 
+#if defined(ENABLE_AVX512_NO_DU_DV)
+int Graph::IntersectNeighborSetsAVX512NoDuDv(int u, int v, int min_cn_num) {
+    int cn_count = 2; // count for self and v, count for self and u
+
+    auto off_nei_u = out_edge_start[u], off_nei_v = out_edge_start[v];
+    auto off_u_end = out_edge_start[u + 1], off_v_end = out_edge_start[v + 1];
+    // correctness guaranteed by two pruning previously in computing min_cn
+    constexpr int parallelism = 16;
+    while (true) {
+        // avx512(knl), out_edges[offset_nei_v] as the pivot
+        while (off_nei_u + parallelism < off_u_end) {
+            __m512i pivot = _mm512_set1_epi32(out_edges[off_nei_v]);
+            __m512i inspected_ele = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&out_edges[off_nei_u]));
+            __mmask16 cmp_res = _mm512_cmpgt_epi32_mask(pivot, inspected_ele);
+            auto count = _mm_popcnt_u32(cmp_res);
+
+            // update offset_nei_u and du
+            off_nei_u += count;
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (off_nei_u + parallelism >= out_edge_start[u + 1]) {
+            break;
+        }
+
+        // avx512(knl), out_edges[offset_nei_u] as the pivot
+        while (off_nei_v + parallelism < off_v_end) {
+            __m512i pivot = _mm512_set1_epi32(out_edges[off_nei_u]);
+            __m512i inspected_ele = _mm512_loadu_si512(reinterpret_cast<const __m512i *>(&out_edges[off_nei_v]));
+            __mmask16 cmp_res = _mm512_cmpgt_epi32_mask(pivot, inspected_ele);
+            auto count = _mm_popcnt_u32(cmp_res);
+
+            // update offset_nei_u and du
+            off_nei_v += count;
+            if (count < parallelism) {
+                break;
+            }
+        }
+        if (off_nei_v + parallelism >= out_edge_start[v + 1]) {
+            break;
+        }
+
+        // find possible equality
+        if (out_edges[off_nei_u] == out_edges[off_nei_v]) {
+            ++cn_count;
+            if (cn_count >= min_cn_num) {
+                return SIMILAR;
+            }
+            ++off_nei_u;
+            ++off_nei_v;
+        }
+    }
+
+    if (off_nei_u < off_u_end && off_nei_v < off_v_end) {
+        while (true) {
+            while (out_edges[off_nei_u] < out_edges[off_nei_v]) {
+                ++off_nei_u;
+                if (off_nei_u >= off_u_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+            while (out_edges[off_nei_u] > out_edges[off_nei_v]) {
+                ++off_nei_v;
+                if (off_nei_v >= off_v_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+            if (out_edges[off_nei_u] == out_edges[off_nei_v]) {
+                cn_count++;
+                ++off_nei_u;
+                ++off_nei_v;
+                if (off_nei_u >= off_u_end || off_nei_v >= off_v_end) {
+                    return cn_count >= min_cn_num ? SIMILAR : NOT_SIMILAR;
+                }
+            }
+        }
+    }
+}
+#endif
+
 #if defined(ENABLE_AVX512_MERGE)
 int Graph::IntersectNeighborSetsAVX512MergePopCnt(int u, int v, int min_cn_num) {
     if (degree[u] > degree[v]) {
@@ -589,6 +670,8 @@ int Graph::EvalSimilarity(int u, ui edge_idx) {
     int v = out_edges[edge_idx];
 #if defined(ENABLE_AVX512)
     return IntersectNeighborSetsAVX512(u, v, min_cn[edge_idx]);
+#elif defined(ENABLE_AVX512_NO_DU_DV)
+    return IntersectNeighborSetsAVX512NoDuDv(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_AVX512_MERGE)
     return IntersectNeighborSetsAVX512MergePopCnt(u, v, min_cn[edge_idx]);
 #elif defined(ENABLE_AVX2)
