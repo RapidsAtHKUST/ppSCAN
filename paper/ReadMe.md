@@ -1,13 +1,17 @@
 ## Experiments
 
-`6*4=24` figures
+`7*4=28` figures
+
+show that different `u`(`2, 5, 10, 15`), they show similar trends
 
 parameters | varying range
 --- | ---
-`u` | `2, 5, 10, 15`
+`u` | `5`
 `eps` | `0.1 to 0.9`
 
-* overall comparison on KNL(4 real-world graph2s, fixed `u=5`, varying `eps`), log time
+* ppSCAN performance with different `u`(4 real-world graphs)(on KNL), varying `u`(`2, 5, 10, 15`)
+    * ppSCAN shows similar trends
+* overall comparison on KNL(4 real-world graphs, fixed `u=5`, varying `eps`), log time
   * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
 * overall comparison on CPU(4 real-world graphs, fixed `u=5`, varying `eps`), log time
   * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
@@ -17,5 +21,5 @@ parameters | varying range
   * ppSCAN and ppSCAN-NO
 * scalability with different thread numbers(4 real-world graphs, fixed `u=5`, `eps=0.2`), log-log time and thread number
   * ppSCAN 4 stages and total time
-* performance on ROLL graphs(4 different degree 1-billion edge ROLL graphs, varying `u` and `eps`)
+* performance on ROLL graphs(4 different-degree 1-billion edge ROLL graphs, fixed `u=5` and `eps`)
   * ppSCAN time, speedup namely on **CPU and KNL**, **report time and speedup**
