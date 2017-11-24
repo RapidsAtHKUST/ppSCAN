@@ -5,11 +5,12 @@ if __name__ == '__main__':
     # lfr_data_set_lst = ['n6000000_k40_C0dot3_Bin', 'n4000000_k60_C0dot3_Bin',
     #                     'n3000000_k80_C0dot3_Bin', 'n2400000_k100_C0dot3_Bin']
     roll_graph_data_set_lst = [
-        'n50_m20_1billion_edge', 'n25_m40_1billion_edge',
+        # 'n50_m20_1billion_edge',
+        'n25_m40_1billion_edge',
         'n16dot7_m60_1billion_edge', 'n12dot5_m80_1billion_edge']
 
     data_set_lst = roll_graph_data_set_lst
-    parameter_eps_lst = reversed([float(i + 1) / 10 for i in xrange(9)])
+    parameter_eps_lst = list(reversed([float(i + 1) / 10 for i in xrange(9)]))
     parameter_min_pts_lst = [5]
     thread_num = 64
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
@@ -21,13 +22,14 @@ if __name__ == '__main__':
     print parameter_min_pts_lst
 
     for data_set_path in data_set_lst:
+        print data_set_lst
         for eps in parameter_eps_lst:
             for min_pts in parameter_min_pts_lst:
                 # statistics output dir and file
                 data_set_name = data_set_path.split(os.sep)[-1]
                 statistics_dir = os.sep.join(
                     map(str,
-                        ['.', 'paper-roll-graph-exp-11-24-knl', data_set_name, 'eps-' + str(eps),
+                        ['.', 'paper-roll-graph-exp-11-24-gpu23', data_set_name, 'eps-' + str(eps),
                          'min_pts-' + str(min_pts)]))
                 os.system('mkdir -p ' + statistics_dir)
                 statistics_file_path = statistics_dir + os.sep + '-'.join(
