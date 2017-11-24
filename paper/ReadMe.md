@@ -1,24 +1,21 @@
-## Comments
+## Experiments
 
-* Problem: related work should be put after preliminaries, otherwise it may be weird
+`6*4=24` figures
 
-done, by placing it right after notations and SCAN algorithm
+parameters | varying range
+--- | ---
+`u` | `2, 5, 10, 15`
+`eps` | `0.1 to 0.9`
 
-* in technique section, emphasize my contributions(set-intersection improvement),
-separate existing work(1. similarity predicate eval:
-easy computation pruning/better set-intersection
-
-done, by summarizing my three contributions at the beginning of techniques, the first one
-
-* in technique section 2. core checking and clustering: avoiding redundant computation
-and min-max and disjoint-set pruning) and
-my contributions(set-intersection improvement and non-trivial parallel extension)
-
-done, by summarizing my three contributions at the beginning of techniques, the second and third, my observations and parallel extension analysis
-
-## Evaluation
-
-### Arguments
-
-
-### Experimental Cases
+* overall comparison on KNL(4 real-world graph2s, fixed `u=5`, varying `eps`), log time
+  * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
+* overall comparison on CPU(4 real-world graphs, fixed `u=5`, varying `eps`), log time
+  * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
+* normalized set-intersection invocation number(4 real-world graphs, fixed `u=5`, varying `eps`)
+  * pSCAN and ppSCAN
+* set-intersection optimization(4 real-world graphs, fixed `u=5`, varying `eps`, accumulated time)
+  * ppSCAN and ppSCAN-NO
+* scalability with different thread numbers(4 real-world graphs, fixed `u=5`, `eps=0.2`), log-log time and thread number
+  * ppSCAN 4 stages and total time
+* performance on ROLL graphs(4 different degree 1-billion edge ROLL graphs, varying `u` and `eps`)
+  * ppSCAN time, speedup namely on **CPU and KNL**, **report time and speedup**
