@@ -2,16 +2,16 @@ import os
 import time
 
 if __name__ == '__main__':
-    lfr_data_set_lst = ['n6000000_k40_C0dot3_Bin', 'n4000000_k60_C0dot3_Bin',
-                        'n3000000_k80_C0dot3_Bin', 'n2400000_k100_C0dot3_Bin']
+    # lfr_data_set_lst = ['n6000000_k40_C0dot3_Bin', 'n4000000_k60_C0dot3_Bin',
+    #                     'n3000000_k80_C0dot3_Bin', 'n2400000_k100_C0dot3_Bin']
     roll_graph_data_set_lst = [
         'n50_m20_1billion_edge', 'n25_m40_1billion_edge',
         'n16dot7_m60_1billion_edge', 'n12dot5_m80_1billion_edge']
 
-    data_set_lst = lfr_data_set_lst
-    parameter_eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+    data_set_lst = roll_graph_data_set_lst
+    parameter_eps_lst = reversed([float(i + 1) / 10 for i in xrange(9)])
     parameter_min_pts_lst = [5]
-    thread_num = 40
+    thread_num = 256
     data_set_lst = map(lambda name: os.pardir + os.sep + 'dataset' + os.sep + name, data_set_lst)
 
     print 'data set:', data_set_lst
@@ -27,7 +27,7 @@ if __name__ == '__main__':
                 data_set_name = data_set_path.split(os.sep)[-1]
                 statistics_dir = os.sep.join(
                     map(str,
-                        ['.', 'synthetic-graph-roll-self', data_set_name, 'eps-' + str(eps),
+                        ['.', 'paper-roll-graph-exp-11-24-gpu23', data_set_name, 'eps-' + str(eps),
                          'min_pts-' + str(min_pts)]))
                 os.system('mkdir -p ' + statistics_dir)
                 statistics_file_path = statistics_dir + os.sep + '-'.join(
@@ -55,14 +55,16 @@ if __name__ == '__main__':
                     os.system(' '.join(['du -b', res_file_path, '>>', statistics_file_path]))
 
 
-                params_lst = map(str, ['../pSCAN-refactor/build/pSCANParallelExp0', data_set_path,
+                params_lst = map(str, ['../pSCAN-refactor/build/pSCANParallelExp0AVX512', data_set_path,
                                        eps, min_pts, thread_num, 'output', '>>', statistics_file_path])
                 os.system(' '.join(params_lst))
                 check_result()
                 write_split()
 
-                params_lst = map(str, ['../pSCAN-refactor/build/pSCANSerial', data_set_path,
-                                       eps, min_pts, 'output', '>>', statistics_file_path])
+                # params_lst = map(str, ['../pSCAN-refactor/build/pSCANSerial', data_set_path,
+                #                        eps, min_pts, 'output', '>>', statistics_file_path])
+                params_lst = map(str, ['../pSCAN-refactor/build/pSCANParallelExp0AVX512', data_set_path,
+                                       eps, min_pts, 1, 'output', '>>', statistics_file_path])
                 os.system(' '.join(params_lst))
                 check_result()
 
