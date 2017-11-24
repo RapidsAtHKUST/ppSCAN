@@ -45,7 +45,7 @@ def first_exp_fix_orkut_vary_u(suffix_str='pdf'):
 
 
 def second_exp_fix_u_vary_datasets(suffix_str='pdf'):
-    data_lst = get_exp_data('exp2_fix_u5.md')
+    data_lst = get_exp_data('exp2_fix_u15.md')
     exp2_figure, ax_tuple = plt.subplots(1, 4, sharey=True, sharex=True, figsize=(16, 3))
     x_lst = [float(i + 1) / 10 for i in range(9)]
     print x_lst
@@ -76,13 +76,13 @@ def second_exp_fix_u_vary_datasets(suffix_str='pdf'):
 
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('workload_exp_fix_u_5.' + suffix_str, dpi=1200)
+    plt.savefig('workload_exp_fix_u_15.' + suffix_str, dpi=1200)
     exp2_figure.show()
 
 
 if __name__ == '__main__':
     # first_exp_fix_orkut_vary_u()
-    # second_exp_fix_u_vary_datasets()
+    second_exp_fix_u_vary_datasets()
 
     # first_exp_fix_orkut_vary_u('png')
     second_exp_fix_u_vary_datasets('png')
