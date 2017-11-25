@@ -12,7 +12,7 @@ parameters | varying range
 
 ### Overall
 
-script: [comparison](comparison)
+overall comparison script: [comparison](comparison)
 
 * overall comparison on **KNL**(4 real-world graphs, fixed `u=5`, varying `eps`), log time
   * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
@@ -20,6 +20,8 @@ script: [comparison](comparison)
   * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
 
 ### Set Intersection 
+
+invocation number script: [workload](workload)
 
 * normalized set-intersection invocation number(4 real-world graphs, fixed `u=5`, varying `eps`)
   * pSCAN and ppSCAN
