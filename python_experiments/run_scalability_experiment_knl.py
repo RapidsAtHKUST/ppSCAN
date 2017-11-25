@@ -68,7 +68,7 @@ if __name__ == '__main__':
     # thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
     # thread_num_lst = [1, 4, 8, 16, 24, 32, 40]
     # thread_num_lst = [1, 2, 4, 8, 16, 32, 64, 128, 256]
-    thread_num_lst = [256]
+    thread_num_lst = [128, 256]
     # loop run experiments
     loop_count = 1
     for i in xrange(loop_count):
