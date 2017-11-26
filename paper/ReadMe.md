@@ -23,7 +23,7 @@ ok. overall comparison script: [comparison](comparison)
 
 ok. invocation number script: [workload](workload)
 
-set-intersection script(ppSCAN vs ppSCAN-NO): 
+ok. set-intersection script(ppSCAN vs ppSCAN-NO): [set_intersection_optimization](set_intersection_optimization)
 
 * normalized set-intersection invocation number(4 real-world graphs, fixed `u=5`, varying `eps`)
   * pSCAN and ppSCAN
