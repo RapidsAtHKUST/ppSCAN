@@ -7,7 +7,7 @@ u_lst = [2, 5, 10, 15]
 legend_lst = ['$\\mu = 2 $', '$\\mu = 5 $', '$\\mu = 10 $', '$\\mu = 15 $']
 
 
-def get_ppscan_runtime(dataset, eps, min_pts, thread_num=256, root_dir_path='.'):
+def get_ppscan_runtime(dataset, eps, min_pts, root_dir_path, thread_num=256):
     runtime_tag = 'Total time without IO'
 
     file_path = os.sep.join([root_dir_path, dataset, 'eps-' + str(eps), 'min_pts-' + str(min_pts),
@@ -18,6 +18,8 @@ def get_ppscan_runtime(dataset, eps, min_pts, thread_num=256, root_dir_path='.')
     # runtime unit: ms
     runtime_lst = map(lambda time_str: eval(time_str.split('ms')[0]) if 'ms' in time_str else eval(time_str) / 1000,
                       map(lambda my_str: my_str.split(':')[-1], filter(lambda line: runtime_tag in line, lines)))
+    if len(runtime_lst) == 0:
+        print eps, min_pts
     return float(min(runtime_lst)) / 1000
 
 
@@ -64,5 +66,5 @@ if __name__ == '__main__':
         my_ax.grid(True)
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('scalability_exp2_varying_everything.' + 'pdf', dpi=1200)
+    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'pdf', dpi=1200)
     exp2_figure.show()

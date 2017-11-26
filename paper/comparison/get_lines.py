@@ -222,8 +222,8 @@ def ppscan_json_gen():
 
 if __name__ == '__main__':
     os.system('mkdir -p data-json')
-    scan_super_naive_json_gen()
-    pscan_json_gen()
-    scan_xp_json_gen()
-    anyscan_json_gen()
+    # scan_super_naive_json_gen()
+    # pscan_json_gen()
+    # scan_xp_json_gen()
+    # anyscan_json_gen()
     ppscan_json_gen()

@@ -93,5 +93,6 @@ if __name__ == '__main__':
 
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('figures/scalability_roll_graph.' + 'pdf', dpi=1200)
+    # plt.savefig('figures/scalability_roll_graph.' + 'pdf', dpi=1200)
+    plt.savefig('scalability_roll_graph.' + 'pdf', dpi=1200)
     exp2_figure.show()
