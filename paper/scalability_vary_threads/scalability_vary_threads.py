@@ -71,10 +71,8 @@ if __name__ == '__main__':
         ppscan_runtime_lst_lst = time_lst_lst_arr[ax_idx]
         shape_lst = ['o-', 's-', '^-', 'h-', 'x-']
 
-        my_lines = []
         for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst):
-            my_line = ax.plot(log_thread_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
-            my_lines.append(my_line)
+            ax.plot(log_thread_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
 
         ax.set_yscale('log')
         plt.xticks(log_thread_lst, [1, 2, 4, 8, 16, 32, 64, 128, 256])

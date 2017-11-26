@@ -12,7 +12,7 @@ parameters | varying range
 
 ### Overall
 
-overall comparison script: [comparison](comparison)
+ok. overall comparison script: [comparison](comparison)
 
 * overall comparison on **KNL**(4 real-world graphs, fixed `u=5`, varying `eps`), log time
   * anySCAN(runtime err on webbase, friendster), SCAN-XP, pSCAN, SCAN(TLE in some parameters), ppSCAN
@@ -37,7 +37,6 @@ ok. scalability on varying threads: [scalability_vary_threads](scalability_vary_
 ok. scalability on varying both u and eps script: [scalability_vary_u_and_eps](scalability_vary_u_and_eps)
 
 ok. scalability on roll graph script: [scalability_roll_graph](scalability_roll_graph)
-
 
 * scalability with different thread numbers(4 real-world graphs, fixed `u=5`, `eps=0.2`), log-log time and thread number
   * ppSCAN 4 stages and total time
