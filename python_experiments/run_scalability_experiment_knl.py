@@ -67,14 +67,14 @@ if __name__ == '__main__':
     parameter_eps_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     # parameter_eps_lst = [0.4]
     # parameter_eps_lst = [0.3]
-    parameter_min_pts_lst = [2, 5, 10, 15]
+    parameter_min_pts_lst = [5]
     # parameter_min_pts_lst = [2]
     # thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
     # thread_num_lst = [1, 4, 8, 16, 24, 32, 40]
     # thread_num_lst = [1, 2, 4, 8, 16, 32, 64, 128, 256]
     thread_num_lst = [256]
     # loop run experiments
-    loop_count = 3
+    loop_count = 15
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
