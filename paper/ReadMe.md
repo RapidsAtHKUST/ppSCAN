@@ -23,6 +23,8 @@ overall comparison script: [comparison](comparison)
 
 invocation number script: [workload](workload)
 
+set-intersection script(ppSCAN vs ppSCAN-NO): 
+
 * normalized set-intersection invocation number(4 real-world graphs, fixed `u=5`, varying `eps`)
   * pSCAN and ppSCAN
 * set-intersection optimization(4 real-world graphs, fixed `u=5`, varying `eps`, accumulated time)
@@ -30,7 +32,12 @@ invocation number script: [workload](workload)
 
 ### Scalability
 
+scalability on varying threads: [scalability_vary_threads](scalability_vary_threads)
+
+scalability on varying both u and eps script: [scalability_vary_u_and_eps](scalability_vary_u_and_eps)
+
 scalability on roll graph script: [scalability_roll_graph](scalability_roll_graph)
+
 
 * scalability with different thread numbers(4 real-world graphs, fixed `u=5`, `eps=0.2`), log-log time and thread number
   * ppSCAN 4 stages and total time
