@@ -27,8 +27,8 @@ def first_exp_fix_orkut_vary_u(suffix_str='pdf'):
         print data_lst[idx]
         # ax.plot(x_lst, data_lst[idx][0], 'o-', label='pSCAN-Naive', linewidth=1.0, markersize=10,
         #         markerfacecolor='none')
-        ax.plot(x_lst, data_lst[idx][1], 's-', label='pSCAN', linewidth=1.0, markersize=10, markerfacecolor='none')
-        ax.plot(x_lst, data_lst[idx][2], '^-', label='ppSCAN', linewidth=1.0, markersize=10, markerfacecolor='none')
+        ax.plot(x_lst, data_lst[idx][1], 'o-.', label='pSCAN', linewidth=1.0, markersize=10, markerfacecolor='none')
+        ax.plot(x_lst, data_lst[idx][2], 's:', label='ppSCAN', linewidth=1.0, markersize=10, markerfacecolor='none')
         ax.grid(True)
         ax.set_title(ax_title_lst[idx], fontsize=12)
         ax.set_ylim(0.0, 1.1)
@@ -58,9 +58,9 @@ def second_exp_fix_u_vary_datasets(input_name, output_name, suffix_str='pdf'):
         print data_lst[idx]
         # line0, = ax.plot(x_lst, data_lst[idx][0], 'o-', label='pSCAN-Naive', linewidth=1.0, markersize=10,
         #                  markerfacecolor='none')
-        line1, = ax.plot(x_lst, data_lst[idx][1], 's-', label='pSCAN', linewidth=1.0, markersize=10,
+        line1, = ax.plot(x_lst, data_lst[idx][1], 'o-.', label='pSCAN', linewidth=1.0, markersize=10,
                          markerfacecolor='none')
-        line2, = ax.plot(x_lst, data_lst[idx][2], '^-', label='ppSCAN', linewidth=1.0, markersize=10,
+        line2, = ax.plot(x_lst, data_lst[idx][2], 's--', label='ppSCAN', linewidth=1.0, markersize=10,
                          markerfacecolor='none')
         # my_legends[idx] = [line0, line1, line2]
         my_legends[idx] = [line1, line2]

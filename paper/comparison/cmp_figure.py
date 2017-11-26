@@ -35,7 +35,7 @@ def draw_figures_per_platform(platform_tag):
         for idx, algorithm in enumerate(algorithm_lst):
             time_lst = get_time_lst(algorithm, platform_tag, data_set_lst[ax_idx], 10000)
             time_lst_lst.append(time_lst)
-            shape_lst = ['o-', 's-', '^-', 'h-', 'x-']
+            shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
             ax.plot(eps_lst, time_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
             ax.set_yscale('log')
         ax.legend(['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN'], ncol=2)

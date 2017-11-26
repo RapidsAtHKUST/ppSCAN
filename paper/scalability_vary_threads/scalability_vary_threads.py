@@ -69,9 +69,11 @@ if __name__ == '__main__':
 
     for ax_idx, ax in enumerate(ax_tuple):
         ppscan_runtime_lst_lst = time_lst_lst_arr[ax_idx]
-        shape_lst = ['o-', 's-', '^-', 'h-', 'x-']
+        shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
 
         for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst):
+            # if idx==0:
+            #     ax.plot(log_thread_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
             ax.plot(log_thread_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
 
         ax.set_yscale('log')

@@ -44,7 +44,7 @@ if __name__ == '__main__':
     legend_lst = ['ROLL-d40', 'ROLL-d80', 'ROLL-d120', 'ROLL-d160']
 
     ax = ax_tuple[0]
-    shape_lst = ['o-', 's-', '^-', 'x-']
+    shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
     for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst):
         ax.plot(eps_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
     ax.legend(legend_lst)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     ax.grid(True)
 
     ax = ax_tuple[1]
-    shape_lst = ['o-', 's-', '^-', 'x-']
+    shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
     for idx, speedup_lst in enumerate(ppscan_speedup_lst_lst):
         ax.plot(eps_lst, speedup_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
     ax.legend(legend_lst)
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     ax.grid(True)
 
     ax = ax_tuple[2]
-    shape_lst = ['o-', 's-', '^-', 'x-']
+    shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
     for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst_knl):
         ax.plot(eps_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
     ax.legend(legend_lst)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     ax.grid(True)
 
     ax = ax_tuple[3]
-    shape_lst = ['o-', 's-', '^-', 'x-']
+    shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
     for idx, speedup_lst in enumerate(ppscan_speedup_lst_lst_knl):
         ax.plot(eps_lst, speedup_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
     ax.legend(legend_lst)

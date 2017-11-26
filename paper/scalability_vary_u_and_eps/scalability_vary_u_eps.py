@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     for idx, ax in enumerate(ax_tuple):
         ppscan_runtime_lst_lst = process_dataset(data_set_lst[idx])
-        shape_lst = ['o-', 's-', '^-', 'x-']
+        shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
         for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst):
             ax.plot(eps_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
         ax.legend(legend_lst)
