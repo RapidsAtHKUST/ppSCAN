@@ -16,7 +16,6 @@ def scalability_exp(data_set_lst, parameter_eps_lst, parameter_min_pts_lst, thre
         for eps in parameter_eps_lst:
             for min_pts in parameter_min_pts_lst:
                 for thread_num in thread_num_lst:
-                    # statistics output dir and file
                     data_set_name = data_set_path.split(os.sep)[-1]
                     statistics_dir = os.sep.join(
                         map(str,
@@ -31,19 +30,10 @@ def scalability_exp(data_set_lst, parameter_eps_lst, parameter_min_pts_lst, thre
                         ['echo', my_splitter + time.ctime() + my_splitter, '>>', statistics_file_path]))
 
                     # 2nd: execute pscan+ with different parameters
-                    # params_lst = map(str, ['../pSCAN-refactor/build/pSCANParallelExp0AVX512', data_set_path,
-                    #                        eps, min_pts, thread_num, 'output', '>>', statistics_file_path])
-                    params_lst = map(str, ['../pSCAN-refactor/build/pSCANParallelExp0AVX512', data_set_path,
+                    params_lst = map(str, ['../pSCAN-refactor/build/pSCANParallelExp1', data_set_path,
                                            eps, min_pts, thread_num, '>>', statistics_file_path])
                     my_cmd = ' '.join(params_lst)
                     os.system(my_cmd)
-
-                    # 3rd: check md5, line count and byte count
-                    # res_file_name = '-'.join(map(str, ['result', eps, min_pts])) + '.txt'
-                    # res_file_path = data_set_path + os.sep + res_file_name
-                    # os.system(' '.join(['md5sum', res_file_path, '>>', statistics_file_path]))
-                    # os.system(' '.join(['wc -l', res_file_path, '>>', statistics_file_path]))
-                    # os.system(' '.join(['du -b', res_file_path, '>>', statistics_file_path]))
 
                     with open(statistics_file_path, 'a+') as ifs:
                         ifs.write(my_splitter + time.ctime() + my_splitter)
@@ -54,28 +44,15 @@ def scalability_exp(data_set_lst, parameter_eps_lst, parameter_min_pts_lst, thre
 if __name__ == '__main__':
     # parameters
     data_set_lst = [
-        # 'small_snap_dblp',
-        # 'snap_livejournal',
-        # 'snap_pokec',
-        'snap_orkut',
-        # 'lfr_benchmark/10million_avgdeg15_maxdeg50_Cdefault',
-        # 'webgraph_uk',
-        'webgraph_webbase',
-        'webgraph_twitter',
-        'snap_friendster'
+        'snap_orkut', 'webgraph_webbase',
+        'webgraph_twitter', 'snap_friendster'
     ]
     parameter_eps_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    # parameter_eps_lst = [0.4]
-    # parameter_eps_lst = [0.3]
-    parameter_min_pts_lst = [2, 5, 10, 15]
-    # parameter_min_pts_lst = [2]
-    # thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40]
-    # thread_num_lst = [1, 4, 8, 16, 24, 32, 40]
-    # thread_num_lst = [1, 2, 4, 8, 16, 32, 64, 128, 256]
-    thread_num_lst = [256]
+    parameter_min_pts_lst = [5]
+    thread_num_lst = [64]
     # loop run experiments
-    loop_count = 3
+    loop_count = 1
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
-                        folder_name='scalability_simd_paper2')
+                        folder_name='ppSCANNO_gpu23')

@@ -62,12 +62,12 @@ if __name__ == '__main__':
         'webgraph_twitter', 'snap_friendster'
     ]
     parameter_eps_lst = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    # parameter_min_pts_lst = [5]
-    parameter_min_pts_lst = [2, 5, 10, 15]
+    parameter_min_pts_lst = [5]
+    # parameter_min_pts_lst = [2, 5, 10, 15]
     # thread_num_lst = [1, 2, 4, 8, 16, 24, 32, 40, 64]
-    thread_num_lst = [40, 64]
+    thread_num_lst = [64]
     # loop run experiments
-    loop_count = 1
+    loop_count = 10
     for i in xrange(loop_count):
         scalability_exp(data_set_lst=data_set_lst, parameter_eps_lst=parameter_eps_lst,
                         parameter_min_pts_lst=parameter_min_pts_lst, thread_num_lst=thread_num_lst,
