@@ -72,7 +72,7 @@ def second_exp_fix_u_vary_datasets(input_name, output_name, suffix_str='pdf'):
         # ax.legend(('pSCAN-Naive', 'pSCAN', 'ppSCAN'))
         ax.legend(('pSCAN', 'ppSCAN'))
 
-    ax_tuple[0].set_ylabel('Normalized Similarity Eval #', fontsize=12)
+    ax_tuple[0].set_ylabel('Normalized Invocation #', fontsize=12)
 
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()

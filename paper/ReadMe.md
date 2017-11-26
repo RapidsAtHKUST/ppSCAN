@@ -30,6 +30,8 @@ invocation number script: [workload](workload)
 
 ### Scalability
 
+scalability on roll graph script: [scalability_roll_graph](scalability_roll_graph)
+
 * scalability with different thread numbers(4 real-world graphs, fixed `u=5`, `eps=0.2`), log-log time and thread number
   * ppSCAN 4 stages and total time
 * scalability with different `u`(4 real-world graphs)(on KNL), varying `u`(`2, 5, 10, 15`)
