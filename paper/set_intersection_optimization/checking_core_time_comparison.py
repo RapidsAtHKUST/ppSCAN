@@ -161,7 +161,7 @@ def draw_speedup():
 
 
 if __name__ == '__main__':
-    # display_comparison_txt()
+    display_comparison_txt()
     draw_time()
 
     # print get_speedup_lst('snap_orkut', knl_tag)

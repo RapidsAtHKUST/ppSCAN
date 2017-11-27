@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         ax.legend(legend_lst, ncol=2, columnspacing=0, bbox_to_anchor=(1.02, 0.38))
         print ax_idx
-        factor_lst = [200, 100, 1000, 1000]
+        factor_lst = [100, 40, 600, 400]
         mul_factor = [2, 2, 3, 3]
         ax.set_ylim(float(min(map(min, ppscan_runtime_lst_lst))) / factor_lst[ax_idx],
                     max(map(max, ppscan_runtime_lst_lst)) * mul_factor[ax_idx])
