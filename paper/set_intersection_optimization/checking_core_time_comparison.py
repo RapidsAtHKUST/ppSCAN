@@ -149,7 +149,7 @@ def draw_speedup():
     for idx, my_ax in enumerate(ax_tuple):
         my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
-            my_ax.set_ylabel('Checking Core Speedup', fontsize=12)
+            my_ax.set_ylabel('Core Checking Speedup', fontsize=12)
         my_ax.set_xlabel('$\\epsilon = $')
         my_ax.xaxis.set_label_coords(0.00, -0.045)
         my_ax.grid(True)

@@ -89,8 +89,8 @@ if __name__ == '__main__':
     for idx, my_ax in enumerate(ax_tuple):
         my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
-            my_ax.set_ylabel('Runtime (s)', fontsize=12)
-        my_ax.set_xlabel('Thread Number')
+            my_ax.set_ylabel('Runtime (seconds)', fontsize=12)
+        my_ax.set_xlabel('Number of threads')
         my_ax.grid(True)
 
     exp_figure.subplots_adjust(wspace=0)

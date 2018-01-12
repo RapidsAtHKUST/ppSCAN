@@ -43,7 +43,7 @@ def process_dataset(dataset):
 
 
 if __name__ == '__main__':
-    ppscan_runtime_tag = 'ppSCAN Runtime (s)'
+    ppscan_runtime_tag = 'ppSCAN Runtime (seconds)'
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     for idx, my_ax in enumerate(ax_tuple):
         my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
-            my_ax.set_ylabel('Runtime (s)', fontsize=12)
+            my_ax.set_ylabel('Runtime (seconds)', fontsize=12)
         my_ax.set_xlabel('$\\epsilon = $')
         my_ax.xaxis.set_label_coords(0.00, -0.045)
         my_ax.grid(True)

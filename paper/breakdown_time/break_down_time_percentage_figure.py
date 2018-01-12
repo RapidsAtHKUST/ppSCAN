@@ -55,7 +55,7 @@ if __name__ == '__main__':
                            'pSCAN\n$\\epsilon$: 0.6', 'pSCAN\n$\\epsilon$: 0.8']
         display_time_division(recal_for_bar_char(lst_lst), xtick_label_lst, title='(a) Breakdown Time',
                               ax=ax_tuple[0])
-        ax_tuple[0].set_ylabel('Runtime (s)', fontsize=12)
+        ax_tuple[0].set_ylabel('Runtime (seconds)', fontsize=12)
 
         # 2nd: draw percentage
         lst_lst = my_data_lst[2]

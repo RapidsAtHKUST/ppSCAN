@@ -46,7 +46,7 @@ if __name__ == '__main__':
                                'pSCAN\n$\\epsilon$: 0.6', 'pSCAN\n$\\epsilon$: 0.8']
             display_time_division(recal_for_bar_char(lst_lst), xtick_label_lst, title=ax_title_lst[idx],
                                   ax=ax_tuple[idx])
-        ax_tuple[0].set_ylabel('Breakdown Runtime (s)', fontsize=12)
+        ax_tuple[0].set_ylabel('Breakdown Runtime (seconds)', fontsize=12)
 
         breakdown_time_figure.subplots_adjust(wspace=0)
         plt.tight_layout()
