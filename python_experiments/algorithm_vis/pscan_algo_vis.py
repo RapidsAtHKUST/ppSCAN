@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from pscan_algo import to_csr_graph
+from pscan_algo_naive import to_csr_graph
 from itertools import chain
 
 
