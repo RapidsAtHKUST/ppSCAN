@@ -8,7 +8,7 @@ eps = 0.2
 thread_lst = [2 ** i for i in xrange(9)]
 tag_lst = ['prune execution time', 'check core first-phase bsp time', 'check core second-phase bsp time',
            '3rd: core clustering time', 'non-core clustering time', 'Total time without IO']
-legend_lst = ['1. prune', '2. check core', '3. cluster core', '4. cluster non-core', 'in total']
+legend_lst = ['1. pruning', '2. core checking', '3. core clustering', '4. non-core clustering', 'in total']
 
 
 def filter_time_lst(runtime_tag, lines):
@@ -72,28 +72,27 @@ if __name__ == '__main__':
         shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
 
         for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst):
-            # if idx==0:
-            #     ax.plot(log_thread_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
             ax.plot(log_thread_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
 
         ax.set_yscale('log')
         plt.xticks(log_thread_lst, [1, 2, 4, 8, 16, 32, 64, 128, 256])
 
-        ax.legend(legend_lst, ncol=2, columnspacing=0, bbox_to_anchor=(1.02, 0.38))
         print ax_idx
-        factor_lst = [100, 40, 600, 400]
-        mul_factor = [2, 2, 3, 3]
-        ax.set_ylim(float(min(map(min, ppscan_runtime_lst_lst))) / factor_lst[ax_idx],
-                    max(map(max, ppscan_runtime_lst_lst)) * mul_factor[ax_idx])
+        # ax.set_ylim(float(min(map(min, ppscan_runtime_lst_lst))) / factor_lst[ax_idx],
+        #             max(map(max, ppscan_runtime_lst_lst)) * mul_factor[ax_idx])
 
     for idx, my_ax in enumerate(ax_tuple):
-        my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
             my_ax.set_ylabel('Runtime (seconds)', fontsize=12)
-        my_ax.set_xlabel('Number of threads')
+        my_ax.set_xlabel('Number of threads' + '\n' + sub_titles[idx], fontsize=12)
         my_ax.grid(True)
 
     exp_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
+
+    plt.subplots_adjust(top=0.85)
+    plt.legend(legend_lst, ncol=len(legend_lst), prop={'size': 12, "weight": "bold"},
+               loc=2, bbox_to_anchor=(-2.9, 1.25))
     plt.savefig('scalability_varying_threads_knl.' + 'pdf', dpi=1200)
-    exp_figure.show()
+    # exp_figure.show()
+    plt.close()

@@ -125,14 +125,14 @@ def draw_time():
     exp_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
     plt.savefig('set_intersection_opt_time' + '.pdf', dpi=1200)
-    exp_figure.show()
+    plt.close()
 
 
 def draw_speedup():
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     eps_lst = [float(i + 1) / 10 for i in xrange(9)]
 
-    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3))
+    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3.0))
 
     for ax_idx, ax in enumerate(ax_tuple):
         time_lst_lst = []
@@ -142,22 +142,27 @@ def draw_speedup():
             time_lst_lst.append(time_lst)
             shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
             ax.plot(eps_lst, time_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
-        ax.legend(['ppSCAN / ppSCAN-NO on CPU(AVX2)', 'ppSCAN / ppSCAN-NO on KNL(AVX512)'])
-        ax.set_ylim(0, float(max(max(time_lst_lst))) * 1.5)
-
+        ax.set_ylim(0, float(max(max(time_lst_lst))) * 1.2)
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
     for idx, my_ax in enumerate(ax_tuple):
-        my_ax.set_title(sub_titles[idx], fontsize=12)
+        # my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
             my_ax.set_ylabel('Core Checking Speedup', fontsize=12)
-        my_ax.set_xlabel('$\\epsilon = $')
-        my_ax.xaxis.set_label_coords(0.00, -0.045)
+        my_ax.set_xlabel('$\\epsilon $' + '\n' + sub_titles[idx], fontsize=12)
         my_ax.grid(True)
 
     exp_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
-    plt.savefig('set_intersection_opt_speedup' + '.pdf', dpi=1200)
-    exp_figure.show()
+    legend_lst = ['ppSCAN speedup over ppSCAN-NO on CPU (AVX2)',
+                  'ppSCAN speedup over ppSCAN-NO on KNL (AVX512)']
+
+    plt.subplots_adjust(top=0.85)
+    plt.legend(legend_lst, ncol=len(legend_lst),
+               prop={'size': 12, "weight": "bold"}, loc=2,
+               bbox_to_anchor=(-2.8, 1.3))
+
+    plt.savefig('set_intersection_opt_speedup' + '.pdf', dpi=300)
+    plt.close()
 
 
 if __name__ == '__main__':
