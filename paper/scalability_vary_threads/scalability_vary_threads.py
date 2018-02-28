@@ -8,7 +8,7 @@ eps = 0.2
 thread_lst = [2 ** i for i in xrange(9)]
 tag_lst = ['prune execution time', 'check core first-phase bsp time', 'check core second-phase bsp time',
            '3rd: core clustering time', 'non-core clustering time', 'Total time without IO']
-legend_lst = ['1. pruning', '2. core checking', '3. core clustering', '4. non-core clustering', 'in total']
+legend_lst = ['1. Pruning', '2. Core Checking', '3. Core Clustering', '4. Non-Core Clustering', 'The Whole ppSCAN']
 
 
 def filter_time_lst(runtime_tag, lines):
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         print time_lst_lst
         time_lst_lst_arr.append(time_lst_lst)
 
-    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3))
+    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 2.5))
 
     log_thread_lst = map(lambda ele: int(math.log(ele, 2)), thread_lst)
 
@@ -78,6 +78,8 @@ if __name__ == '__main__':
         plt.xticks(log_thread_lst, [1, 2, 4, 8, 16, 32, 64, 128, 256])
 
         print ax_idx
+        ylim_lst = [(10 ** (-1), 10 ** 3), (1, 10 ** 3 * 2), (10 ** (-1), 10 ** 4 * 2), (1, 10 ** 4 * 2)]
+        ax.set_ylim(ylim_lst[ax_idx])
         # ax.set_ylim(float(min(map(min, ppscan_runtime_lst_lst))) / factor_lst[ax_idx],
         #             max(map(max, ppscan_runtime_lst_lst)) * mul_factor[ax_idx])
 
@@ -92,7 +94,7 @@ if __name__ == '__main__':
 
     plt.subplots_adjust(top=0.85)
     plt.legend(legend_lst, ncol=len(legend_lst), prop={'size': 12, "weight": "bold"},
-               loc=2, bbox_to_anchor=(-2.9, 1.25))
+               loc=2, bbox_to_anchor=(-3.55, 1.32, 4.5, 0.0), mode='expand')
     plt.savefig('scalability_varying_threads_knl.' + 'pdf', dpi=1200)
     # exp_figure.show()
     plt.close()

@@ -132,7 +132,7 @@ def draw_speedup():
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     eps_lst = [float(i + 1) / 10 for i in xrange(9)]
 
-    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3.0))
+    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 2.5))
 
     for ax_idx, ax in enumerate(ax_tuple):
         time_lst_lst = []
@@ -142,7 +142,11 @@ def draw_speedup():
             time_lst_lst.append(time_lst)
             shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
             ax.plot(eps_lst, time_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
-        ax.set_ylim(0, float(max(max(time_lst_lst))) * 1.2)
+        # ax.set_ylim(0, float(max(max(time_lst_lst))) * 1.2)
+        lim_lst = [(0.8, 2.5), (0.8, 4.2), (0.8, 5.2), (0.8, 3.2)]
+        ax.set_ylim(lim_lst[ax_idx])
+        if ax_idx == 2:
+            ax.set_yticks([1, 2, 3, 4, 5])
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
     for idx, my_ax in enumerate(ax_tuple):
         # my_ax.set_title(sub_titles[idx], fontsize=12)
@@ -159,15 +163,15 @@ def draw_speedup():
     plt.subplots_adjust(top=0.85)
     plt.legend(legend_lst, ncol=len(legend_lst),
                prop={'size': 12, "weight": "bold"}, loc=2,
-               bbox_to_anchor=(-2.8, 1.3))
+               bbox_to_anchor=(-3.25, 1.3, 4.0, 0.0), mode='expand')
 
     plt.savefig('set_intersection_opt_speedup' + '.pdf', dpi=300)
     plt.close()
 
 
 if __name__ == '__main__':
-    display_comparison_txt()
-    draw_time()
+    # display_comparison_txt()
+    # draw_time()
 
     # print get_speedup_lst('snap_orkut', knl_tag)
     # print get_speedup_lst('snap_orkut', gpu23_tag)

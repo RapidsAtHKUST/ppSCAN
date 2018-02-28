@@ -16,11 +16,12 @@ def get_dict(algorithm_name, tag):
 def get_time_lst(algorithm_name, tag, data_set, inf_val=10000):
     if algorithm_name == 'anyscan':
         if data_set == 'webgraph_webbase' or data_set == 'snap_friendster':
-            return [float(inf_val) for _ in xrange(9)]
+            # return [float(inf_val) for _ in xrange(9)]
+            return [None for _ in xrange(9)]
 
     time_str_lst = get_dict(algorithm_name, tag)[data_set]
     time_lst_val = map(
-        lambda ele_str: float(inf_val) if ele_str == 'RE' or ele_str == 'TLE'  else float(ele_str) / 1000, time_str_lst)
+        lambda ele_str: None if ele_str == 'RE' or ele_str == 'TLE' else float(ele_str) / 1000, time_str_lst)
     return time_lst_val
 
 
@@ -28,7 +29,7 @@ def draw_figures_per_platform(platform_tag):
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     eps_lst = [float(i + 1) / 10 for i in xrange(9)]
 
-    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3))
+    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 2.5))
 
     for ax_idx, ax in enumerate(ax_tuple):
         time_lst_lst = []
@@ -38,32 +39,41 @@ def draw_figures_per_platform(platform_tag):
             shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
             ax.plot(eps_lst, time_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
             ax.set_yscale('log')
-        ax.legend(['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN'], ncol=2)
 
-        factor_lst = [70, 220, 50, 50]
-        if platform_tag == knl_tag:
-            factor_lst = [100, 200, 80, 100]
-        TLE = 10 ** 4
-        upper_bound_lst = [10 ** 4, 8 * TLE, 8 * TLE, 8 * TLE]
-        ax.set_ylim(float(min(map(min, time_lst_lst))) / factor_lst[ax_idx], upper_bound_lst[ax_idx])
-        if ax_idx > 0:
-            ax.text(0.5, 10 ** 4 * 3, '$10^4$ means TLE(>5400s) or RE(runtime error)', horizontalalignment='center')
+        # factor_lst = [70, 220, 50, 50]
+        # if platform_tag == knl_tag:
+        #     factor_lst = [100, 200, 80, 100]
+        # TLE = 10 ** 4
+        # upper_bound_lst = [10 ** 4, 8 * TLE, 8 * TLE, 8 * TLE]
+        upper_bound = 1.5 * 10 ** 4
+        if platform_tag == gpu23_tag:
+            lim_lst = [(0.1, 10 ** 4), (1, upper_bound), (1, upper_bound), (10, upper_bound)]
         else:
-            ax.text(0.5, 10 ** 3 * 3.75, '$10^4$ means TLE(>5400s) or RE(runtime error)', horizontalalignment='center')
+            lim_lst = [(0.1, 10 ** 4), (1, upper_bound), (1, upper_bound), (1, upper_bound)]
+
+        ax.set_ylim(lim_lst[ax_idx])
 
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
     for idx, my_ax in enumerate(ax_tuple):
-        my_ax.set_title(sub_titles[idx], fontsize=12)
+        # my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
             my_ax.set_ylabel('Runtime (seconds)', fontsize=12)
-        my_ax.set_xlabel('$\\epsilon = $')
-        my_ax.xaxis.set_label_coords(0.00, -0.045)
+        my_ax.set_xlabel('$\\epsilon$' + '\n' + sub_titles[idx], fontsize=12)
+        # my_ax.xaxis.set_label_coords(0.00, -0.045)
         my_ax.grid(True)
 
     exp_figure.subplots_adjust(wspace=0)
+
+    plt.subplots_adjust(top=0.5)
     plt.tight_layout()
-    plt.savefig('comparison_' + platform_tag + '.pdf', dpi=1200)
-    exp_figure.show()
+
+    legend_lst = ['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN']
+    plt.legend(legend_lst, ncol=len(legend_lst),
+               prop={'size': 12, "weight": "bold"}, loc=2,
+               bbox_to_anchor=(-3.5, 1.32, 4.5, 0.0), mode="expand")
+    plt.savefig('comparison_' + platform_tag + '.pdf', dpi=300)
+
+    plt.close()
 
 
 if __name__ == '__main__':

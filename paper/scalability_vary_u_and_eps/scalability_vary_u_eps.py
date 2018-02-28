@@ -47,24 +47,29 @@ if __name__ == '__main__':
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
 
-    exp2_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3))
+    exp2_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 2.5))
 
     for idx, ax in enumerate(ax_tuple):
         ppscan_runtime_lst_lst = process_dataset(data_set_lst[idx])
         shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
         for idx, runtime_lst in enumerate(ppscan_runtime_lst_lst):
             ax.plot(eps_lst, runtime_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
-        ax.legend(legend_lst)
+        # ax.legend(legend_lst)
         ax.set_ylim(0, max(map(max, ppscan_runtime_lst_lst)) * 1.1)
 
     for idx, my_ax in enumerate(ax_tuple):
-        my_ax.set_title(sub_titles[idx], fontsize=12)
+        # my_ax.set_title(sub_titles[idx], fontsize=12)
         if idx == 0:
             my_ax.set_ylabel('Runtime (seconds)', fontsize=12)
-        my_ax.set_xlabel('$\\epsilon = $')
-        my_ax.xaxis.set_label_coords(0.00, -0.045)
+        my_ax.set_xlabel('$\\epsilon $' + '\n' + sub_titles[idx], fontsize=12)
+        # my_ax.xaxis.set_label_coords(0.00, -0.045)
         my_ax.grid(True)
     exp2_figure.subplots_adjust(wspace=0)
     plt.tight_layout()
+    plt.subplots_adjust(top=0.85)
+
+    plt.legend(legend_lst, ncol=len(legend_lst), prop={'size': 12, "weight": "bold"},
+               loc=2, bbox_to_anchor=(-3.05, 1.3, 3.5, 0.0), mode='expand')
     plt.savefig('scalability_exp2_varying_u_and_eps.' + 'pdf', dpi=1200)
-    exp2_figure.show()
+    # exp2_figure.show()
+    plt.close()
