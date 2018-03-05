@@ -51,7 +51,14 @@ def draw_figures_per_platform(platform_tag):
         else:
             lim_lst = [(0.1, 10 ** 4), (1, upper_bound), (1, upper_bound), (1, upper_bound)]
 
+        ytick_lst = [
+            [10 ** i for i in [-1, 0, 1, 2, 3]],
+            [10 ** i for i in [0, 1, 2, 3, 4]],
+            [10 ** i for i in [0, 1, 2, 3, 4]],
+            [10 ** i for i in [1, 2, 3, 4]] if platform_tag == gpu23_tag else [10 ** i for i in [0, 1, 2, 3, 4]]
+        ]
         ax.set_ylim(lim_lst[ax_idx])
+        ax.set_yticks(ytick_lst[ax_idx])
 
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
     for idx, my_ax in enumerate(ax_tuple):

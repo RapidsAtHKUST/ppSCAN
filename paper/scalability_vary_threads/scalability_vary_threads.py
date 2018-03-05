@@ -8,7 +8,8 @@ eps = 0.2
 thread_lst = [2 ** i for i in xrange(9)]
 tag_lst = ['prune execution time', 'check core first-phase bsp time', 'check core second-phase bsp time',
            '3rd: core clustering time', 'non-core clustering time', 'Total time without IO']
-legend_lst = ['1. Pruning', '2. Core Checking', '3. Core Clustering', '4. Non-Core Clustering', 'The Whole ppSCAN']
+legend_lst = ['1. Similarity Pruning', '2. Core Checking and Consolidating', '3. Core Clustering',
+              '4. Non-Core Clustering', 'The Whole ppSCAN']
 
 
 def filter_time_lst(runtime_tag, lines):
@@ -80,6 +81,13 @@ if __name__ == '__main__':
         print ax_idx
         ylim_lst = [(10 ** (-1), 10 ** 3), (1, 10 ** 3 * 2), (10 ** (-1), 10 ** 4 * 2), (1, 10 ** 4 * 2)]
         ax.set_ylim(ylim_lst[ax_idx])
+
+        ytick_lst = [[10 ** i for i in [-1, 0, 1, 2, 3]],
+                     [10 ** i for i in [0, 1, 2, 3]],
+                     [10 ** i for i in [-1, 0, 1, 2, 3, 4]],
+                     [10 ** i for i in [0, 1, 2, 3, 4]],
+                     ]
+        ax.set_yticks(ytick_lst[ax_idx])
         # ax.set_ylim(float(min(map(min, ppscan_runtime_lst_lst))) / factor_lst[ax_idx],
         #             max(map(max, ppscan_runtime_lst_lst)) * mul_factor[ax_idx])
 

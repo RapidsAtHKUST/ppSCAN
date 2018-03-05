@@ -76,7 +76,7 @@ if __name__ == '__main__':
         plt.subplots_adjust(top=0.55)
         plt.tight_layout()
 
-        legend_lst = ['other computation', 'workload reduction computation', 'similarity evaluation']
+        legend_lst = ['other computation', 'workload reduction computation', 'similarity computation']
 
         plt.legend(legend_lst, ncol=len(legend_lst),
                    prop={'size': 12, "weight": "bold"}, loc=2,
