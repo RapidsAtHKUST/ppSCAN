@@ -1,13 +1,18 @@
 	A common class of graph structural clustering algorithms, pioneered by
-	SCAN (Structural Clustering Algorithm for Networks), not only find
-	clusters among vertices but also classify vertices as cores, hubs and
-	outliers. However, these algorithms suffer from efficiency issues of extensive similarity computations using set intersections. Pruning-based SCAN algorithms reduce the
-	amount of computation. Nevertheless, the similarity computation
-	is still the performance bottleneck. In this paper, we propose to parallelize pruning-based SCAN
-	algorithms on multi-core CPUs and Intel Xeon Phi Processors (KNL). Specifically, we design
-	ppSCAN, a multi-phase vertex computation based parallel algorithm. Moreover, we propose a pivot-based vectorized set intersection algorithm.
-	Experimental results show that ppSCAN is scalable on both
-	CPU and KNL with respect to the number of threads.
-	In particular, on the 1.8 billion-edge graph friendster, our ppSCAN
-	achieves speedups of 100x-130x on KNL (64 physical cores with hyper-threading) and the in-memory computation completes within 65 seconds, up to 250x
-	faster than pSCAN, the state-of-the-art sequential algorithm.
+SCAN (Structural Clustering Algorithm for Networks), not only find
+clusters among vertices but also classify vertices as cores, hubs and
+outliers. However, these algorithms suffer from efficiency issues due to the
+great amount of computation on structural similarity among vertices.
+Pruning-based SCAN algorithms improve efficiency by reducing the
+amount of computation. Nevertheless, this structural similarity computation
+is still the performance bottleneck, especially on big graphs of billions
+of edges. In this paper, we propose to parallelize pruning-based SCAN
+algorithms on multi-core CPUs and Intel Xeon Phi Processors (KNL) with
+multiple threads and vectorized instructions. Specifically, we design
+ppSCAN, a multi-phase vertex computation based parallel algorithm, to avoid redundant computation and
+achieve scalability. Moreover, we propose a
+pivot-based vectorized set intersection algorithm for the structural
+similarity computation. Experimental results show that ppSCAN is scalable
+on both CPU and KNL with respect to the number of threads.
+In particular, on the 1.8 billion-edge graph friendster, our ppSCAN completes within 65 seconds on KNL (64 physical cores with hyper-threading), which is 100x-130x faster over our single-threaded version, and up to 250x
+faster than pSCAN, the state-of-the-art sequential algorithm.
