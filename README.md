@@ -2,6 +2,13 @@
 
 [SCAN Preliminaries](scan_preliminary.md), [our ppSCAN overview](ppscan_overview.md) including design and optimizations.
 
+## Paper to Present 
+
+* Yulin Che, Shixuan Sun, Qiong Luo. 2018. Parallelizing Pruning-based Graph
+Structural Clustering. In ICPP 2018: 47th International Conference on Parallel
+Processing, August 13–16, 2018, Eugene, OR, USA. ACM, New York, NY, USA,
+10 pages. 
+
 ## Project
 
 description | folder link
