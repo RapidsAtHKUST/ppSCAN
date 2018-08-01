@@ -1,6 +1,6 @@
 # ppScan
 
-[SCAN Preliminaries](scan_preliminary.md), [our ppSCAN overview](ppscan_overview.md) including design and optimizations.
+[SCAN Preliminaries](scan_preliminary.md), [our ppSCAN overview](ppscan_overview.md) including design and optimizations.  (To appear in ICPP 2018), parallel pSCAN algorithm with vectorized set intersection, compared with SCAN, pSCAN, SCAN++, anySCAN, SCAN-XP (an order of magnitude faster than the-state-of-the-arts), 250x faster than pSCAN on KNL (1.8 billion-edge-grap friendster) .
 
 ## Paper to Present 
 
