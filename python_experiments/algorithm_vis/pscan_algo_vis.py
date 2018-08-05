@@ -21,14 +21,15 @@ def vis_input(graph, min_cn, similar_deg_lst, min_pts, graph_name):
         map(lambda pair: [pair[0] for _ in xrange(pair[1])], zip(range(len(deg_lst)), deg_lst))))
     edge_with_property_lst = filter(lambda pair: pair[0][0] < pair[0][1], zip(zip(src_u_lst, dst_v_lst), min_cn))
     print edge_with_property_lst
-    nx.draw_networkx_edge_labels(graph, pos=pos, edge_labels=dict(edge_with_property_lst))
+    # nx.draw_networkx_edge_labels(graph, pos=pos, edge_labels=dict(edge_with_property_lst))
 
     blue_edges = map(lambda pair: pair[0], filter(lambda pair: pair[1] == -2, edge_with_property_lst))
     nx.draw_networkx_edges(graph, pos=pos, edgelist=blue_edges, edge_color='b', width=4)
     red_edges = map(lambda pair: pair[0], filter(lambda pair: pair[1] == -1, edge_with_property_lst))
     nx.draw_networkx_edges(graph, pos=pos, edgelist=red_edges, edge_color='r', width=4)
 
-    alpha_lst = map(lambda similar_deg: min(float(similar_deg) / min_pts, 1), similar_deg_lst)
+    # alpha_lst = map(lambda similar_deg: min(float(similar_deg) / min_pts, 1), similar_deg_lst)
+    alpha_lst = map(lambda similar_deg: 0 if similar_deg< min_pts else 1, similar_deg_lst)
     print alpha_lst
     for idx, alpha in enumerate(alpha_lst):
         nx.draw_networkx_nodes(graph, with_labels=True, pos=pos, font_size=12, node_size=350, alpha=alpha,
