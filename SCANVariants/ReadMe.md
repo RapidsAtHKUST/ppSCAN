@@ -15,10 +15,3 @@ description | folder link
 spatial dbscan sc2012 project | [dbscan-v1.0.0](other-projects/dbscan-v1.0.0)
 spatial dbscan another | [markus.goetz-hpdbscan](other-projects/markus.goetz-hpdbscan)
 parameter-free scan | [gSkeletonClu](other-projects/gSkeletonClu)
-
-* Submodules Init
-
-```
-git submodule init
-git submodule update
-```
