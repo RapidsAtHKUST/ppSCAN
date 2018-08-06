@@ -50,5 +50,5 @@ if __name__ == '__main__':
 
         breakdown_time_figure.subplots_adjust(wspace=0)
         plt.tight_layout()
-        plt.savefig('breakdown_time.' + 'pdf', dpi=1200)
+        plt.savefig('breakdown_time.' + 'png', dpi=1200)
         breakdown_time_figure.show()

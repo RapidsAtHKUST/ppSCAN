@@ -70,6 +70,6 @@ if __name__ == '__main__':
 
     plt.legend(legend_lst, ncol=len(legend_lst), prop={'size': 12, "weight": "bold"},
                loc=2, bbox_to_anchor=(-3.05, 1.3, 3.5, 0.0), mode='expand')
-    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'pdf', dpi=1200)
+    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'png', dpi=300)
     # exp2_figure.show()
     plt.close()

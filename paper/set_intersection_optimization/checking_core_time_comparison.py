@@ -165,7 +165,7 @@ def draw_speedup():
                prop={'size': 12, "weight": "bold"}, loc=2,
                bbox_to_anchor=(-3.25, 1.3, 4.0, 0.0), mode='expand')
 
-    plt.savefig('set_intersection_opt_speedup' + '.pdf', dpi=300)
+    plt.savefig('set_intersection_opt_speedup' + '.png', dpi=300)
     plt.close()
 
 

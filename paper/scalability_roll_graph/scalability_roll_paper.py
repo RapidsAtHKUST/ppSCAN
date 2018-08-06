@@ -100,6 +100,6 @@ if __name__ == '__main__':
                prop={'size': 11, "weight": "bold"}, loc=2,
                bbox_to_anchor=(-3.4, 1.3, 4.0, 0.0), mode='expand')
 
-    plt.savefig('scalability_roll_graph.' + 'pdf', dpi=1200)
+    plt.savefig('scalability_roll_graph.' + 'png', dpi=1200)
     # exp2_figure.show()
     plt.close()

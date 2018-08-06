@@ -103,6 +103,6 @@ if __name__ == '__main__':
     plt.subplots_adjust(top=0.85)
     plt.legend(legend_lst, ncol=len(legend_lst), prop={'size': 12, "weight": "bold"},
                loc=2, bbox_to_anchor=(-3.55, 1.32, 4.5, 0.0), mode='expand')
-    plt.savefig('scalability_varying_threads_knl.' + 'pdf', dpi=1200)
+    plt.savefig('scalability_varying_threads_knl.' + 'png', dpi=1200)
     # exp_figure.show()
     plt.close()

@@ -87,6 +87,6 @@ if __name__ == '__main__':
     # first_exp_fix_orkut_vary_u('png')
     # second_exp_fix_u_vary_datasets('png')
 
-    second_exp_fix_u_vary_datasets('exp2_fix_u5.md', 'workload_exp_fix_u_5')
-    # second_exp_fix_u_vary_datasets('exp2_fix_u10.md', 'workload_exp_fix_u_10')
-    # second_exp_fix_u_vary_datasets('exp2_fix_u15.md', 'workload_exp_fix_u_15')
+    second_exp_fix_u_vary_datasets('exp2_fix_u5.md', 'workload_exp_fix_u_5', 'png')
+    second_exp_fix_u_vary_datasets('exp2_fix_u10.md', 'workload_exp_fix_u_10', 'png')
+    second_exp_fix_u_vary_datasets('exp2_fix_u15.md', 'workload_exp_fix_u_15', 'png')

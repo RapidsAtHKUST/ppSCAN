@@ -78,7 +78,7 @@ def draw_figures_per_platform(platform_tag):
     plt.legend(legend_lst, ncol=len(legend_lst),
                prop={'size': 12, "weight": "bold"}, loc=2,
                bbox_to_anchor=(-3.5, 1.32, 4.5, 0.0), mode="expand")
-    plt.savefig('comparison_' + platform_tag + '.pdf', dpi=300)
+    plt.savefig('comparison_' + platform_tag + '.png', dpi=300)
 
     plt.close()
 

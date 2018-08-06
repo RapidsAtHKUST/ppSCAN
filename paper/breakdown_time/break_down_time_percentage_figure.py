@@ -82,5 +82,5 @@ if __name__ == '__main__':
                    prop={'size': 12, "weight": "bold"}, loc=2,
                    bbox_to_anchor=(-1.15, 1.3, 2.15, 0.0), mode='expand')
 
-        plt.savefig('breakdown_time.' + 'pdf', dpi=300)
+        plt.savefig('breakdown_time_twitter.' + 'png', dpi=300)
         plt.close()
