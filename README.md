@@ -4,6 +4,10 @@ Parallel pSCAN algorithm with vectorized set intersection, compared with SCAN, p
 
 See our [slides](https://www.dropbox.com/sh/i1r45o2ceraey8j/AAD8V3WwPElQjwJ0-QtaKAzYa?dl=0&preview=ppSCAN.pdf) for the general idea. Please check out our ICPP'18 paper for further details.
 
+by Authors:
+
+[Yulin Che](https://github.com/CheYulin), [Shixuan Sun](https://github.com/shixuansun) and [Prof. Luo](http://www.cse.ust.hk/~luo/).
+
 ## ppSCAN Codes RoadMap
 
 ppSCAN is tested on both Multi-core Intel Xeon CPU and Intel Xeon Phi Processor Knights Landing.
