@@ -1,8 +1,12 @@
 # ppSCAN
 
-Parallel pSCAN algorithm with vectorized set intersection, compared with SCAN, pSCAN, SCAN++, anySCAN, SCAN-XP (an order of magnitude faster than the-state-of-the-arts), 250x faster than pSCAN on KNL (1.8 billion-edge-grap friendster). Please check out our ICPP'18 paper for further details. (ppSCAN is tested on both Multi-core Intel Xeon CPU and Intel Xeon Phi Processor Knights Landing)
+Parallel pSCAN algorithm with vectorized set intersection, compared with SCAN, pSCAN, SCAN++, anySCAN, SCAN-XP (an order of magnitude faster than the-state-of-the-arts), 250x faster than pSCAN on KNL (1.8 billion-edge-grap friendster).
+
+See our [slides](https://www.dropbox.com/sh/i1r45o2ceraey8j/AAD8V3WwPElQjwJ0-QtaKAzYa?dl=0&preview=ppSCAN.pdf) for the general idea. Please check out our ICPP'18 paper for further details.
 
 ## ppSCAN Codes RoadMap
+
+ppSCAN is tested on both Multi-core Intel Xeon CPU and Intel Xeon Phi Processor Knights Landing.
 
 content | directory
 --- | ---
