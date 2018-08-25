@@ -9,7 +9,6 @@
 #include <vector>
 #include <atomic>
 #include <unordered_set>
-#include <hbw_allocator.h>
 
 #include "ThreadSafeDisjointSet.h"
 #include "Util.h"
