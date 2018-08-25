@@ -1,8 +1,8 @@
 # ppSCAN
 
-Parallel pSCAN algorithm with vectorized set intersection, compared with SCAN, pSCAN, SCAN++, anySCAN, SCAN-XP (an order of magnitude faster than the-state-of-the-arts), 250x faster than pSCAN on KNL (1.8 billion-edge-grap friendster).
+Parallel pSCAN algorithm with vectorized set intersection, compared with SCAN, pSCAN, SCAN++, anySCAN, SCAN-XP (an order of magnitude faster than the-state-of-the-arts), 250x faster than pSCAN on KNL (1.8 billion-undirected-edge-graph friendster).
 
-See our [slides](https://www.dropbox.com/sh/i1r45o2ceraey8j/AAD8V3WwPElQjwJ0-QtaKAzYa?dl=0&preview=ppSCAN.pdf) for the general idea. Please check out our ICPP'18 paper for further details.
+See our [slides](https://www.dropbox.com/sh/i1r45o2ceraey8j/AAD8V3WwPElQjwJ0-QtaKAzYa?dl=0&preview=ppSCAN.pdf) for the general idea. Please check out our ICPP'18 paper [Parallelizing Pruning-based Graph Structural Clustering](https://dl.acm.org/citation.cfm?doid=3225058.3225063) for further details.
 
 ## ppSCAN Codes RoadMap
 
@@ -17,7 +17,7 @@ python scripts for generating figures in paper | see [python paper-figures](http
 SCAN variants codes | see [SCANVariants](SCANVariants): SCAN, pSCAN, SCAN++, anySCAN, SCAN-XP
 python scripts during study | see [python_playground](python_playground): union-find, galloping-search, pSCAN
 
-## Paper to Present
+## Paper Presented
 
 * Yulin Che, Shixuan Sun, Qiong Luo. 2018. Parallelizing Pruning-based Graph
 Structural Clustering. In ICPP 2018: 47th International Conference on Parallel
