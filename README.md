@@ -14,6 +14,7 @@ ppSCAN is tested on both Multi-core Intel Xeon CPU and Intel Xeon Phi Processor 
 
 content | directory
 --- | ---
+c++ parallel codes (Release) | see [ppSCAN-release](ppSCAN-release), removing experimental codes, tested on KNL (support dst_edge (neighbors) array allocated on MCDRAM, using [memkind](https://github.com/memkind/memkind))
 c++ parallel codes | see [ppSCAN](https://github.com/GraphProcessor/ppSCAN/tree/master/pSCAN-refactor)
 vectorization codes (AVX2 / AVX512) | see [Graph.cpp](https://github.com/GraphProcessor/ppSCAN/blob/master/pSCAN-refactor/Graph.cpp)
 experimental scripts and case studies | see [python_experiments](https://github.com/GraphProcessor/ppSCAN/tree/master/python_experiments)
