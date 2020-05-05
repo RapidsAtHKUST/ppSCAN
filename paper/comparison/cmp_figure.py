@@ -63,6 +63,7 @@ def draw_figures_per_platform(platform_tag):
         ]
         ax.set_ylim(lim_lst[ax_idx])
         ax.set_yticks(ytick_lst[ax_idx])
+        ax.set_xticks(eps_lst)
         ax.tick_params(labelsize=TICK_SIZE)
 
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']

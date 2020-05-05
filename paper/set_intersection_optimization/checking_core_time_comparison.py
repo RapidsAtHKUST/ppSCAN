@@ -179,6 +179,7 @@ def draw_speedup():
         # ax.set_ylim(0, float(max(max(time_lst_lst))) * 1.2)
         lim_lst = [(0.8, 2.5), (0.8, 4.2), (0.8, 5.2), (0.8, 3.2)]
         ax.set_ylim(lim_lst[ax_idx])
+        ax.set_xticks(eps_lst)
         if ax_idx == 2:
             ax.set_yticks([1, 2, 3, 4, 5])
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']

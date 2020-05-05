@@ -59,6 +59,7 @@ if __name__ == '__main__':
     ax.set_xlabel('$\\epsilon$' + '\n' + '(a) on CPU', fontsize=LABEL_SIZE)
     # ax.xaxis.set_label_coords(0.00, -0.045)
     ax.grid(True)
+    ax.set_xticks(eps_lst)
     ax.tick_params(labelsize=LABEL_SIZE)
 
     ax = ax_tuple[1]
@@ -72,6 +73,7 @@ if __name__ == '__main__':
     ax.set_xlabel('$\\epsilon$' + '\n' + 'on CPU', fontsize=LABEL_SIZE)
     # ax.xaxis.set_label_coords(0.00, -0.045)
     ax.grid(True)
+    ax.set_xticks(eps_lst)
     ax.tick_params(labelsize=LABEL_SIZE)
 
     ax = ax_tuple[2]
@@ -85,6 +87,7 @@ if __name__ == '__main__':
     ax.set_xlabel('$\\epsilon$' + '\n' + '(b) on KNL', fontsize=LABEL_SIZE)
     # ax.xaxis.set_label_coords(0.00, -0.045)
     ax.grid(True)
+    ax.set_xticks(eps_lst)
     ax.tick_params(labelsize=LABEL_SIZE)
 
     ax = ax_tuple[3]
@@ -98,6 +101,7 @@ if __name__ == '__main__':
     ax.set_xlabel('$\\epsilon$' + '\n' + 'on KNL', fontsize=LABEL_SIZE)
     # ax.xaxis.set_label_coords(0.00, -0.045)
     ax.grid(True)
+    ax.set_xticks(eps_lst)
     ax.tick_params(labelsize=LABEL_SIZE)
 
     # exp2_figure.subplots_adjust(wspace=0)

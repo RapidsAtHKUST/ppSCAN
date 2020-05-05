@@ -74,7 +74,7 @@ def second_exp_fix_u_vary_datasets(input_name, output_name, suffix_str='pdf'):
         # ax.set_xlabel('$\\epsilon = $')
         ax.set_xlabel('$\\epsilon$' + '\n' + ax_title_lst[idx], fontsize=LABEL_SIZE)
         ax.legend(('pSCAN', 'ppSCAN'), prop={'size': LEGEND_SIZE, "weight": "bold"})
-
+        ax.set_xticks(x_lst)
         ax.set_ylabel('Normalized Number', fontsize=LABEL_SIZE - 2)
 
     exp2_figure.subplots_adjust(wspace=0)
