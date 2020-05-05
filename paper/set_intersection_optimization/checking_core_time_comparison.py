@@ -1,6 +1,12 @@
 import os
 import matplotlib.pyplot as plt
 
+LABEL_SIZE = 24
+TICK_SIZE = 24
+LEGEND_SIZE = 24
+MARK_SIZE = 18
+
+
 ppscanno_knl_folder = '/home/yche/mnt/luocpu8/nfsshare/share/python_experiments/ppSCANNO_knl'
 ppscan_knl_folder = '/home/yche/mnt/luocpu8/nfsshare/share/python_experiments/scalability_simd_paper2'
 thread_num_knl = 256
@@ -13,7 +19,7 @@ gpu23_tag = 'gpu23'
 knl_tag = 'knl'
 
 u = 5
-eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+eps_lst = [float(i + 1) / 10 for i in range(9)]
 data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
 
 tag_lst = ['prune execution time', 'check core first-phase bsp time', 'check core second-phase bsp time',
@@ -50,26 +56,30 @@ def get_algorithm_checking_core_runtime(dataset, eps, min_pts, thread_num, root_
         # 1st, 2nd, 3rd, 4th, total
         breakdown_time_lst = [min_lst[0], min_lst[1] + min_lst[2], min_lst[3], min_lst[4], min_lst[5]]
 
-        for i in xrange(len(tag_lst)):
+        for i in range(len(tag_lst)):
             assert len(my_lst_lst[0]) == len(my_lst_lst[i])
         return breakdown_time_lst[1]
 
 
 def display_comparison_txt():
-    print '====================On KNL(AVX512)=========================='
+    print
+    '====================On KNL(AVX512)=========================='
     for data_set in data_set_lst:
         for eps in eps_lst:
             time_no_opt = get_algorithm_checking_core_runtime(data_set, eps, u, thread_num_knl, ppscanno_knl_folder)
             time_opt = get_algorithm_checking_core_runtime(data_set, eps, u, thread_num_knl, ppscan_knl_folder)
-            print time_no_opt, time_opt, float(time_no_opt) / time_opt
+            print
+            time_no_opt, time_opt, float(time_no_opt) / time_opt
         print
 
-    print '====================On GPU23(AVX2)=========================='
+    print
+    '====================On GPU23(AVX2)=========================='
     for data_set in data_set_lst:
         for eps in eps_lst:
             time_no_opt = get_algorithm_checking_core_runtime(data_set, eps, u, thread_num_gpu23, ppscanno_gpu23_folder)
             time_opt = get_algorithm_checking_core_runtime(data_set, eps, u, thread_num_gpu23, ppscan_gpu23_folder)
-            print time_no_opt, time_opt, float(time_no_opt) / time_opt
+            print
+            time_no_opt, time_opt, float(time_no_opt) / time_opt
         print
 
 
@@ -91,12 +101,12 @@ def get_speedup_lst(dataset, tag):
         ppscan_lst = get_time_lst(dataset, thread_num_gpu23, ppscan_gpu23_folder)
         return map(lambda my_pair: my_pair[0] / my_pair[1], zip(ppscan_no_lst, ppscan_lst))
     else:
-        print 'err'
+        print('err')
 
 
 def draw_time():
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
-    eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+    eps_lst = [float(i + 1) / 10 for i in range(9)]
 
     exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 3))
 
@@ -130,7 +140,7 @@ def draw_time():
 
 def draw_speedup():
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
-    eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+    eps_lst = [float(i + 1) / 10 for i in range(9)]
 
     exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 2.5))
 

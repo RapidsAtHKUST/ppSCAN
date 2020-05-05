@@ -5,6 +5,10 @@ gpu23_tag = 'gpu23'
 knl_tag = 'knl'
 algorithm_lst = ['scan_super_naive', 'pscan', 'anyscan', 'scan_xp', 'ppscan']
 
+LABEL_SIZE = 24
+TICK_SIZE = 24
+LEGEND_SIZE = 24
+
 
 def get_dict(algorithm_name, tag):
     with open('data-json' + os.sep + algorithm_name + '.json') as ifs:
@@ -17,27 +21,27 @@ def get_time_lst(algorithm_name, tag, data_set, inf_val=10000):
     if algorithm_name == 'anyscan':
         if data_set == 'webgraph_webbase' or data_set == 'snap_friendster':
             # return [float(inf_val) for _ in xrange(9)]
-            return [None for _ in xrange(9)]
+            return [None for _ in range(9)]
 
     time_str_lst = get_dict(algorithm_name, tag)[data_set]
     time_lst_val = map(
         lambda ele_str: None if ele_str == 'RE' or ele_str == 'TLE' else float(ele_str) / 1000, time_str_lst)
-    return time_lst_val
+    return list(time_lst_val)
 
 
 def draw_figures_per_platform(platform_tag):
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
-    eps_lst = [float(i + 1) / 10 for i in xrange(9)]
+    eps_lst = [float(i + 1) / 10 for i in range(9)]
 
-    exp_figure, ax_tuple = plt.subplots(1, 4, sharex=True, figsize=(16, 2.5))
-
+    exp_figure, ax_tuple = plt.subplots(2, 2, figsize=(16, 8))
+    ax_tuple = ax_tuple.flatten()
     for ax_idx, ax in enumerate(ax_tuple):
         time_lst_lst = []
         for idx, algorithm in enumerate(algorithm_lst):
             time_lst = get_time_lst(algorithm, platform_tag, data_set_lst[ax_idx], 10000)
             time_lst_lst.append(time_lst)
             shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
-            ax.plot(eps_lst, time_lst, shape_lst[idx], markersize=10, markerfacecolor='none')
+            ax.plot(eps_lst, time_lst, shape_lst[idx], markersize=18, markerfacecolor='none')
             ax.set_yscale('log')
 
         # factor_lst = [70, 220, 50, 50]
@@ -59,27 +63,26 @@ def draw_figures_per_platform(platform_tag):
         ]
         ax.set_ylim(lim_lst[ax_idx])
         ax.set_yticks(ytick_lst[ax_idx])
+        ax.tick_params(labelsize=TICK_SIZE)
 
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
     for idx, my_ax in enumerate(ax_tuple):
         # my_ax.set_title(sub_titles[idx], fontsize=12)
-        if idx == 0:
-            my_ax.set_ylabel('Runtime (seconds)', fontsize=12)
-        my_ax.set_xlabel('$\\epsilon$' + '\n' + sub_titles[idx], fontsize=12)
+        # if idx == 0:
+        my_ax.set_ylabel('Runtime (seconds)', fontsize=LABEL_SIZE)
+        my_ax.set_xlabel('$\\epsilon$' + '\n' + sub_titles[idx], fontsize=LABEL_SIZE)
         # my_ax.xaxis.set_label_coords(0.00, -0.045)
         my_ax.grid(True)
 
-    exp_figure.subplots_adjust(wspace=0)
-
-    plt.subplots_adjust(top=0.5)
+    legend_lst = ['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN']
+    exp_figure.legend(legend_lst, ncol=len(legend_lst),
+                      prop={'size': LEGEND_SIZE, "weight": "bold"}, loc="upper left",
+                      bbox_to_anchor=(0., 0.92, 1., .102),
+                      mode="expand")
+    plt.subplots_adjust(top=0.6, wspace=0.4)
     plt.tight_layout()
 
-    legend_lst = ['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN']
-    plt.legend(legend_lst, ncol=len(legend_lst),
-               prop={'size': 12, "weight": "bold"}, loc=2,
-               bbox_to_anchor=(-3.5, 1.32, 4.5, 0.0), mode="expand")
-    plt.savefig('comparison_' + platform_tag + '.png', dpi=300)
-
+    plt.savefig('comparison_' + platform_tag + '.pdf', dpi=300)
     plt.close()
 
 
