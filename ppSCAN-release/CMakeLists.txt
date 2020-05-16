@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 project(ppSCAN)
 
+option(USE_LOG_DEBUG "use log debug" OFF)
+if (USE_LOG_DEBUG)
+    add_compile_options(-DUSE_LOG=1)
+endif ()
 set(CMAKE_CXX_STANDARD 11)
 
 # setup pthread environmental variables
