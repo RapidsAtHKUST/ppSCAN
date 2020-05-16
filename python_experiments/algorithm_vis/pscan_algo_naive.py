@@ -1,5 +1,6 @@
 import math
 import networkx as nx
+import copy
 from itertools import chain
 
 from disjoint_set import DisjointSet
@@ -32,6 +33,9 @@ class PScan:
     direct_reachable = -1
     not_sure = 0
 
+    def print_min_cnt_lst(self, comment):
+        print '{}, min_cn_lst:'.format(comment), list(zip(self.el_lst, self.min_cn_lst))
+
     def __init__(self, offset_lst, dst_v_lst, deg_lst, eps, min_pts):
         # parameters
         self.eps = eps
@@ -47,6 +51,12 @@ class PScan:
         # dst_v and edeg properties
         self.dst_v_lst = dst_v_lst
         self.min_cn_lst = [PScan.not_sure] * len(self.dst_v_lst)
+
+        self.src_lst = [0] * len(dst_v_lst)
+        for u in range(0, len(offset_lst) - 1):
+            for i in range(offset_lst[u], offset_lst[u + 1]):
+                self.src_lst[i] = u
+        self.el_lst = list(zip(self.src_lst, self.dst_v_lst))
 
         # disjoint set
         self.disjoint_set = DisjointSet(self.n)
@@ -192,24 +202,24 @@ class PScan:
 
     def run_algorithm(self):
         print ', '.join(['not_direct_reachable = -2', 'direct_reachable = -1', 'not_sure = 0',
-                        '>0 means min_cn to satisfy direct reachable']), '\n'
+                         '>0 means min_cn to satisfy direct reachable']), '\n'
 
         # 1st: prune
         self.prune()
-        print '1. after prune, min_cn_lst:', self.min_cn_lst
+        self.print_min_cnt_lst('1. after prune')
 
         # 2nd: check core
         for i in xrange(self.n):
             self.check_core_1st_bsp(i)
         candidates = []
-        print '2.1 after check core 1st bsp, min_cn_lst :', self.min_cn_lst
+        self.print_min_cnt_lst('2.1 after check core 1st bsp, min_cn_lst :')
 
         for i in xrange(self.n):
             # print 'check core', i, 'neighbors:', self.dst_v_lst[self.offset_lst[i]:self.offset_lst[i + 1]]
             self.check_core_2nd_bsp(i)
             if self.is_definite_core_vertex(i):
                 candidates.append(i)
-        print '2.2 after check core 2nd bsp, min_cn_lst:', self.min_cn_lst
+        self.print_min_cnt_lst('2.2 after check core 2nd bsp')
         print '2.2 after check core 2nd bsp, similar_degree_lst:', self.similar_degree_lst
         print '2.2 after check core 2nd bsp, cores:', candidates
 

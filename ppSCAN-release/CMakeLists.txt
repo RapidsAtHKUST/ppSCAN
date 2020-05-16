@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 project(ppSCAN)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -34,8 +34,13 @@ else ()
     message(NOT_KNL,NOT_AVX2)
 endif ()
 
+include_directories(${CMAKE_SOURCE_DIR})
+set(COMMON_UTILS util/log/log.cpp util/md5.cpp util/search/search_util.cpp)
+add_library(common-utils ${REORDER_UTILS} ${COMMON_UTILS})
+link_libraries(common-utils)
+
 ## ppSCAN release 1: parallel
-set(SOURCE_FILES main.cpp Graph.cpp Graph.h InputOutput.cpp InputOutput.h
+set(SOURCE_FILES main.cpp Graph.cpp SetIntersection.cpp Graph.h InputOutput.cpp InputOutput.h
         DisjointSet.cpp DisjointSet.h ThreadPool.h Util.h ThreadSafeDisjointSet.h)
 add_executable(pSCANParallel ${SOURCE_FILES})
 target_compile_options(pSCANParallel PRIVATE -O3 -g)
