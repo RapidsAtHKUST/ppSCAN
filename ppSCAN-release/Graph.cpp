@@ -13,6 +13,7 @@
 #include <cstring>
 
 #include <algorithm>
+#include <map>
 
 #include "playground/pretty_print.h"
 
@@ -87,6 +88,25 @@ ui Graph::BinarySearch(EdgeVec &array, ui offset_beg, ui offset_end, int val) {
     return val < array[mid] ? BinarySearch(array, offset_beg, mid, val) : BinarySearch(array, mid + 1, offset_end, val);
 }
 
+void Graph::PrintMinCnBeauty() {
+    map<pair<int, int>, int> dict;
+    map<pair<int, int>, int> dict2;
+    for (auto u = 0; u < n; u++) {
+        for (auto i = out_edge_start[u]; i < out_edge_start[u + 1]; i++) {
+            dict.emplace(make_pair(u, out_edges[i]), min_cn[i]);
+            if (u < out_edges[i]) {
+                dict2.emplace(make_pair(u, out_edges[i]), min_cn[i]);
+            }
+        }
+    }
+    stringstream ss;
+    ss << dict;
+    log_info("min-cn: %s", ss.str().c_str());
+    reset(ss);
+    ss << dict2;
+    log_info("min-cn: %s", ss.str().c_str());
+}
+
 void Graph::PruneDetail(int u) {
     auto sd = 0;
     auto ed = degree[u] - 1;
@@ -121,26 +141,26 @@ void Graph::CheckCoreFirstBSP(int u) {
         auto ed = degree[u] - 1;
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             // be careful, the next line can only be commented when memory load/store of min_cn is atomic, no torn read
-            auto v = out_edges[edge_idx];
-            if (u <= v) {
-                if (min_cn[edge_idx] == SIMILAR) {
-                    ++sd;
-                    if (sd >= min_u) {
-                        log_info("min-max-pruning-sd (CORE), %d, %d, %d", u, sd, min_u);
-                        core_status_lst[u] = CORE;
-                        return;
-                    }
-                } else if (min_cn[edge_idx] == NOT_SIMILAR) {
-                    --ed;
-                    if (ed < min_u) {
-                        log_info("min-max-pruning-ed (NON-CORE), %d, %d, %d", u, ed, min_u);
-                        core_status_lst[u] = NON_CORE;
-                        return;
-                    }
+//            auto v = out_edges[edge_idx];
+//            if (u <= v) {
+            if (min_cn[edge_idx] == SIMILAR) {
+                ++sd;
+                if (sd >= min_u) {
+                    log_info("min-max-pruning-sd-ed (CORE), %d, %d, %d", u, sd, ed);
+                    core_status_lst[u] = CORE;
+                    return;
+                }
+            } else if (min_cn[edge_idx] == NOT_SIMILAR) {
+                --ed;
+                if (ed < min_u) {
+                    log_info("min-max-pruning-sd-ed (NON-CORE), %d, %d, %d", u, ed, ed);
+                    core_status_lst[u] = NON_CORE;
+                    return;
                 }
             }
+//            }
         }
-
+        log_info("init-sd-ed, %d, %d, %d", u, sd, ed);
         for (auto edge_idx = out_edge_start[u]; edge_idx < out_edge_start[u + 1]; edge_idx++) {
             auto v = out_edges[edge_idx];
             if (u <= v && min_cn[edge_idx] > 0) {
@@ -149,20 +169,21 @@ void Graph::CheckCoreFirstBSP(int u) {
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
-                        log_info("early-finalize (CORE), u:%d, sd:%d, min_u:%d", u, sd, min_u);
+                        log_info("early-finalize (CORE), u:%d, sd:%d, ed:%d", u, sd, ed);
                         core_status_lst[u] = CORE;
                         return;
                     }
                 } else {
                     --ed;
                     if (ed < min_u) {
-                        log_info("early-finalize (NON-CORE), u:%d, ed:%d, min_u:%d", u, ed, min_u);
+                        log_info("early-finalize (NON-CORE), u:%d, sd:%d, ed:%d", u, sd, ed);
                         core_status_lst[u] = NON_CORE;
                         return;
                     }
                 }
             }
         }
+        log_info("finalize (NON-SURE), u:%d, sd: %d, ed:%d", u, sd, ed);
     }
 }
 
@@ -174,7 +195,7 @@ void Graph::CheckCoreSecondBSP(int u) {
             if (min_cn[edge_idx] == SIMILAR) {
                 ++sd;
                 if (sd >= min_u) {
-                    log_info("min-max-pruning-sd (CORE), u:%d, sd:%d, min_u:%d", u, sd, min_u);
+                    log_info("min-max-pruning-sd-ed (CORE), %d, %d, %d", u, sd, ed);
                     core_status_lst[u] = CORE;
                     return;
                 }
@@ -182,7 +203,7 @@ void Graph::CheckCoreSecondBSP(int u) {
             if (min_cn[edge_idx] == NOT_SIMILAR) {
                 --ed;
                 if (ed < min_u) {
-                    log_info("min-max-pruning-ed (NON-CORE), u:%d, ed:%d, min_:%d", u, ed, min_u);
+                    log_info("min-max-pruning-sd-ed (NON-CORE), %d, %d, %d", u, sd, ed);
                     return;
                 }
             }
@@ -196,14 +217,14 @@ void Graph::CheckCoreSecondBSP(int u) {
                 if (min_cn[edge_idx] == SIMILAR) {
                     ++sd;
                     if (sd >= min_u) {
-                        log_info("finalize (CORE), u:%d, sd:%d, min_u:%d", u, sd, min_u);
+                        log_info("finalize (CORE), u:%d, sd: %d, ed:%d", u, sd, ed);
                         core_status_lst[u] = CORE;
                         return;
                     }
                 } else {
                     --ed;
                     if (ed < min_u) {
-                        log_info("finalize (NON-CORE), u:%d, ed:%d, min_u:%d", u, ed, min_u);
+                        log_info("finalize (NON-CORE), u:%d, sd: %d, ed:%d", u, sd, ed);
                         return;
                     }
                 }
@@ -218,13 +239,15 @@ void Graph::ClusterCoreFirstPhase(int u) {
         bool core_v = IsDefiniteCoreVertex(v);
         bool same_set = disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
                                                     static_cast<uint32_t>(v));
-        log_info("u:%d, v:%d, IsCore: %d, SameSet: %d, Pruning: %d", u, v, core_v,
-                 same_set, core_v && same_set ? 1 : 0);
+        if (u < v && core_v)
+                log_info("u:%d, v:%d, SameSet: %d, Pruning: %d", u, v, same_set, core_v && same_set ? 1 : 0);
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
                                                                              static_cast<uint32_t>(v))) {
             if (min_cn[j] == SIMILAR) {
-                log_info("union u: %d, v:%d", u, v);
                 disjoint_set_ptr->Union(static_cast<uint32_t>(u), static_cast<uint32_t>(v));
+                stringstream ss;
+                ss << *disjoint_set_ptr;
+                log_info("union u: %d, v:%d, \n%s", u, v, ss.str().c_str());
             }
         }
     }
@@ -236,16 +259,18 @@ void Graph::ClusterCoreSecondPhase(int u) {
         bool core_v = IsDefiniteCoreVertex(v);
         bool same_set = disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
                                                     static_cast<uint32_t>(v));
-        log_info("u:%d, v:%d, IsCore: %d, SameSet: %d, Pruning: %d", u, v, core_v,
-                 same_set, core_v && same_set ? 1 : 0);
+        if (u < v && core_v)
+                log_info("u:%d, v:%d, SameSet: %d, Pruning: %d", u, v, same_set, core_v && same_set ? 1 : 0);
         if (u < v && IsDefiniteCoreVertex(v) && !disjoint_set_ptr->IsSameSet(static_cast<uint32_t>(u),
                                                                              static_cast<uint32_t>(v))) {
             if (min_cn[edge_idx] > 0) {
                 min_cn[edge_idx] = EvalSimilarity(u, edge_idx);
                 log_info("eval u: %d, v:%d", u, v);
                 if (min_cn[edge_idx] == SIMILAR) {
-                    log_info("union u: %d, v:%d", u, v);
                     disjoint_set_ptr->Union(static_cast<uint32_t>(u), static_cast<uint32_t>(v));
+                    stringstream ss;
+                    ss << *disjoint_set_ptr;
+                    log_info("union u: %d, v:%d, \n%s", u, v, ss.str().c_str());
                 }
             }
         }
@@ -255,6 +280,9 @@ void Graph::ClusterCoreSecondPhase(int u) {
 void Graph::ClusterNonCoreDetail(int u, vector<pair<int, int>> &tmp_cluster) {
     for (auto j = out_edge_start[u]; j < out_edge_start[u + 1]; j++) {
         auto v = out_edges[j];
+        if (u == 2) {
+            log_info("%d, %d", v, !IsDefiniteCoreVertex(v));
+        }
         if (!IsDefiniteCoreVertex(v)) {
             auto root_of_u = disjoint_set_ptr->FindRoot(static_cast<uint32_t>(u));
             if (min_cn[j] > 0) {
@@ -327,6 +355,7 @@ void Graph::pSCANSecondPhaseCheckCore() {
     auto first_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core first-phase bsp time:"
          << duration_cast<milliseconds>(first_bsp_end - find_core_start).count() << " ms\n";
+    PrintMinCnBeauty();
 
     // check-core 2nd phase
     {
@@ -355,6 +384,8 @@ void Graph::pSCANSecondPhaseCheckCore() {
     auto second_bsp_end = high_resolution_clock::now();
     cout << "2nd: check core second-phase bsp time:"
          << duration_cast<milliseconds>(second_bsp_end - first_bsp_end).count() << " ms\n";
+
+    PrintMinCnBeauty();
 }
 
 void Graph::pSCANThirdPhaseClusterCore() {
@@ -512,22 +543,15 @@ void Graph::pSCANFourthPhaseClusterNonCore() {
 void Graph::pSCAN() {
     cout << "new algorithm ppSCAN" << endl;
     pSCANFirstPhasePrune();
-    stringstream ss;
-    ss << pretty_print_array(min_cn, out_edges.size()) << endl;
-    log_info("%s", ss.str().c_str());
+    PrintMinCnBeauty();
 
     pSCANSecondPhaseCheckCore();
-    reset(ss);
-    ss << pretty_print_array(min_cn, out_edges.size()) << endl;
-    log_info("%s", ss.str().c_str());
+    PrintMinCnBeauty();
+
 
     pSCANThirdPhaseClusterCore();
-    reset(ss);
-    ss << pretty_print_array(min_cn, out_edges.size()) << endl;
-    log_info("%s", ss.str().c_str());
+    PrintMinCnBeauty();
 
     pSCANFourthPhaseClusterNonCore();
-    reset(ss);
-    ss << pretty_print_array(min_cn, out_edges.size()) << endl;
-    log_info("%s", ss.str().c_str());
+    PrintMinCnBeauty();
 }

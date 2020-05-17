@@ -52,6 +52,8 @@ private:
     vector<int> cores;
 
 private:
+    void PrintMinCnBeauty();
+
     // easy-computation pruning optimization: common-neighbor check pruning, as a pre-processing phase
     int ComputeCnLowerBound(int u, int v);
 
