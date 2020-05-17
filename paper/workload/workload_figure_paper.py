@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import os
 
 LABEL_SIZE = 24
 TICK_SIZE = 24
@@ -84,6 +85,9 @@ def second_exp_fix_u_vary_datasets(input_name, output_name, suffix_str='pdf'):
 
 
 if __name__ == '__main__':
-    second_exp_fix_u_vary_datasets('exp2_fix_u5.md', 'workload_exp_fix_u_5', 'pdf')
-    second_exp_fix_u_vary_datasets('exp2_fix_u10.md', 'workload_exp_fix_u_10', 'pdf')
-    second_exp_fix_u_vary_datasets('exp2_fix_u15.md', 'workload_exp_fix_u_15', 'pdf')
+    suffix = 'png'
+    os.system('mkdir -p {}'.format('figures'))
+    # suffix = 'pdf'
+    second_exp_fix_u_vary_datasets('exp2_fix_u5.md', 'workload_exp_fix_u_5', suffix)
+    second_exp_fix_u_vary_datasets('exp2_fix_u10.md', 'workload_exp_fix_u_10', suffix)
+    second_exp_fix_u_vary_datasets('exp2_fix_u15.md', 'workload_exp_fix_u_15', suffix)

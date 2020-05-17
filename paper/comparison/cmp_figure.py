@@ -83,7 +83,7 @@ def draw_figures_per_platform(platform_tag):
     plt.subplots_adjust(top=0.6, wspace=0.4)
     plt.tight_layout()
 
-    plt.savefig('comparison_' + platform_tag + '.pdf', dpi=300)
+    plt.savefig('comparison_' + platform_tag + '.png', dpi=300)
     plt.close()
 
 

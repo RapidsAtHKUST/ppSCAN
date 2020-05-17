@@ -81,6 +81,6 @@ if __name__ == '__main__':
                        bbox_to_anchor=(0.1, 0.92, 0.8, .102), mode='expand')
     plt.tight_layout()
 
-    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'pdf', dpi=300)
+    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'png', dpi=300)
     # exp2_figure.show()
     plt.close()

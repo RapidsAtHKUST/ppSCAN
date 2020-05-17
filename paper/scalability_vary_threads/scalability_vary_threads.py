@@ -121,5 +121,5 @@ if __name__ == '__main__':
     plt.subplots_adjust(top=0.85)
     exp_figure.legend(legend_lst, ncol=3, prop={'size': LEGEND_SIZE - 4, "weight": "bold"},
                       loc="upper left", bbox_to_anchor=(0., 0.92, 1., .102), mode='expand')
-    plt.savefig('scalability_varying_threads_knl.' + 'pdf', dpi=300)
+    plt.savefig('scalability_varying_threads_knl.' + 'png', dpi=300)
     plt.close()

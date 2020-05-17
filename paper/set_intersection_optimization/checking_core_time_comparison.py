@@ -201,14 +201,14 @@ def draw_speedup():
                       bbox_to_anchor=(0.1, 0.92, 0.8, .102),
                       mode='expand')
 
-    plt.savefig('set_intersection_opt_speedup' + '.pdf', dpi=300)
+    plt.savefig('set_intersection_opt_speedup' + '.png', dpi=300)
     plt.close()
 
 
 if __name__ == '__main__':
     # display_comparison_txt()
     # draw_time()
-
+    os.system('mkdir -p {}'.format('figures'))
     get_speedup_lst('snap_orkut', knl_tag)
     get_speedup_lst('snap_orkut', gpu23_tag)
     draw_speedup()
