@@ -6,7 +6,7 @@ server_scalability_folder = '/home/yche//mnt/luocpu9/mnt/storage1/yche/git-repos
 
 eps_lst = [float(i + 1) / 10 for i in range(9)]
 u_lst = [2, 5, 10, 15]
-legend_lst = ['$\\mu = 2 $', '$\\mu = 5 $', '$\\mu = 10 $', '$\\mu = 15 $']
+legend_lst = ['\\textbf{' + name + '}' for name in ['$\\mu = 2 $', '$\\mu = 5 $', '$\\mu = 10 $', '$\\mu = 15 $']]
 
 LABEL_SIZE = 24
 TICK_SIZE = 24
@@ -53,6 +53,8 @@ def process_dataset(dataset):
 
 
 if __name__ == '__main__':
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
     ppscan_runtime_tag = 'ppSCAN Runtime (seconds)'
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
@@ -75,12 +77,12 @@ if __name__ == '__main__':
         my_ax.set_xticks(eps_lst)
         my_ax.tick_params(labelsize=LABEL_SIZE)
         my_ax.grid(True)
-    exp2_figure.subplots_adjust(top=0.7, wspace=0.4)
+    exp2_figure.subplots_adjust(top=0.6, wspace=0.4)
     exp2_figure.legend(legend_lst, ncol=len(legend_lst), prop={'size': LEGEND_SIZE, "weight": "bold"},
                        loc="upper left",
                        bbox_to_anchor=(0.1, 0.92, 0.8, .102), mode='expand')
     plt.tight_layout()
 
-    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'png', dpi=300)
+    plt.savefig('scalability_exp2_varying_u_and_eps.' + 'pdf', dpi=300)
     # exp2_figure.show()
     plt.close()

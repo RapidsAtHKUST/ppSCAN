@@ -74,7 +74,8 @@ def second_exp_fix_u_vary_datasets(input_name, output_name, suffix_str='pdf'):
         ax.tick_params(labelsize=TICK_SIZE)
         # ax.set_xlabel('$\\epsilon = $')
         ax.set_xlabel('$\\epsilon$' + '\n' + ax_title_lst[idx], fontsize=LABEL_SIZE)
-        ax.legend(('pSCAN', 'ppSCAN'), prop={'size': LEGEND_SIZE, "weight": "bold"})
+        ax.legend(['\\textbf{' + name + '}' for name in ['pSCAN', 'ppSCAN']],
+                  prop={'size': LEGEND_SIZE, "weight": "bold"})
         ax.set_xticks(x_lst)
         ax.set_ylabel('Normalized Number', fontsize=LABEL_SIZE - 2)
 
@@ -85,7 +86,9 @@ def second_exp_fix_u_vary_datasets(input_name, output_name, suffix_str='pdf'):
 
 
 if __name__ == '__main__':
-    suffix = 'png'
+    suffix = 'pdf'
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
     os.system('mkdir -p {}'.format('figures'))
     # suffix = 'pdf'
     second_exp_fix_u_vary_datasets('exp2_fix_u5.md', 'workload_exp_fix_u_5', suffix)

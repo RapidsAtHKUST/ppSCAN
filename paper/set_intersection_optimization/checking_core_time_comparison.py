@@ -192,22 +192,24 @@ def draw_speedup():
 
     exp_figure.subplots_adjust(wspace=0.4)
     plt.tight_layout()
-    legend_lst = ['ppSCAN speedup over ppSCAN-NO on CPU (AVX2)',
-                  'ppSCAN speedup over ppSCAN-NO on KNL (AVX512)']
+    legend_lst = ['\\textbf{' + name + '}' for name in ['ppSCAN speedup over ppSCAN-NO on CPU (AVX2)',
+                                                        'ppSCAN speedup over ppSCAN-NO on KNL (AVX512)']]
 
-    exp_figure.subplots_adjust(top=0.8)
+    exp_figure.subplots_adjust(top=0.85)
     exp_figure.legend(legend_lst, ncol=1,
                       prop={'size': LEGEND_SIZE, "weight": "bold"}, loc="upper left",
                       bbox_to_anchor=(0.1, 0.92, 0.8, .102),
                       mode='expand')
 
-    plt.savefig('set_intersection_opt_speedup' + '.png', dpi=300)
+    plt.savefig('set_intersection_opt_speedup' + '.pdf', dpi=300)
     plt.close()
 
 
 if __name__ == '__main__':
     # display_comparison_txt()
     # draw_time()
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
     os.system('mkdir -p {}'.format('figures'))
     get_speedup_lst('snap_orkut', knl_tag)
     get_speedup_lst('snap_orkut', gpu23_tag)

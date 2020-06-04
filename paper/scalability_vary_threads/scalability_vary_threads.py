@@ -13,8 +13,9 @@ eps = 0.2
 thread_lst = [2 ** i for i in range(9)]
 tag_lst = ['prune execution time', 'check core first-phase bsp time', 'check core second-phase bsp time',
            '3rd: core clustering time', 'non-core clustering time', 'Total time without IO']
-legend_lst = ['1. Similarity Pruning', '2. Core Checking and Consolidating', '3. Core Clustering',
-              '4. Non-Core Clustering', 'The Whole ppSCAN']
+legend_lst = ['\\textbf{' + name + '}' for name in
+              ['1. Similarity Pruning', '2. Core Checking and Consolidating', '3. Core Clustering',
+               '4. Non-Core Clustering', 'The Whole ppSCAN']]
 
 
 def filter_time_lst(runtime_tag, lines):
@@ -67,6 +68,9 @@ def get_ppscan_breakdown_runtime(dataset, eps, min_pts, thread_num, root_dir_pat
 
 if __name__ == '__main__':
     # print(get_ppscan_breakdown_runtime(dataset='snap_orkut', eps=0.2, min_pts=5, thread_num=256))
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    suffix = 'pdf'
     ppscan_runtime_tag = 'ppSCAN Runtime (s)'
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     sub_titles = ['(a) dataset = orkut', '(b) dataset = webbase', '(c) dataset = twitter', '(d) dataset = friendster']
@@ -121,5 +125,5 @@ if __name__ == '__main__':
     plt.subplots_adjust(top=0.85)
     exp_figure.legend(legend_lst, ncol=3, prop={'size': LEGEND_SIZE - 4, "weight": "bold"},
                       loc="upper left", bbox_to_anchor=(0., 0.92, 1., .102), mode='expand')
-    plt.savefig('scalability_varying_threads_knl.' + 'png', dpi=300)
+    plt.savefig('scalability_varying_threads_knl.' + suffix, dpi=300)
     plt.close()

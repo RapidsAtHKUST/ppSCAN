@@ -19,7 +19,9 @@ MARK_SIZE = 18
 if __name__ == '__main__':
     if not os.path.exists('figures'):
         os.mkdir('figures')
-
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    suffix = 'pdf'
     # gpu23
     ppscan_runtime_lst_lst = []
     ppscan_speedup_lst_lst = []
@@ -46,7 +48,8 @@ if __name__ == '__main__':
     eps_lst = [float(i + 1) / 10 for i in range(9)]
     exp2_figure, ax_tuple = plt.subplots(2, 2, figsize=(16, 8))
     # legend_lst = ['avg deg = 40', 'avg deg = 80', 'avg deg = 120', 'avg deg = 160']
-    legend_lst = ['ROLL-d40', 'ROLL-d80', 'ROLL-d120', 'ROLL-d160']
+    legend_lst = ['\\textbf{' + name + '}' for name in
+                  ['ROLL-d40', 'ROLL-d80', 'ROLL-d120', 'ROLL-d160']]
     ax_tuple = ax_tuple.flatten()
     ax = ax_tuple[0]
     shape_lst = ['o-.', 's--', '^:', 'v:', 'x-']
@@ -109,9 +112,9 @@ if __name__ == '__main__':
 
     plt.subplots_adjust(top=0.88)
     exp2_figure.legend(legend_lst, ncol=len(legend_lst),
-               prop={'size': LEGEND_SIZE, "weight": "bold"}, loc="upper left",
-               bbox_to_anchor=(0., 0.92, 1., .102), mode='expand')
+                       prop={'size': LEGEND_SIZE, "weight": "bold"}, loc="upper left",
+                       bbox_to_anchor=(0., 0.92, 1., .102), mode='expand')
 
-    plt.savefig('scalability_roll_graph.' + 'png', dpi=300)
+    plt.savefig('scalability_roll_graph.' + suffix, dpi=300)
     # exp2_figure.show()
     plt.close()

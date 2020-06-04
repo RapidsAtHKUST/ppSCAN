@@ -29,7 +29,7 @@ def get_time_lst(algorithm_name, tag, data_set, inf_val=10000):
     return list(time_lst_val)
 
 
-def draw_figures_per_platform(platform_tag):
+def draw_figures_per_platform(platform_tag, suffix='.pdf'):
     data_set_lst = ['snap_orkut', 'webgraph_webbase', 'webgraph_twitter', 'snap_friendster']
     eps_lst = [float(i + 1) / 10 for i in range(9)]
 
@@ -75,15 +75,16 @@ def draw_figures_per_platform(platform_tag):
         # my_ax.xaxis.set_label_coords(0.00, -0.045)
         my_ax.grid(True)
 
-    legend_lst = ['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN']
+    legend_lst = ['\\textbf{' + name + '}' for name in
+                  ['SCAN', 'pSCAN', 'anySCAN', 'SCAN-XP', 'ppSCAN']]
     exp_figure.legend(legend_lst, ncol=len(legend_lst),
                       prop={'size': LEGEND_SIZE, "weight": "bold"}, loc="upper left",
                       bbox_to_anchor=(0., 0.92, 1., .102),
                       mode="expand")
-    plt.subplots_adjust(top=0.6, wspace=0.4)
+    plt.subplots_adjust(top=0.55, wspace=0.4)
     plt.tight_layout()
 
-    plt.savefig('comparison_' + platform_tag + '.png', dpi=300)
+    plt.savefig('comparison_' + platform_tag + suffix, dpi=300)
     plt.close()
 
 
@@ -91,5 +92,8 @@ if __name__ == '__main__':
     # print get_time_lst('anyscan', gpu23_tag, 'webgraph_webbase', 10000)
     # print get_time_lst('ppscan', gpu23_tag, 'webgraph_webbase')
     # print get_time_lst('scan_super_naive', knl_tag, 'webgraph_webbase')
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
     draw_figures_per_platform(gpu23_tag)
     draw_figures_per_platform(knl_tag)
